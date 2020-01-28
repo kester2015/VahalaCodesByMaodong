@@ -3,8 +3,8 @@ close all
 clear
 clc
 %%
-filedir = "D:\Measurement Data\ThermalBroadening_20200126\20200126-inRange";
-fileToSaveDir = "D:\Measurement Data\ThermalBroadening_20200126\20200126-inRangeMat";
+filedir = "C:\Users\Lab\Documents\Maodong\20200127-broadeningFromOSC\1555nm-04";
+fileToSaveDir = "C:\Users\Lab\Documents\Maodong\20200127-broadeningFromOSC\1555nm-04-mat";
 
 binfiles = dir(strcat(filedir,'\*.bin') );
 %%
