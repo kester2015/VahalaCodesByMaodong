@@ -5,13 +5,19 @@ clc
 MZID1 = 39.9553; %MHz
 %%
 
-filedir = "D:\Measurement Data\Absorption project\20200130\1540nm-01-mat";
+filedir = "D:\Measurement Data\Absorption project\20200201-new\1540nm-01-mat";
 matfiles = dir(strcat(filedir,'\*.mat') );
 extractFreq = 50; % Hz
 FWHMList1 = zeros(length(matfiles),2);
+
+transList = zeros(length(matfiles));
+
+
 jj = 1;
 for ii = 1:length(matfiles)
     filename = strcat(filedir, '\', matfiles(ii).name);
+    
+    
     [sweepFreq, EOMPowerinput] = extractFreqAndPower(filename);
     if sweepFreq == extractFreq
         [~,FWHM] = getFWHM(filename);
@@ -34,11 +40,11 @@ end
 FWHMList1 = sortrows(FWHMList1,1);
 
 
-FWHMList1 = FWHMList1(8)
+% FWHMList1 = FWHMList1(8:end-4,:)
 
 %%
 
-filedir = "D:\Measurement Data\Absorption project\20200130\1540nm-02-mat";
+filedir = "D:\Measurement Data\Absorption project\20200201-new\1540nm-02-mat";
 matfiles = dir(strcat(filedir,'\*.mat') );
 extractFreq = 50; % Hz
 FWHMList2 = zeros(length(matfiles),2);
@@ -64,6 +70,9 @@ for ii = 1:length(matfiles)
     end
 end
 FWHMList2 = sortrows(FWHMList2,1);
+
+
+% FWHMList2 = FWHMList2(3:end-4,:)
 
 %%
 % extractFreq = 30; % Hz

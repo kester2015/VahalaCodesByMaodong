@@ -3,19 +3,29 @@ clear
 clc
 
 MZID1 = 39.9553; %MHz
+
+wavelength = 1550;
 %%
 
-filedir = "D:\Measurement Data\Absorption project\20200130\1540nm-01-mat";
+filedir = strcat("D:\Measurement Data\Absorption project\20200201-new\",num2str(wavelength),"nm-01-mat");
 matfiles = dir(strcat(filedir,'\*.mat') );
-extractFreq = 50; % Hz
+% extractFreq = 5; % Hz
 FWHMList1 = zeros(length(matfiles),2);
-jj = 1;
+
+transList = zeros(length(matfiles),1);
+
+
+% jj = 1;
+
 for ii = 1:length(matfiles)
     filename = strcat(filedir, '\', matfiles(ii).name);
-    [sweepFreq, EOMPowerinput] = extractFreqAndPower(filename);
-    if sweepFreq == extractFreq
+    
+    
+%     [sweepFreq, EOMPowerinput] = extractFreqAndPower(filename);
+%     if sweepFreq == extractFreq
         [~,FWHM] = getFWHM(filename);
         
+        transList(ii) = getTransmission(filename);
         
         FWHM = FWHM*MZID1; %MHz
         
@@ -26,27 +36,30 @@ for ii = 1:length(matfiles)
         
         EOMPower = sqrt(Ch1*Ch4)*sqrt(4.156*0.3374)/sqrt(1.76*1.82) ;
         
-        FWHMList1(jj,:) = [EOMPower FWHM];
+        FWHMList1(ii,:) = [EOMPower FWHM];
         
-        jj = jj + 1;
-    end
+%         jj = jj + 1;
+%     end
 end
 FWHMList1 = sortrows(FWHMList1,1);
 
 
-FWHMList1 = FWHMList1(8:end-4,:)
 
 %%
 
-filedir = "D:\Measurement Data\Absorption project\20200130\1540nm-02-mat";
+
+filedir = strcat("D:\Measurement Data\Absorption project\20200201-new\",num2str(wavelength),"nm-02-mat");
 matfiles = dir(strcat(filedir,'\*.mat') );
-extractFreq = 50; % Hz
+
+% extractFreq = 5; % Hz
+
 FWHMList2 = zeros(length(matfiles),2);
-jj = 1;
+% jj = 1;
 for ii = 1:length(matfiles)
     filename = strcat(filedir, '\', matfiles(ii).name);
-    [sweepFreq, EOMPowerinput] = extractFreqAndPower(filename);
-    if sweepFreq == extractFreq
+    
+%     [sweepFreq, EOMPowerinput] = extractFreqAndPower(filename);
+%     if sweepFreq == extractFreq
         [~,FWHM] = getFWHM(filename);
         
         
@@ -58,15 +71,15 @@ for ii = 1:length(matfiles)
         
         EOMPower = sqrt(Ch1*Ch4)*sqrt(4.204*0.2839)/sqrt(1.746*1.565) ;
         
-        FWHMList2(jj,:) = [EOMPower FWHM];
-        
-        jj = jj + 1;
-    end
+        FWHMList2(ii,:) = [EOMPower FWHM];
+%         
+%         jj = jj + 1;
+%     end
 end
 FWHMList2 = sortrows(FWHMList2,1);
 
 
-FWHMList2 = FWHMList2(3:end-4,:)
+
 
 %%
 % extractFreq = 30; % Hz
@@ -125,6 +138,7 @@ FWHMfit2 = coeff2(1)*FWHMList2(:,1)+coeff2(2);
 plot(FWHMList1(:,1),FWHMfit1,'--','LineWidth',2.0);
 hold on
 plot(FWHMList2(:,1),FWHMfit2,'--','LineWidth',2.0);
+title(strcat(num2str(wavelength),'nm'));
 meanSlope = sqrt( coeff1(1)* coeff2(1) ) % in MHz/mW
 
 

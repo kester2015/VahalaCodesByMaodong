@@ -1,5 +1,10 @@
 function [Base, FWHM] = getFWHM(filename)
 load(filename,'timeAxis','Ch2','Ch3');
+
+timeAxis = timeAxis(end/2:end);
+Ch2 = Ch2(end/2:end);
+Ch3 = Ch3(end/2:end);
+
 if length(timeAxis) > 1e4
         timeAxis = timeAxis(1:round(length(timeAxis)/1e4):end);
         Ch3= Ch3(1:round(length(Ch3)/1e4):end);

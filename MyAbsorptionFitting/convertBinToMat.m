@@ -1,9 +1,9 @@
 
-close all
+% close all
 clear
 clc
 %%
-filedir = "D:\Measurement Data\Absorption project\20200130\1545nm-03";
+filedir = "D:\Measurement Data\Absorption project\20200201-new\1560nm-02";
 fileToSaveDir = strcat(filedir,'-mat');
 if ~isfolder(fileToSaveDir)
     mkdir(fileToSaveDir);
