@@ -24,18 +24,18 @@ OSC.connect;
 %     Offset = input(['Please input new offset:']);
 % end
 
-VEOM = -1.1:0.1:2.2;
+VEOM = 0:0.05:1;
 
-% sweepFreq = 10:20:50;
-sweepFreq = 50;
+sweepFreq = 5;
+Vpp = 1.920;%1.920;
+Offset = 1.863;%2.263;
 
 
-Vpp = 1.920;
-Offset = 2.263;
 
 %         OSC.Write([':TIM:POS ' num2str(1/50*3/4)]);
 %         OSC.Write([':TIM:SCAL ' num2str(1/50/20)]);
 %%
+Myfg2.DC1 = 2.163;
 for m = 1 : length(VEOM)
     for n = 1 : length(sweepFreq)
 %         if Vpp/2 > Offset
@@ -55,20 +55,22 @@ for m = 1 : length(VEOM)
 %         Myfg1.TriggerExt1;
         Myfg2.DC2 = VEOM(m);       
         
-        
-        OSC.Write([':TIM:POS ' num2str(1/Freq0*3/4)]);
-        OSC.Write([':TIM:SCAL ' num2str(1/Freq0/20)]);
+         
+%         OSC.Write([':TIM:POS ' num2str(1/Freq0*3/4)]);
+%         OSC.Write([':TIM:SCAL ' num2str(1/Freq0/20)]);
+        OSC.Write([':TIM:POS ' num2str(1/Freq0*1/2)]);
+        OSC.Write([':TIM:SCAL ' num2str(1/Freq0/10)]);
         OSC.Single;
         pause(1);   
         Myfg1.Trigger1;
 %         Myfg2.Trigger1;
 %         pause(1.5*20/Freq0);
-                pause(2);  
+                pause(4);  
         %%
 %         dip_x = str2num(OSC.Query(':MEAS:TMIN? CHAN3'));
 %         mid_x = 1/Freq0*3/4;
         %
-        filename = strcat('C:\Users\Administrator\Documents\Maodong\20200127\1555nm-04\Sweep_', num2str(Freq0), 'Hz_Power_', num2str(VEOM(m)),'V.bin');
+        filename = strcat('C:\Users\Administrator\Documents\Maodong\20200203\es-1540nm\Sweep_', num2str(Freq0), 'Hz_Power_', num2str(VEOM(m)),'V.bin');
 %          filename = 'test';
         OSC.write2osc(filename);
 %         %% Control of frequency offset
@@ -86,6 +88,8 @@ for m = 1 : length(VEOM)
         disp('===========================================');
     end
 end
+
+sound(sin(2*pi*25*(1:4000)/100));
 % Myfg1.disconnect;
 % Myfg2.disconnect;
 % OSC.disconnect;
