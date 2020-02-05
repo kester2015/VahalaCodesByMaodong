@@ -24,18 +24,22 @@ OSC.connect;
 %     Offset = input(['Please input new offset:']);
 % end
 
-VEOM = 0:0.05:1;
+VEOM = 0:0.04:1;
 
 sweepFreq = 5;
 Vpp = 1.920;%1.920;
-Offset = 1.863;%2.263;
+Offset = -2.237;%2.263;
+
+
+Myfg2.DC1 = 2.093;
 
 
 
 %         OSC.Write([':TIM:POS ' num2str(1/50*3/4)]);
 %         OSC.Write([':TIM:SCAL ' num2str(1/50/20)]);
 %%
-Myfg2.DC1 = 2.163;
+
+
 for m = 1 : length(VEOM)
     for n = 1 : length(sweepFreq)
 %         if Vpp/2 > Offset
@@ -70,7 +74,7 @@ for m = 1 : length(VEOM)
 %         dip_x = str2num(OSC.Query(':MEAS:TMIN? CHAN3'));
 %         mid_x = 1/Freq0*3/4;
         %
-        filename = strcat('C:\Users\Administrator\Documents\Maodong\20200203\es-1540nm\Sweep_', num2str(Freq0), 'Hz_Power_', num2str(VEOM(m)),'V.bin');
+        filename = strcat('C:\Users\Administrator\Documents\Maodong\20200204\1565nm-02\Sweep_', num2str(Freq0), 'Hz_Power_', num2str(VEOM(m)),'V.bin');
 %          filename = 'test';
         OSC.write2osc(filename);
 %         %% Control of frequency offset

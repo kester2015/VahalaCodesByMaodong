@@ -1,9 +1,9 @@
 
-
+close all
 
 wavelength = 1550;
 filedir = strcat("D:\Measurement Data\Absorption project\20200201-new\",num2str(wavelength),"nm-01-mat");
-
+filedir = "C:\Users\Lab\Documents\Maodong\20200203\test-1550nm-mat";
 matfiles = dir(strcat(filedir,'\*.mat') );
 % extractFreq = 5; % Hz
 FWHMList1 = zeros(length(matfiles),2);
@@ -20,8 +20,9 @@ for ii = 1:length(matfiles)
         timeAxis = timeAxis(1:round(length(timeAxis)/1e4):end);
         Ch2 = Ch2(1:round(length(Ch2)/1e4):end);
     end
+    Ch2 = Ch2 + 3.09e-3;
     
-    maxCh2 = max(Ch2);
+    maxCh2 = median(Ch2);
 %     minCh2 = min(Ch2);
     
     normalCh2 = Ch2/maxCh2;
