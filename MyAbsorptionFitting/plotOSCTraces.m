@@ -12,11 +12,13 @@ function hh = plotOSCTraces(filename)
     hold on
     plot(timeAxis,Ch2);
     hold on
-    plot(timeAxis,Ch3);
-    hold on
+%     plot(timeAxis,Ch3);
+%     hold on
     plot(timeAxis,Ch4);
     hold on
-    legend({'Ch1','Ch2','Ch3','Ch4'});
+    legend({'Ch1','Ch2','Ch4'});
     xlabel('Time/s');
     ylabel('Voltage/V');
+    tt = strsplit(filename,'\');
+    title(tt(end),'Interpreter','none');
 end

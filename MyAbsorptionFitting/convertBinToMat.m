@@ -3,7 +3,7 @@
 clear
 clc
 
-datadir = "C:\Users\Lab\Documents\Maodong\20200203";
+datadir = "D:\Measurement Data\Absorption project\20200211";
 allSubfolders = dir(datadir);
 
 
@@ -17,13 +17,16 @@ for kk = 1:length(allSubfolders)
             
             
             fileToSaveDir = strcat(filedir,'-mat');
-            if ~isfolder(fileToSaveDir)
-                mkdir(fileToSaveDir);
-            end
+%             if ~isfolder(fileToSaveDir)
+%                 mkdir(fileToSaveDir);
+%             end
 
             binfiles = dir(strcat(filedir,'\*.bin') );
             %%
             for ii = 1:length(binfiles)
+                if ~isfolder(fileToSaveDir)
+                    mkdir(fileToSaveDir);
+                end
                 filename = strcat(filedir, '\', binfiles(ii).name);
 
                 [timeAxis, Ch1] = importAgilentBin(filename, 1);

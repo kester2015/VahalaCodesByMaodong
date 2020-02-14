@@ -174,7 +174,7 @@ for count = 1:length(wavelengthList)
     pause(1);
 
 
-    %% Calculate n2 here
+    % Calculate n2 here
     Qtot = QtotList(count);
     Qext = QextList(count);
 
@@ -203,7 +203,7 @@ for count = 1:length(wavelengthList)
     QabsList(count) = Qabs;
     
     
-    %% Calculate n2 over coupling here
+    % Calculate n2 over coupling here
     Qtot = QtotList(count);
     Qext = QextList(count);
 
@@ -237,23 +237,21 @@ end
 
 figure;
 scatter(wavelengthList,n2List,'LineWidth',2.0);
-% hold on
-% scatter(wavelengthList,n2ListOC,'LineWidth',2.0);
+hold on
+scatter(wavelengthList,n2ListOC,'LineWidth',2.0);
 xlabel('wavelength / nm');
 ylabel('n2 / MHz/mW');
 title("n2 for different wavelength");
-% legend({'under couple'})
-% legend({'under couple','over couple'})
+legend({'under couple','over couple'})
 
 figure;
 scatter(wavelengthList,QabsList,'LineWidth',2.0);
 hold on
-% scatter(wavelengthList,QabsListOC,'LineWidth',2.0);
+scatter(wavelengthList,QabsListOC,'LineWidth',2.0);
 xlabel('wavelength / nm');
 ylabel('Qabs');
 title("Qabs for different wavelength");
-% legend({'under couple'})
-% legend({'under couple','over couple'})
+legend({'under couple','over couple'})
 
 %%
 % tt = rmoutliers(FWHMList1,'movmedian',6);

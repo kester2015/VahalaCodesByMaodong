@@ -1,34 +1,68 @@
 
 close all
 
-wavelength = 1550;
-filedir = strcat("D:\Measurement Data\Absorption project\20200201-new\",num2str(wavelength),"nm-01-mat");
-filedir = "C:\Users\Lab\Documents\Maodong\20200203\test-1550nm-mat";
-matfiles = dir(strcat(filedir,'\*.mat') );
-% extractFreq = 5; % Hz
-FWHMList1 = zeros(length(matfiles),2);
+wavelengthList = 1540;
+highNoiseThreshold = 0.1;
 
-transList = zeros(length(matfiles),1);
+for wavelength = wavelengthList
+    filedirGolb = strcat("D:\Measurement Data\Absorption project\20200204\",num2str(wavelength));
 
-figure;
+    filedir = strcat(filedirGolb,"nm-01-mat");
+    matfiles = dir(strcat(filedir,'\*.mat') );
+    % extractFreq = 5; % Hz
+    FWHMList1 = zeros(length(matfiles),2);
+    transList = zeros(length(matfiles),1);
 
-for ii = 1:length(matfiles)
-    filename = strcat(filedir, '\', matfiles(ii).name);
-    
-    load(filename,'timeAxis','Ch2');
-    if length(Ch2) > 1e4
-        timeAxis = timeAxis(1:round(length(timeAxis)/1e4):end);
-        Ch2 = Ch2(1:round(length(Ch2)/1e4):end);
+    figure('Units', 'Normalized', 'OuterPosition', [2.1, 0.45, 0.55, 0.5]);
+    subplot(121)
+    for ii = 1:length(matfiles)
+        filename = strcat(filedir, '\', matfiles(ii).name);
+        [sweepFreq, EOMPower] = extractFreqAndPower(filename);
+        if EOMPower < highNoiseThreshold
+            continue;
+        end
+
+        load(filename,'timeAxis','Ch2');
+        if length(Ch2) > 1e4
+            timeAxis = timeAxis(1:round(length(timeAxis)/1e4):end);
+            Ch2 = Ch2(1:round(length(Ch2)/1e4):end);
+        end
+        Ch2 = Ch2 + 3.09e-3;
+        maxCh2 = median(Ch2);
+    %     minCh2 = min(Ch2);
+        normalCh2 = Ch2/maxCh2;
+        plot(timeAxis,normalCh2);
+        hold on    
     end
-    Ch2 = Ch2 + 3.09e-3;
+    title(strcat(num2str(wavelength),'nm', ', Not reversed'));
+    xlabel('time / s')
+    ylabel('Normalized transmission')
+
+
+    FWHMList1 = zeros(length(matfiles),2);
+    filedir = strcat(filedirGolb,"nm-02-mat");
+    subplot(122)
+    for ii = 1:length(matfiles)
+        filename = strcat(filedir, '\', matfiles(ii).name);
+        [sweepFreq, EOMPower] = extractFreqAndPower(filename);
+        if EOMPower < highNoiseThreshold
+            continue;
+        end
+        load(filename,'timeAxis','Ch2');
+        if length(Ch2) > 1e4
+            timeAxis = timeAxis(1:round(length(timeAxis)/1e4):end);
+            Ch2 = Ch2(1:round(length(Ch2)/1e4):end);
+        end
+        Ch2 = Ch2 + 3.09e-3;
+        maxCh2 = median(Ch2);
+    %     minCh2 = min(Ch2); 
+        normalCh2 = Ch2/maxCh2;
+        plot(timeAxis,normalCh2);
+        hold on    
+    end
+    title(strcat(num2str(wavelength),'nm', ', Reversed'));
+    xlabel('time / s')
+    ylabel('Normalized transmission')
     
-    maxCh2 = median(Ch2);
-%     minCh2 = min(Ch2);
-    
-    normalCh2 = Ch2/maxCh2;
-    plot(timeAxis,normalCh2);
-    hold on    
+    pause(1);
 end
-title(strcat(num2str(wavelength),'nm', ', Not reversed'));
-xlabel('time / s')
-ylabel('Normalized transmission')
