@@ -22,7 +22,7 @@ function varargout = ExperimentGUI(varargin)
 
 % Edit the above text to modify the response to help ExperimentGUI
 
-% Last Modified by GUIDE v2.5 04-Jan-2020 14:57:38
+% Last Modified by GUIDE v2.5 16-Feb-2020 16:44:24
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -195,7 +195,7 @@ winopen([handles.Directory.String, handles.Prefix.String]);
 
 function Method_Callback(hObject, eventdata, handles)
 global Config;
-handles.SetWhenRun.Value = 1;
+handles.SetWhenRun.Value = 0;
 handles.Scan.Value = 0;
 handles.Scan.Enable = 'off';
 handles.Scan_Range.Enable = 'off';
@@ -612,8 +612,8 @@ switch handles.Method.Value
     case 4
         %% Reading
         NChan = 4; % Number of channel
-        %% Device.osc.Stop;
-        [X,Y] = Device.osc.readmultipletrace(NChan,[]);
+        Device.osc.Stop;
+        [X,Y] = Device.osc.readmultipletrace(1:NChan,[]);
         figure;
         for ii = 1:NChan
             chanstr=['Channel ',num2str(ii)];
@@ -623,9 +623,11 @@ switch handles.Method.Value
         end
         save([filename_raw '.mat'],'X','Y');
         filename = filename_raw;
+        Device.osc.Run;
 end
 Data.Currfilename = filename;
 fprintf('Finished\r\n');
+Device.osc.HighRes; % change back to High res mode
 
 %% Dispersion Process
 function Disper = ProcessDispersion(handles,filename)
@@ -1033,3 +1035,12 @@ function QSens_KeyPressFcn(hObject, eventdata, handles)
 %	Character: character interpretation of the key(s) that was pressed
 %	Modifier: name(s) of the modifier key(s) (i.e., control, shift) pressed
 % handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in pushbutton20.
+function pushbutton20_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton20 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global Device
+Device.osc.HighRes;

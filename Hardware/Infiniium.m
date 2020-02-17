@@ -275,6 +275,10 @@ classdef Infiniium < handle
           %  end
         end
         
+        function HighRes(Obj)
+            Obj.Write(':ACQ:MODE HRES');
+        end
+        
     end
     
     methods (Static = true)

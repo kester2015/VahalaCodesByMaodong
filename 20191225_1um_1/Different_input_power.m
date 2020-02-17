@@ -24,14 +24,14 @@ OSC.connect;
 %     Offset = input(['Please input new offset:']);
 % end
 
-VEOM = 0:0.04:1;
+VAOM = 0:0.04:1;
 
 sweepFreq = 5;
 Vpp = 1.920;%1.920;
-Offset = -2.237;%2.263;
+Offset = 0.363;%2.263;
 
 
-Myfg2.DC1 = 2.093;
+Myfg2.DC1 = 2.083;
 
 
 
@@ -40,7 +40,7 @@ Myfg2.DC1 = 2.093;
 %%
 
 
-for m = 1 : length(VEOM)
+for m = 1 : length(VAOM)
     for n = 1 : length(sweepFreq)
 %         if Vpp/2 > Offset
 %             disp('Error! Negative voltage on laser piezo!!');
@@ -57,7 +57,7 @@ for m = 1 : length(VEOM)
         Myfg1.Freq1 =[Freq0 Vpp Offset];
         Myfg1.Phase1 = 90;
 %         Myfg1.TriggerExt1;
-        Myfg2.DC2 = VEOM(m);       
+        Myfg2.DC2 = VAOM(m);       
         
          
 %         OSC.Write([':TIM:POS ' num2str(1/Freq0*3/4)]);
@@ -74,7 +74,7 @@ for m = 1 : length(VEOM)
 %         dip_x = str2num(OSC.Query(':MEAS:TMIN? CHAN3'));
 %         mid_x = 1/Freq0*3/4;
         %
-        filename = strcat('C:\Users\Administrator\Documents\Maodong\20200204\1565nm-02\Sweep_', num2str(Freq0), 'Hz_Power_', num2str(VEOM(m)),'V.bin');
+        filename = strcat('C:\Users\Administrator\Documents\Maodong\20200211\1535nm-02\Sweep_', num2str(Freq0), 'Hz_Power_', num2str(VAOM(m)),'V.bin');
 %          filename = 'test';
         OSC.write2osc(filename);
 %         %% Control of frequency offset
@@ -83,12 +83,12 @@ for m = 1 : length(VEOM)
 %         Offset = Offset + 0.05*err + 0.001*Error_I;
         %% Display status 
         disp('===========================================');
-        disp(strcat('Scanning number ', num2str(m), ' of ', num2str(length(VEOM))));
+        disp(strcat('Scanning number ', num2str(m), ' of ', num2str(length(VAOM))));
         disp(strcat('Sub scanning number ', num2str(n), ' of 3'));
         disp(strcat('Sweep Frequency:', num2str(Freq0), 'Hz'));
         disp(strcat('Vpp:', num2str(Vpp*1e3), 'mV'));
         disp(strcat('Offset:', num2str(Offset), 'V'));
-        disp(strcat('Voltage on EOM:', num2str(VEOM(m)), 'V'));
+        disp(strcat('Voltage on EOM:', num2str(VAOM(m)), 'V'));
         disp('===========================================');
     end
 end
