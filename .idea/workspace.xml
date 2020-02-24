@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="ca33173f-5080-4c2c-835b-73d90a93851b" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/MyAbsorptionFitting/extractFWHMForEachFreq.asv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MyAbsorptionFitting/convertBinToMat.asv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/MyAbsorptionFitting/convertBinToMat.m" beforeDir="false" afterPath="$PROJECT_DIR$/MyAbsorptionFitting/convertBinToMat.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MyAbsorptionFitting/extractFWHMForEachFreq.m" beforeDir="false" afterPath="$PROJECT_DIR$/MyAbsorptionFitting/extractFWHMForEachFreq.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MyAbsorptionFitting/plotEachPowerTrace.m" beforeDir="false" afterPath="$PROJECT_DIR$/MyAbsorptionFitting/plotEachPowerTrace.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MyAbsorptionFitting/plotOSCTraces.m" beforeDir="false" afterPath="$PROJECT_DIR$/MyAbsorptionFitting/plotOSCTraces.m" afterDir="false" />
+    </list>
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="1XmGtM2coBLV3sd9OS47yX2VH3H" />
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="ca33173f-5080-4c2c-835b-73d90a93851b" name="Default Changelist" comment="" />
+      <created>1581644073282</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1581644073282</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>

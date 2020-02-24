@@ -20,12 +20,18 @@ outputVoltage2List = [520 504 605 607 413 312.8 455.5]*1e-3; %V
 outputPower2List = [775.4 808.0 933.9 990.7 635.8 497.8 737.7]*1e-3;%mW
 inputVoltage2List = [2.15 1.72 1.99 2.05 1.932 1.25 1.70]; %V
 inputPower2List = [5.342 4.414 5.075 5.388 4.925 3.383 4.605];%mW
+
 QtotList = [0.7888 1.297 0.797 1.331 1.203 1.112 1.284]*1e6;
 QextList = [5.945 4.588 4.52 4.501 3.262 3.378 3.081]*1e6;
 
 
 kerrOverTotalList = 1 - [0.9319 0.9030 0.9299 0.8982 0.9003 0.9080 0.8970];
 
+kerrOverTotalList = [0.0810 0.166 0.0844 0.199 0.1202 0.1076 0.1208];
+
+kerrOverTotalList = [0.0830 0.1196 0.0865 0.1231 0.1234 0.1104 0.1239]; 
+
+kerrOverTotalList = [0.0825 0.1187 0.0852 0.1235 0.1236 0.1103 0.1243];
 %------20200204-----------%
 % outputVoltage1List = [475.87 511.71 472.40 439.27 461.33 448.20]*1e-3; %V
 % outputPower1List = [796.2 800.5 803.6 684.6 792.0 711.0] *1e-3;%mW
@@ -167,13 +173,20 @@ for count = 1:length(wavelengthList)
     plot(FWHMList1forfit(:,1),FWHMfit1,'--','LineWidth',2.0);
     hold on
     plot(FWHMList2forfit(:,1),FWHMfit2,'--','LineWidth',2.0);
-    meanSlope = sqrt( coeff1(1)* coeff2(1) ) % in MHz/mW
+    meanSlope(count) = sqrt( coeff1(1)* coeff2(1) ) % in MHz/mW
     xlabel('waveguide Power / mW');
     ylabel('FWHM / MHz');
     title(strcat(num2str(wavelength),'nm'));
     pause(1);
 
-
+end
+save(strcat(filedirGolb,'meanSlope.mat'),'meanSlope');
+%%
+for count = 1:length(wavelengthList)
+    %%
+    load(strcat(filedirGolb,'meanSlope.mat'),'meanSlope');
+    wavelength = wavelengthList(count);
+    
     %% Calculate n2 here
     Qtot = QtotList(count);
     Qext = QextList(count);
@@ -181,19 +194,19 @@ for count = 1:length(wavelengthList)
     c = 299792458;
     lambda = wavelength * 1e-9; % normalize ti SI unit
     omega=c/lambda*2*pi;
-    n0=3.3;
+    n0 = 2.8639;
     kappa = c/lambda/Qtot*2*pi; % in rad/s
     ita = Qtot/Qext;
     r = 719.38e-6;
-    Aeff = 2.63e-13;
+    Aeff = 2.540e-13;
 
-    alpha = meanSlope*2*pi*1e6/1e-3* kappa/2/ita ;
+    alpha = meanSlope(count)*2*pi*1e6/1e-3* kappa/2/ita ;
 
     kerrOverTotal = kerrOverTotalList(count);
     g=(kerrOverTotal)*alpha;
     n2=g*n0^2*Aeff*2*pi*r/omega/c;
 
-    n2List(count) = n2;
+    n2List(count) = n2 * 0.8737;
 
     nT = 2.3e-4;
     dTdP = 88.354;
@@ -210,19 +223,19 @@ for count = 1:length(wavelengthList)
     c = 299792458;
     lambda = wavelength * 1e-9; % normalize ti SI unit
     omega=c/lambda*2*pi;
-    n0=3.3;
+    n0=2.8639;
     kappa = c/lambda/Qtot*2*pi; % in rad/s
     ita = 1 - Qtot/Qext;
     r = 719.38e-6;
-    Aeff = 2.63e-13;
+    Aeff = 2.540e-13;
 
-    alpha = meanSlope*2*pi*1e6/1e-3* kappa/2/ita ;
+    alpha = meanSlope(count)*2*pi*1e6/1e-3* kappa/2/ita ;
 
     kerrOverTotal = kerrOverTotalList(count);
     g=(kerrOverTotal)*alpha;
     n2=g*n0^2*Aeff*2*pi*r/omega/c;
 
-    n2ListOC(count) = n2;
+    n2ListOC(count) = n2 * 0.8737;
 
     nT = 2.3e-4;
     dTdP = 88.354;
@@ -240,7 +253,7 @@ scatter(wavelengthList,n2List,'LineWidth',2.0);
 % hold on
 % scatter(wavelengthList,n2ListOC,'LineWidth',2.0);
 xlabel('wavelength / nm');
-ylabel('n2 / MHz/mW');
+ylabel('n2 / m^2/W');
 title("n2 for different wavelength");
 % legend({'under couple'})
 % legend({'under couple','over couple'})
@@ -251,6 +264,7 @@ hold on
 % scatter(wavelengthList,QabsListOC,'LineWidth',2.0);
 xlabel('wavelength / nm');
 ylabel('Qabs');
+ylim([0 10]*1e6)
 title("Qabs for different wavelength");
 % legend({'under couple'})
 % legend({'under couple','over couple'})
