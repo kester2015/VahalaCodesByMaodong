@@ -17,6 +17,11 @@ for kk = 1:length(allSubfolders)
             
             
             fileToSaveDir = strcat(filedir,'-mat');
+            
+            if isfolder(fileToSaveDir)
+                continue;
+            end
+            
 %             if ~isfolder(fileToSaveDir)
 %                 mkdir(fileToSaveDir);
 %             end
