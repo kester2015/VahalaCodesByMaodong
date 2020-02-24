@@ -279,6 +279,10 @@ classdef Infiniium < handle
             Obj.Write(':ACQ:MODE HRES');
         end
         
+        function AutoMemoryDepth(Obj)
+            Obj.Write(':ACQ:POIN:ANAL AUTO');
+        end
+        
     end
     
     methods (Static = true)

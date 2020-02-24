@@ -628,6 +628,7 @@ end
 Data.Currfilename = filename;
 fprintf('Finished\r\n');
 Device.osc.HighRes; % change back to High res mode
+Device.osc.AutoMemoryDepth; % change back to AUTO analog memory depth
 
 %% Dispersion Process
 function Disper = ProcessDispersion(handles,filename)
