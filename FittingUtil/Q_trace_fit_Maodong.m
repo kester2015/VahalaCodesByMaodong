@@ -8,18 +8,16 @@
 %   trace_MZI (N*1 double) is the oscilloscope MZI trace;
 %   MZI_FSR (double) is the MZI FSR, in MHZ;
 %   lambda (double) is the center wavelength, in nm;
-%   threshold (optional; double, from 0 to 0.995) is the threshold for peak
+%   threshold (optional; double, from 0 to 0.95) is the threshold for peak
 %     detection. 0 does not detect peaks, and 0.95 is most sensitive.
 %     Defaults to 0;
-%   corr_type (optional; '' | 'fano' | 'split' | 'osc' | append with 'mzi')
+%   corr_type (optional; '' | 'MZI' | 'Q' | 'all' | 'osc' | 'oscall')
 %     instructs the code to correct for non-ideal lineshapes. First four
-%     options are no correction, Fano lineshapes, mode splitting, or trying
-%     to remove low-frequency sine components from the Q trace background
-%     with Fourier transform. Appending any option with 'MZI' also corrects
-%     scanning drift with the Hilbert transform. Case-insensitive. Defaults
-%     to '';
+%     options are no correction, MZI scan drift, Fano lineshapes, or both.
+%     Last two options use Fourier transform and try to remove low-freq 
+%     sine components from the Q trace background. Defaults to '';
 %   cutoff_freq (optional; int) is the cutoff frequency used in 'osc' and
-%     'oscmzi'. Sine components with less than cutoff_freq periods will be
+%     'oscall'. Sine components with less than cutoff_freq periods will be
 %     removed. If not specified the code attempts to find a frequency by
 %     analyzing the Q trace.
 % 
@@ -39,8 +37,7 @@ classdef Q_trace_fit
         MZI_FSR
         lambda
         threshold
-        flag_fano_corr
-        flag_split_corr
+        flag_Q_corr
         flag_osc_corr
         flag_MZI_corr
         cutoff_freq
@@ -76,38 +73,23 @@ classdef Q_trace_fit
             if nargin<6 % determine the correction type to be applied
                 corr_type='';
             end
-            flag_fano_corr=false;
-            flag_split_corr=false;
+            flag_Q_corr=false;
             flag_osc_corr=false;
             flag_MZI_corr=false;
-            corr_type=lower(corr_type);
             switch corr_type
                 case ''
                 case blanks(0)
                     % no correction
-                case 'fano'
-                    flag_fano_corr=true;
-                case 'split'
-                    flag_split_corr=true;
+                case 'MZI'
+                    flag_MZI_corr=true;
+                case 'Q'
+                    flag_Q_corr=true;
+                case 'all'
+                    flag_Q_corr=true;
+                    flag_MZI_corr=true;
                 case 'osc'
                     flag_osc_corr=true;
-                case 'mzi'
-                    flag_MZI_corr=true;
-                case 'fanomzi'
-                    flag_fano_corr=true;
-                    flag_MZI_corr=true;
-                case 'splitmzi'
-                    flag_split_corr=true;
-                    flag_MZI_corr=true;
-                case 'oscmzi'
-                    flag_osc_corr=true;
-                    flag_MZI_corr=true;
-%                 case 'splitosc'
-%                     flag_osc_corr=true;
-%                     flag_split_corr=true;
-                case 'all'
-                    flag_fano_corr=true;
-                    flag_split_corr=true;
+                case 'oscall'
                     flag_osc_corr=true;
                     flag_MZI_corr=true;
                 otherwise
@@ -180,8 +162,6 @@ classdef Q_trace_fit
             fit_Lorentz=fittype('A*(1-LP/(LS^2+(x-x0)^2))','coefficients',{'A','LP','LS','x0'});
             % Lorentz lineshape, with correction against Fano lineshape caused by multimode tapers
             fit_Lorentz_corr=fittype('A*((x-x0+F0)^2+LS^2-LP)/(LS^2+(x-x0)^2)','coefficients',{'A','LP','LS','x0','F0'});
-            % Lorentz lineshape, with mode splitting
-            fit_Lorentz_split=fittype('A*(1-(4*kin*((2*LS-kin)*(4*LS^2+4*(x-x0)^2)+8*LS*g2))/((4*LS^2+4*(x-x0)^2-4*g2)^2+64*LS^2*g2))','coefficients',{'A','kin','LS','x0','g2'});
             % Lorentz-Gibbs lineshape, used for fitting signals after high-pass filters
             fit_Lorentz_osc=fittype('AL*LS^2*(cos((x-x0)*f0)-(x-x0)/LS*sin((x-x0)*f0))/(LS^2+(x-x0)^2)','coefficients',{'AL','LS','x0'},'problem',{'f0'});
             % Sine lineshape, with T=period, in pixels
@@ -218,32 +198,18 @@ classdef Q_trace_fit
                     
                     trace_Q_tofit=trace_Q(peakstart:peakend);
                     Q_fit=fit((peakstart-peakpos:peakend-peakpos).', trace_Q_tofit, fit_Lorentz, ...
-                        'StartPoint', [Q_baseline, (1-transmission)*linewidth^2/4, linewidth/2, 0]); % Lorentz fit, {'A','LP','LS','x0'}
+                        'StartPoint', [Q_baseline, (1-transmission)*linewidth^2/4, linewidth/2, 0]); % Lorentz fit
                     kappa=2*abs(Q_fit.LS); % LS may be negative due to nonlinear fitting
                     kappa0=abs(Q_fit.LS)+sqrt(Q_fit.LS^2-Q_fit.LP);
                     Q_baseline=Q_fit.A;
                     transmission=Q_fit(Q_fit.x0)/Q_fit.A;
-                    if ~flag_split_corr
-                        if flag_fano_corr
-                            Q_fit=fit((peakstart-peakpos:peakend-peakpos).', trace_Q_tofit, fit_Lorentz_corr, ...
-                                'StartPoint', [Q_fit.A, Q_fit.LP, abs(Q_fit.LS), Q_fit.x0, 0]); % Fano fit, {'A','LP','LS','x0','F0'}
-                            kappa=2*abs(Q_fit.LS);
-                            kappa0=abs(Q_fit.LS)+sqrt(Q_fit.LS^2-Q_fit.LP);
-                            Q_baseline=Q_fit.A;
-                            transmission=Q_fit(Q_fit.x0-Q_fit.F0*Q_fit.LS^2/Q_fit.LP)/Q_fit.A;
-                        end
-                    else
-                        peakend=min(peakpos+10*linewidth,trace_length);
-                        peakstart=max(peakpos-10*linewidth,1);
-                        trace_Q_trunc(peakstart:peakend)=1;
-                        trace_Q_tofit=trace_Q(peakstart:peakend);
-                        peakrange=find(trace_Q_tofit<trace_Q_baseline(peakstart:peakend)*(1+transmission)/2);
-                        g2estimate=max([(max(peakrange)-min(peakrange))^2/4-linewidth^2,0]);
-                        peakdirection=sign(max(peakrange)+min(peakrange)-length(trace_Q_tofit));
-                        Q_fit=fit((peakstart-peakpos:peakend-peakpos).', trace_Q_tofit, fit_Lorentz_split, ...
-                            'StartPoint', [Q_fit.A, kappa-kappa0, abs(Q_fit.LS), Q_fit.x0+peakdirection*sqrt(g2estimate), g2estimate]); % split fit, {'A','kin','LS','x0','g2'}
+                    if flag_Q_corr
+                        Q_fit=fit((peakstart-peakpos:peakend-peakpos).', trace_Q_tofit, fit_Lorentz_corr, ...
+                            'StartPoint', [Q_fit.A, Q_fit.LP, abs(Q_fit.LS), Q_fit.x0, 0]); % Fano fit
                         kappa=2*abs(Q_fit.LS);
-                        kappa0=2*abs(Q_fit.LS)-Q_fit.kin;
+                        kappa0=abs(Q_fit.LS)+sqrt(Q_fit.LS^2-Q_fit.LP);
+                        Q_baseline=Q_fit.A;
+                        transmission=Q_fit(Q_fit.x0-Q_fit.F0*Q_fit.LS^2/Q_fit.LP)/Q_fit.A;
                     end
                     if transmission<=0 % Apparant negative transmission warning
                         warning('A fitted peak has apparant negative transmission of %.2g. The coupling will be assumed critical, but this will introduce a relative error of %.1g.', ...
@@ -318,7 +284,7 @@ classdef Q_trace_fit
                     
                     MZI_fit_data=mean(trace_MZI_tofit)+real(trace_MZI_phasor((peakstart-MZIstart+1):(end-MZIend+peakend)));
                     trace_MZI_peakpos=peakpos-MZIstart+1;
-                    MZI_fit_T=4*pi*round(MZI_period_local/4)/(trace_MZI_phase(trace_MZI_peakpos+round(MZI_period_local/4))-trace_MZI_phase(trace_MZI_peakpos-round(MZI_period_local/4)));
+                    MZI_fit_T=4*pi/(trace_MZI_phase(trace_MZI_peakpos+1)-trace_MZI_phase(trace_MZI_peakpos-1));
                     MZI_fit_A0=mean(trace_MZI_tofit);
                     MZI_fit_A=mean(abs(trace_MZI_phasor));
                 end
@@ -348,8 +314,7 @@ classdef Q_trace_fit
             Q_obj.MZI_FSR=MZI_FSR;
             Q_obj.lambda=lambda;
             Q_obj.threshold=threshold;
-            Q_obj.flag_fano_corr=flag_fano_corr;
-            Q_obj.flag_split_corr=flag_split_corr;
+            Q_obj.flag_Q_corr=flag_Q_corr;
             Q_obj.flag_osc_corr=flag_osc_corr;
             Q_obj.flag_MZI_corr=flag_MZI_corr;
             Q_obj.cutoff_freq=cutoff_freq;

@@ -793,13 +793,13 @@ if strcmp(handles.data_status.String,'Data loaded')
                 targeted_freq(ind)=f_scan_center+(-fitq_center_mu-mu_center)*MZI_dispersion(1)/1000;
             end
             Qobj=Q_trace_fit(fitq_trace_Q,fitq_trace_MZI,MZI_dispersion(1),...
-                299792458/targeted_freq(ind),1-0.1*10.^(-eval(handles.process_th_peak.String)/10),'all');
+                299792458/targeted_freq(ind),1-0.1*10.^(-eval(handles.process_th_peak.String)/10),'fanomzi');
             targeted_Q_matrix=Qobj.get_Q;
             try
                 targeted_Q0(ind)=targeted_Q_matrix(1,1);
                 targeted_Q1(ind)=targeted_Q_matrix(1,2);
                 targeted_QL(ind)=targeted_Q_matrix(1,3);
-                if mod(ind,10)==5
+                if 1==1 %mod(ind,60)==5
                     Qobj.plot_Q_max;
                 end
             catch
@@ -808,6 +808,22 @@ if strcmp(handles.data_status.String,'Data loaded')
         end
         figure;
         plot(299792458./targeted_freq,([targeted_freq./targeted_Q0,targeted_freq./targeted_Q1,targeted_freq./targeted_QL]/1e3).','.-');
+        title("Linewidth contribution");
+        xlabel("wavelength/nm")
+        ylabel("linewidth/MHz")
+        legend('Internal','Loaded','Total','Location','best')
+        figure;
+        % plot(299792458./targeted_freq,[targeted_Q0 targeted_Q1 targeted_QL]);
+        scatter(299792458./targeted_freq,targeted_Q0);
+        hold on
+        scatter(299792458./targeted_freq,targeted_Q1);
+        hold on
+        scatter(299792458./targeted_freq,targeted_QL);
+        title("Q distribution");
+        xlabel("wavelength/nm")
+        ylabel("Q / Million")
+        legend('Internal','Loaded','Total','Location','best')
+        hold off
     end
 end
 

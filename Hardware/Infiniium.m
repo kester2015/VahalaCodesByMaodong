@@ -205,7 +205,7 @@ classdef Infiniium < handle
         end
         
         function write2osc(Obj,filename)
-            Obj.Write([':DISK:SAVE:WAVeform ALL,"',filename,'",BIN']);
+            Obj.Write(strcat(':DISK:SAVE:WAVeform ALL,"',filename,'",BIN'));
         end
         
         function Qsetting(Obj)
@@ -283,6 +283,10 @@ classdef Infiniium < handle
             Obj.Write(':ACQ:POIN:ANAL AUTO');
         end
         
+        function makeDirOnOSC(Obj,fullpath)
+            tt = strcat(":DISK:MDIR ","""", fullpath, """");
+            Obj.Write(tt);
+        end
     end
     
     methods (Static = true)

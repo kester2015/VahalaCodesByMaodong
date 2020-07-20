@@ -36,16 +36,15 @@ Offset = 1.523;%2.263;
 Myfg2.DC1 = 2.19;
 
 filedirToSave = "C:\Users\Administrator\Documents\Maodong\20200303\1560nm-2";
-% OSC.Write(":DISK:MDIR  ""C:\Users\Administrator\Documents20\Maodong\20200223\1570nm-02""")
 
-% OSC.makeDirOnOSC(filedirToSave);
+
+% OSC.Write(":DISK:MDIR  ""C:\Users\Administrator\Documents20\Maodong\20200223\1570nm-02""")
 % OSC.makeDirOnOSC(filedirToSave);
 
 %         OSC.Write([':TIM:POS ' num2str(1/50*3/4)]);
 %         OSC.Write([':TIM:SCAL ' num2str(1/50/20)]);
 %%
 tic;
-
 for m = 1 : length(VAOM)
     for n = 1 : length(sweepFreq)
 %         if Vpp/2 > Offset
@@ -56,8 +55,6 @@ for m = 1 : length(VAOM)
 %             disp('Error! Too large offset!')
 %             pause;
 %         end
-%%
-%         m=1;n=1;%for debug only
 %%
 %         Freq0 = sweepFreq(n);
 %         Myfg1.Freq1 =[Freq0 Vpp Offset];
@@ -76,16 +73,17 @@ for m = 1 : length(VAOM)
 %         Myfg2.Trigger1;
 %         pause(1.5*20/Freq0);
                 pause(4);  
-        %%
+%%
 %         dip_x = str2num(OSC.Query(':MEAS:TMIN? CHAN3'));
 %         mid_x = 1/Freq0*3/4;
-        %
-        filename = strcat(filedirToSave, '\Sweep_', num2str(Freq0), 'Hz_Power_', num2str(VAOM(m)),'V.bin');
-%          filename = 'test';
 
-        OSC.write2osc(filename);
+%         filename = strcat(filedirToSave, '\Sweep_', num2str(Freq0), 'Hz_Power_', num2str(VAOM(m)),'V.bin');
+%         OSC.write2osc(filename);
 
-%         [Xdata Ydata] = OSC.readmultipletrace([1 2 3],1e5)
+        [Xdata,Ydata] = OSC.readmultipletrace([1 2 3 4],1e5);
+        
+        
+        
         
 %         %% Control of frequency offset
 %         err = (dip_x - mid_x)/(1/Freq0/2);
@@ -105,7 +103,6 @@ end
 
 t = toc;
 disp(strcat("Finished in ", num2str(t/60), 'min'));
-
 sound(sin(2*pi*25*(1:4000)/100));
 % Myfg1.disconnect;
 % Myfg2.disconnect;
