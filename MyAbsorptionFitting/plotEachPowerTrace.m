@@ -1,11 +1,11 @@
 
 close all
 
-wavelengthList = 1540;
-highNoiseThreshold = 0.1;
+wavelengthList = 1535:10:1555;
+highNoiseThreshold = 0.2;
 
 for wavelength = wavelengthList
-    filedirGolb = strcat("D:\Measurement Data\Absorption project\20200204\",num2str(wavelength));
+    filedirGolb = strcat("D:\Measurement Data\Absorption project\SiN\20200223\Row2Col1_Triangle\",num2str(wavelength));
 
     filedir = strcat(filedirGolb,"nm-01-mat");
     matfiles = dir(strcat(filedir,'\*.mat') );
