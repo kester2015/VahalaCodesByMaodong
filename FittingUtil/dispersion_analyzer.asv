@@ -820,7 +820,6 @@ if strcmp(handles.data_status.String,'Data loaded')
         xlabel("wavelength/nm")
         ylabel("linewidth/MHz")
         legend('Internal','Loaded','Total','Location','best')
-        
         figure;
         % plot(299792458./targeted_freq,[targeted_Q0 targeted_Q1 targeted_QL]);
         scatter(299792458./targeted_freq,targeted_Q0);
@@ -831,7 +830,6 @@ if strcmp(handles.data_status.String,'Data loaded')
         title("Q distribution");
         xlabel("wavelength/nm")
         ylabel("Q / Million")
-        ylim([0 2*max(max(targeted_Q1),max(targeted_Q0))])
         legend('Internal','Loaded','Total','Location','best')
         hold off
     end

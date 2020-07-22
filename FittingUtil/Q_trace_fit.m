@@ -354,6 +354,7 @@ classdef Q_trace_fit
             Q_obj.flag_MZI_corr=flag_MZI_corr;
             Q_obj.cutoff_freq=cutoff_freq;
             
+            
             Q_obj.trace_length=trace_length;
             Q_obj.trace_Q_filtered=trace_Q_filtered;
             
