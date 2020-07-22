@@ -799,7 +799,7 @@ if strcmp(handles.data_status.String,'Data loaded')
                 targeted_Q0(ind)=targeted_Q_matrix(1,1);
                 targeted_Q1(ind)=targeted_Q_matrix(1,2);
                 targeted_QL(ind)=targeted_Q_matrix(1,3);
-                if 1==1 %mod(ind,60)==5
+                if mod(ind,60)==5
                     Qobj.plot_Q_max;
                 end
             catch

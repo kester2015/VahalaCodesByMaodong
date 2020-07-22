@@ -22,7 +22,7 @@ function varargout = EtcherCalculatorGUI(varargin)
 
 % Edit the above text to modify the response to help EtcherCalculatorGUI
 
-% Last Modified by GUIDE v2.5 08-Mar-2020 17:04:20
+% Last Modified by GUIDE v2.5 08-Mar-2020 17:52:19
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -477,6 +477,8 @@ function FileDir_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+    currPath = fileparts(mfilename('fullpath'));% get current path 
+    set(hObject,'String',currPath);
 
 function [avgEtchRate, usedEtchRate, usedEtchRateDate] = getEtchRate(etchRateList,etchRateDate)
     if isempty(etchRateList)
