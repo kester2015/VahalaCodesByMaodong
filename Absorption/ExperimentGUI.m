@@ -22,7 +22,7 @@ function varargout = ExperimentGUI(varargin)
 
 % Edit the above text to modify the response to help ExperimentGUI
 
-% Last Modified by GUIDE v2.5 16-Feb-2020 16:44:24
+% Last Modified by GUIDE v2.5 23-Jul-2020 17:25:42
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -67,7 +67,8 @@ cd(mfileloc(1:end-14));
 % load configuration
 global Config;
 load ('config.mat','Config');
-handles.Directory.String = Config.Directory;
+% handles.Directory.String = Config.Directory;
+handles.Directory.String = ['C:\Users\Lab\Documents\Maodong\' datestr(now,'yyyymmdd') '\'];
 handles.Condition.String = Config.Condition;
 handles.Wavelength.String = Config.Wavelength;
 handles.MZI_FSR.String = Config.MZI_FSR;
@@ -144,6 +145,8 @@ if Device.laser1.isconnected
         else
             handles.B_LaserOn.String = 'Power on';
         end
+        handles.Wavelength.String = num2str(Device.laser1.Wavelength);
+        handles.Current.String = num2str(Device.laser1.Current);
     end
 else
     handles.B_Move.Enable = 'off';
@@ -170,6 +173,9 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 function Prefix_Callback(hObject, eventdata, handles)
+if ~isempty(hObject.String) && hObject.String(end) ~= '\'
+    hObject.String = [hObject.String '\'];
+end
 
 function Prefix_CreateFcn(hObject, eventdata, handles)
 
@@ -569,7 +575,7 @@ switch handles.Method.Value
         Data.Currfilename = filename;
         mfileloc = mfilename('fullpath');
         cd(mfileloc(1:end-14));
-        run('..\FittingUtil\dispersion_analyzer.m');
+%         run('..\FittingUtil\dispersion_analyzer.m');
 
 %         disp('Processing started');
 %         Disper = ProcessDispersion(handles,filename);
@@ -582,7 +588,9 @@ switch handles.Method.Value
 %         saveas(gcf,[filename,'_dispersion_color_D1=', num2str(disk_FSR/10^3,7),'GHz.fig'])
 %         saveas(gcf,[filename,'_dispersion_color_D1=', num2str(disk_FSR/10^3,7),'GHz.png'])
 %         EnableDispersionProcess(handles,'on');
-        Device.laser2.Move2Wavelength(Config.final);
+
+%         Device.laser2.Move2Wavelength(Config.final);
+        Device.laser2.Move2Wavelength(1522);
     case 3
         %% Ringdown
         for ii = 1:10
@@ -1045,3 +1053,40 @@ function pushbutton20_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 global Device
 Device.osc.HighRes;
+
+
+% --- Executes on button press in wavelength_increase_button.
+function wavelength_increase_button_Callback(hObject, eventdata, handles)
+% hObject    handle to wavelength_increase_button (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global Device;
+if Device.laser1.PowerON && str2double(handles.Wavelength.String)<1569.76
+    newWavelength = str2double(handles.Wavelength.String)+0.25;
+    if isfield(Device,'fg')
+        Device.fg.CH1(0);
+    end
+    Device.laser1.Move2Wavelength(newWavelength);
+    handles.Wavelength.String = num2str(newWavelength);
+    if isfield(Device,'fg')
+        Device.fg.CH1(1);
+    end
+end
+
+% --- Executes on button press in wavelength_decrease_button.
+function wavelength_decrease_button_Callback(hObject, eventdata, handles)
+% hObject    handle to wavelength_decrease_button (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global Device;
+if Device.laser1.PowerON && str2double(handles.Wavelength.String)>1520.24
+    newWavelength = str2double(handles.Wavelength.String)-0.25;
+    if isfield(Device,'fg')
+        Device.fg.CH1(0);
+    end
+    Device.laser1.Move2Wavelength(newWavelength);
+    handles.Wavelength.String = num2str(newWavelength);
+    if isfield(Device,'fg')
+        Device.fg.CH1(1);
+    end
+end

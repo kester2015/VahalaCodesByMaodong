@@ -26,11 +26,11 @@ data_matrix = [time,trans,mzi];
 save([filename,'.mat'],'data_matrix','-mat');
 
 waveform_figure=figure;
-k = 2;
-for j=[trans_ch,mzi_ch]
+k = 3;
+for j=[mzi_ch trans_ch]
     chanstr=['Channel ',num2str(j)];
     plot(data_matrix(:,1),data_matrix(:,k),'DisplayName',chanstr);
-    k = k + 1;
+    k = k - 1;
     legend('-DynamicLegend');
     hold on
 end
