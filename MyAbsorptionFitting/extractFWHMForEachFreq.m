@@ -12,18 +12,18 @@ MZID1 = 39.9553; %MHz
 % %------20200223-----------%
 wavelengthList = 1548;%1535:10:1555;
 count = 1;%1535nm
-filedirGolb = strcat("Z:\Maodong\Tantala\20200723-thermal-rawdata\");
-outputVoltage1List = [0.97773 1.2649 1.1053]; %V
-outputPower1List = [1.221 1.637 1.846];%mW
-inputVoltage1List = [1.77296 2.2588 2.4366]; %V
-inputPower1List = [8.421 11.17 12.17];%mW
-outputVoltage2List = [0.89960 1.2781 1.1564]; %V
-outputPower2List = [1.196 1.489 1.704];%mW
-inputVoltage2List = [1.773 2.1937 2.4256]; %V
-inputPower2List = [8.548 10.55 12.24];%mW
+filedirGolb = strcat("Z:\Maodong\Tantala\20200803-thermal-rawdata\");
+outputVoltage1List = [1.322];%[0.97773 1.2649 1.1053]; %V
+outputPower1List   = [0.1738];%[1.221 1.637 1.846];%mW
+inputVoltage1List  = [2.794];%[1.77296 2.2588 2.4366]; %V
+inputPower1List    = [2.495];%[8.421 11.17 12.17];%mW
+outputVoltage2List = [0.161];%[0.89960 1.2781 1.1564]; %V
+outputPower2List   = [0.03747];%[1.196 1.489 1.704];%mW
+inputVoltage2List  = [2.810];%[1.773 2.1937 2.4256]; %V
+inputPower2List    = [2.883];%[8.548 10.55 12.24];%mW
 
-QtotList = [7.495 9.027 10.3]*1e6;
-QextList = [18.39 19.96 20.61]*1e6;
+QtotList = [0.8831]*1e6;
+QextList = [4.61]*1e6;
 
 kerrOverTotalList = [0.1 0.1 0.1];
 % kerrOverTotalList = 1 - [0.9319 0.9030 0.9299 0.8982 0.9003 0.9080 0.8970];
@@ -62,6 +62,8 @@ kerrOverTotalList = [0.1 0.1 0.1];
 % inputPower2List = [4.537 5.208 4.115 4.622 4.631 4.455];%mW
 
 %%
+
+matfileStart = 20; 
 for count = 1:length(wavelengthList)
     %%
     wavelength = wavelengthList(count);
@@ -80,7 +82,7 @@ for count = 1:length(wavelengthList)
     %%
     hh = figure;
     subplot(211)
-    filedir = strcat(filedirGolb,num2str(wavelength),"nm-1-mat");
+    filedir = strcat(filedirGolb,num2str(wavelength),"nm-01-mat");
 
 
     matfiles = dir(strcat(filedir,'\*.mat') );
@@ -91,7 +93,7 @@ for count = 1:length(wavelengthList)
     [~, pos] = sort( [matfiles.voltage] );
 
     FWHMList1 = zeros( length(matfiles), 2);
-    for ii = 1:length(matfiles)
+    for ii = 20:length(matfiles)  %------------------------------>>>NEED CHOOSE START POINT!!, 1 by default.
         filename = strcat(filedir, '\', matfiles(pos(ii)).name);
             [~,FWHM] = getFWHM(filename);
 
@@ -120,7 +122,7 @@ for count = 1:length(wavelengthList)
     %----- reverse -----%
 
 
-    filedir = strcat(filedirGolb,num2str(wavelength),"nm-2-mat");
+    filedir = strcat(filedirGolb,num2str(wavelength),"nm-02-mat");
     matfiles = dir(strcat(filedir,'\*.mat') );
     matfilesName = {matfiles.name};
         for pp = 1:length(matfiles)
@@ -129,7 +131,7 @@ for count = 1:length(wavelengthList)
     [~, pos] = sort( [matfiles.voltage] );
     FWHMList2 = zeros(length(matfiles),2);
     
-    for ii = 1:length(matfiles)
+    for ii = 10:length(matfiles) %------------------------------>>>NEED CHOOSE START POINT!!, 1 by default.
         filename = strcat(filedir, '\', matfiles(pos(ii)).name);
             [~,FWHM] = getFWHM(filename);
             FWHM = FWHM*MZID1; %MHz
