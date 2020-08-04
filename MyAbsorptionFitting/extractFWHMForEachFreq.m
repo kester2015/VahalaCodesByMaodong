@@ -10,9 +10,9 @@ MZID1 = 39.9553; %MHz
 
 
 % %------20200223-----------%
-wavelengthList = 1535:10:1555;
+wavelengthList = 1548;%1535:10:1555;
 count = 1;%1535nm
-filedirGolb = strcat("D:\Measurement Data\Absorption project\SiN\20200223\Row2Col1_Triangle\");
+filedirGolb = strcat("Z:\Maodong\Tantala\20200723-thermal-rawdata\");
 outputVoltage1List = [0.97773 1.2649 1.1053]; %V
 outputPower1List = [1.221 1.637 1.846];%mW
 inputVoltage1List = [1.77296 2.2588 2.4366]; %V
@@ -80,7 +80,7 @@ for count = 1:length(wavelengthList)
     %%
     hh = figure;
     subplot(211)
-    filedir = strcat(filedirGolb,num2str(wavelength),"nm-01-mat");
+    filedir = strcat(filedirGolb,num2str(wavelength),"nm-1-mat");
 
 
     matfiles = dir(strcat(filedir,'\*.mat') );
@@ -120,7 +120,7 @@ for count = 1:length(wavelengthList)
     %----- reverse -----%
 
 
-    filedir = strcat(filedirGolb,num2str(wavelength),"nm-02-mat");
+    filedir = strcat(filedirGolb,num2str(wavelength),"nm-2-mat");
     matfiles = dir(strcat(filedir,'\*.mat') );
     matfilesName = {matfiles.name};
         for pp = 1:length(matfiles)
@@ -177,10 +177,12 @@ for count = 1:length(wavelengthList)
 
 %     hh = figure;
     subplot(212)
-    fitIndex1 = 20:31;
-    fitIndex2 = 20:31;
-    FWHMList1forfit = FWHMList1(fitIndex1,:);
-    FWHMList2forfit = FWHMList2(fitIndex2,:);
+%     fitIndex1 = 20:31;
+%     fitIndex2 = 20:31;
+%     FWHMList1forfit = FWHMList1(fitIndex1,:);
+%     FWHMList2forfit = FWHMList2(fitIndex2,:);
+    FWHMList1forfit = FWHMList1;
+    FWHMList2forfit = FWHMList2;
     scatter(FWHMList1forfit(:,1),FWHMList1forfit(:,2),'LineWidth',2.0);
     hold on
     scatter(FWHMList2forfit(:,1),FWHMList2forfit(:,2),'LineWidth',2.0);

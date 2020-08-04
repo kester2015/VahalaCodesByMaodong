@@ -25,18 +25,16 @@ OSC.connect;
 %     Offset = input(['Please input new offset:']);
 % end
 
-VAOM = 0.01:0.02:1;
+VAOM = 0.01:0.1:1;
 
 sweepFreq = 20;
 Freq0=sweepFreq;
-Vpp = 7.000;%3.5;%7.000; %2.000;%1.920;
-Offset = 0.000;%3.5/2;%0.000; %1.523;%2.263;
+Vpp = 3.5;%7.000; %2.000;%1.920;
+Offset = 3.5/2;%0.000; %1.523;%2.263;
 
-Myfg2.DC1 = 2.094;
+Myfg2.DC1 = 2.;
 
-
-
-filedirToSave = "\\131.215.238.124\Vahala Group\Qifan\Tantala\20200803-thermal-rawdata\1548nm-02";
+filedirToSave = "\\131.215.238.124\Vahala Group\Qifan\Tantala\20200803-thermal-rawdata\1548nm-network-testing-2";
 
 
 if ~isfolder(filedirToSave)
@@ -65,21 +63,20 @@ for m = 1 : length(VAOM)
 %         m=1;n=1;%for debug only
 %%
 %         Freq0 = sweepFreq(n);
-        Myfg1.Freq1 =[Freq0 Vpp Offset];
+%         Myfg1.Freq1 =[Freq0 Vpp Offset];
 %         Myfg1.Phase1 = 90;
 %         Myfg1.TriggerExt1;
         Myfg2.DC2 = VAOM(m);       
         
         
-        OSC.Write([':TIM:POS ' num2str(1/Freq0)]);
+        OSC.Write([':TIM:POS ' num2str(1/Freq0*3/4)]);
         OSC.Write([':TIM:SCAL ' num2str(1/Freq0/20)]);
 %         OSC.Write([':TIM:POS ' num2str(1/Freq0*1/2)]);
 %         OSC.Write([':TIM:SCAL ' num2str(1/Freq0/10)]);
         OSC.Single;
         pause(2); 
         
-        Myfg1.Phase1 = 90;
-        pause(2); 
+%         Myfg1.Phase1 = 90;
         Myfg1.Trigger1;
         
 %         Myfg2.Trigger1;

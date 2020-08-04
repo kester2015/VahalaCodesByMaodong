@@ -68,8 +68,8 @@ classdef Keysight33500 < handle
         end
         function set.Phase1(Obj,phase)
 %             fprintf(Obj.visaObj, 'SOURce[1|2]:]BURSt:MODE TRIGgered');
-            fprintf(Obj.visaObj, 'BURS:STAT ON');
-%             fprintf(Obj.visaObj,['SOUR1:BURS:PHAS ' num2str(phase)]);
+            fprintf(Obj.visaObj, 'SOUR1:BURS:STAT ON');
+            fprintf(Obj.visaObj,['SOUR1:BURS:PHAS ' num2str(phase)]);
         end
         
     end
