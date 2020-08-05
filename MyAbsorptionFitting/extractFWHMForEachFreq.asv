@@ -245,7 +245,7 @@ dTdP = 1685;%1570;
 for count = 1:length(wavelengthList)
     %%
     load(strcat(filedirGolb,'meanSlope.mat'),'meanSlope');
-    wavelength = realwavelengthList(count);
+    wavelength = wavelengthList(count);
     
     %% Calculate n2 here
     Qtot = QtotList(count);
