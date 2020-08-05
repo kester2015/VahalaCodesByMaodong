@@ -1,6 +1,6 @@
 clc
 clear
-%%
+
 instrreset;
 % Channel 1: fiber laser piezo
 % Channel 2: AOM frequency power
@@ -8,9 +8,9 @@ instrreset;
 Myfg1 = Keysight33500('USB0::0x0957::0x2C07::MY52814912::INSTR'); % lower
 Myfg2 = Keysight33500('USB0::0x0957::0x2607::MY52202388::INSTR'); % upper
 % Ocsillascope
-% OSC = Infiniium('USB0::0x2A8D::0x904E::MY54200105::INSTR');
-OSC = Infiniium('GPIB1::7::INSTR',1); % = Device.osc;
-%%
+OSC = Infiniium('USB0::0x2A8D::0x904E::MY54200105::INSTR');
+% OSC = Infiniium('GPIB1::7::INSTR',1); % = Device.osc;
+
 Myfg1.connect;
 Myfg2.connect;
 OSC.connect;
@@ -25,18 +25,24 @@ OSC.connect;
 %     Offset = input(['Please input new offset:']);
 % end
 
-VAOM = 0.01:0.02:1;
+
+% filedirToSave = ['\\131.215.238.124\Vahala Group\Qifan\Tantala\' datestr(now,'yyyymmdd') '-thermal-rawdata\1548nm-02'];
+filedirToSave = ['Z:\Qifan\Tantala\' datestr(now,'yyyymmdd') '-thermal-rawdata\1536nm-02'];
+
+
+VAOM = 0.01:0.01:1;
+Myfg2.DC1 = 2.217;
 
 sweepFreq = 20;
 Freq0=sweepFreq;
 Vpp = 7.000;%3.5;%7.000; %2.000;%1.920;
 Offset = 0.000;%3.5/2;%0.000; %1.523;%2.263;
 
-Myfg2.DC1 = 2.094;
 
 
 
-filedirToSave = "\\131.215.238.124\Vahala Group\Qifan\Tantala\20200803-thermal-rawdata\1548nm-02";
+
+
 
 
 if ~isfolder(filedirToSave)
@@ -76,15 +82,15 @@ for m = 1 : length(VAOM)
 %         OSC.Write([':TIM:POS ' num2str(1/Freq0*1/2)]);
 %         OSC.Write([':TIM:SCAL ' num2str(1/Freq0/10)]);
         OSC.Single;
-        pause(2); 
+        pause(0.2); 
         
         Myfg1.Phase1 = 90;
-        pause(2); 
+        pause(0.2);
         Myfg1.Trigger1;
         
 %         Myfg2.Trigger1;
 %         pause(1.5*20/Freq0);
-                pause(4);  
+        pause(1);  
         %%
 %         dip_x = str2num(OSC.Query(':MEAS:TMIN? CHAN3'));
 %         mid_x = 1/Freq0*3/4;
@@ -114,6 +120,10 @@ end
 
 t = toc;
 disp(strcat("Finished in ", num2str(t/60), 'min'));
+
+Myfg2.DC2 = 0.4;
+Myfg1.Freq1 =[Freq0 Vpp Offset];
+OSC.Run;
 
 sound(sin(2*pi*25*(1:4000)/100));
 Myfg1.disconnect;
