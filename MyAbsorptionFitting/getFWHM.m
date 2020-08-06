@@ -25,6 +25,9 @@ Q_trace_freq_temp = Q_trace_freq;
 Q_trace_freq_temp(1) = 0;
 [amp_fp,pos_fp] = max(Q_trace_freq_temp(1:round(end/2)));
 fit_T_estimate = length(Q_trace_freq)/(pos_fp-1);
+if pos_fp < 4
+        fit_T_estimate = 2*length(Q_trace_freq);
+end
 fit_B_estimate = amp_fp/length(Q_trace_freq);
 fit_A0_estimate = mean(Trans_raw);
 

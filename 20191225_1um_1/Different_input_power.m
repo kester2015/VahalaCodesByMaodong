@@ -27,16 +27,16 @@ OSC.connect;
 
 
 % filedirToSave = ['\\131.215.238.124\Vahala Group\Qifan\Tantala\' datestr(now,'yyyymmdd') '-thermal-rawdata\1548nm-02'];
-filedirToSave = ['Z:\Qifan\Tantala\' datestr(now,'yyyymmdd') '-thermal-rawdata\1536nm-02'];
+filedirToSave = ['Z:\Qifan\Tantala\' datestr(now,'yyyymmdd') '-thermal-rawdata\1548.1nm-02'];
 
 
-VAOM = 0.01:0.01:1;
+VAOM = 0.01:0.005:1;
 Myfg2.DC1 = 2.217;
 
 sweepFreq = 20;
 Freq0=sweepFreq;
-Vpp = 7.000;%3.5;%7.000; %2.000;%1.920;
-Offset = 0.000;%3.5/2;%0.000; %1.523;%2.263;
+Vpp = 2.500;%3.5;%7.000; %2.000;%1.920;
+Offset = 0.500;%3.5/2;%0.000; %1.523;%2.263;
 
 
 
