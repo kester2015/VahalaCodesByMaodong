@@ -14,11 +14,7 @@ Ch2 = sgolayfilt(Ch2, 2, round(length(Ch2)/1000)*2 + 1);
 phase = MZI_to_phase(Ch3(1:end));
 MZI = Ch3(1:end);
 Trans =  Ch2(1:end);
-if min(Trans)<0
-        PD_background = min(Trans);
-        Trans = Trans - PD_background;
-%         warning("transmission < 0 in rawdata, PD background %d mV are added. critical coupling assumed.", PD_background/0.001);
-end
+
 %% FP background filter
 
 Trans_raw = Trans;
@@ -36,24 +32,16 @@ fit_B_estimate = amp_fp/length(Q_trace_freq);
 fit_A0_estimate = mean(Trans_raw);
 
 fp_fit = fit( (1:length(Trans_raw)).',Trans_raw,fit_sine,...
-    'StartPoint',[fit_A0_estimate fit_B_estimate length(Q_trace_freq)/2 fit_T_estimate],...
-    'Weights',Trans_raw);
-fp_fit_result = fp_fit((1:length(Trans_raw)).');%fp_fit.A0+fp_fit.B*cos(((1:length(Q_trace)).'-fp_fit.x1)/fp_fit.T*2*pi);
-
-Trans = Trans_raw./fp_fit_result;
-
-fp_fit = fit( (1:length(Trans_raw)).',Trans_raw,fit_sine,...
-    'StartPoint',[fit_A0_estimate fit_B_estimate length(Q_trace_freq)/2 fit_T_estimate],...
-    'Weights',Trans.^6);
+    'StartPoint',[fit_A0_estimate fit_B_estimate length(Q_trace_freq)/2 fit_T_estimate]);
 fp_fit_result = fp_fit((1:length(Trans_raw)).');%fp_fit.A0+fp_fit.B*cos(((1:length(Q_trace)).'-fp_fit.x1)/fp_fit.T*2*pi);
 
 Trans = Trans_raw./fp_fit_result;
 
 
 %             figure
-%             plot((1:length(Trans_raw)).',Trans_raw)
+%             plot((1:length(Q_trace)).',Q_trace)
 %             hold on
-%             scatter((1:length(Trans_raw)).',fp_fit_result);
+%             scatter((1:length(Q_trace)).',fp_fit_result);
 %             title("FP fitting")
             
             
