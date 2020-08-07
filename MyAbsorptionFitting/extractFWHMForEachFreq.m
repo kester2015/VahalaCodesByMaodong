@@ -8,27 +8,68 @@ MZID1 = 39.9553; %MHz
 % n2List = zeros(length(wavelengthList),1);
 % QabsList = zeros(length(wavelengthList),1);
 
-% %------20200805 Tantala-----------%
+% %------20200806 Tantala-----------%
 count = 1;%1535nm
-filedirGolb = strcat("Z:\Qifan\Tantala\20200805-thermal-rawdata\");
-wavelengthList     = [1548.1];%1535:10:1555;
-outputVoltage1List = [1.555];
-outputPower1List   = [0.8738];%[1.221 1.637 1.846];%mW
-inputVoltage1List  = [3.929];%[1.77296 2.2588 2.4366]; %V
-inputPower1List    = [17.33];%[8.421 11.17 12.17];%mW
-outputVoltage2List = [1.426];%[0.89960 1.2781 1.1564]; %V
-outputPower2List   = [0.9026];%[1.196 1.489 1.704];%mW
-inputVoltage2List  = [3.902];%[1.773 2.1937 2.4256]; %V
-inputPower2List    = [17.42];%[8.548 10.55 12.24];%mW
-% QtotList         = [1.035   0.7445 1.2    0.8831  0.922   0.3973  0.8875  1.568  ]*1e6;
-% QextList         = [2.07    1.769  3.224  4.61    2.907   0.7945  1.934   4.745  ]*1e6;
-% -----updated with FP fitting------
-QtotList           = [1.069]*1e6;
-QextList           = [2.767]*1e6;
+filedirGolb = strcat("D:\Measurement Data\Tantala-broadening\");
+wavelengthList     = [1536   1548   1548.1   1564];%1535:10:1555;
+outputVoltage1List = [1.651  1.016  1.555   0.960];
+outputPower1List   = [0.9183 0.5081 0.8738  0.5536];%[1.221 1.637 1.846];%mW
+inputVoltage1List  = [3.370  2.842  3.929   2.039];%[1.77296 2.2588 2.4366]; %V
+inputPower1List    = [14.38  11.28  17.33   9.789 ];%[8.421 11.17 12.17];%mW
+outputVoltage2List = [1.438  1.117  1.426   0.907];%[0.89960 1.2781 1.1564]; %V
+outputPower2List   = [0.8606 0.5477 0.9026  0.4925];%[1.196 1.489 1.704];%mW
+inputVoltage2List  = [3.223  2.909  3.902   2.012];%[1.773 2.1937 2.4256]; %V
+inputPower2List    = [14.44  12.15  17.42   9.380];%[8.548 10.55 12.24];%mW
+QtotList           = [1.005  0.788  1.069   1.673]*1e6;
+QextList           = [2.01   1.576  2.767   3.346]*1e6;
+realwavelengthList = [1536.25 1548 1548.1 1564.25];
+kerrOverTotalList  = [0 0 0 0];
 
-realwavelengthList = [1548.1];
+Q0List             = (QtotList.*QextList)./(QextList-QtotList);
 
-kerrOverTotalList  = [0];
+% count = 1;%1535nm
+% filedirGolb = strcat("Z:\Maodong\Tantala\20200806-thermal-rawdata\");
+% wavelengthList     = [1548];%1535:10:1555;
+% outputVoltage1List = [1.016];
+% outputPower1List   = [0.5081];%[1.221 1.637 1.846];%mW
+% inputVoltage1List  = [2.842];%[1.77296 2.2588 2.4366]; %V
+% inputPower1List    = [11.28];%[8.421 11.17 12.17];%mW
+% outputVoltage2List = [1.117];%[0.89960 1.2781 1.1564]; %V
+% outputPower2List   = [0.5477];%[1.196 1.489 1.704];%mW
+% inputVoltage2List  = [2.909];%[1.773 2.1937 2.4256]; %V
+% inputPower2List    = [12.15];%[8.548 10.55 12.24];%mW
+% % QtotList         = [1.035   0.7445 1.2    0.8831  0.922   0.3973  0.8875  1.568  ]*1e6;
+% % QextList         = [2.07    1.769  3.224  4.61    2.907   0.7945  1.934   4.745  ]*1e6;
+% % -----updated with FP fitting------
+% QtotList           = [0.788]*1e6;
+% QextList           = [1.576]*1e6;
+% 
+% realwavelengthList = [1548];
+% 
+% kerrOverTotalList  = [0];
+
+
+% % %------20200805 Tantala-----------%
+% count = 1;%1535nm
+% filedirGolb = strcat("Z:\Qifan\Tantala\20200805-thermal-rawdata\");
+% wavelengthList     = [1548.1];%1535:10:1555;
+% outputVoltage1List = [1.555];
+% outputPower1List   = [0.8738];%[1.221 1.637 1.846];%mW
+% inputVoltage1List  = [3.929];%[1.77296 2.2588 2.4366]; %V
+% inputPower1List    = [17.33];%[8.421 11.17 12.17];%mW
+% outputVoltage2List = [1.426];%[0.89960 1.2781 1.1564]; %V
+% outputPower2List   = [0.9026];%[1.196 1.489 1.704];%mW
+% inputVoltage2List  = [3.902];%[1.773 2.1937 2.4256]; %V
+% inputPower2List    = [17.42];%[8.548 10.55 12.24];%mW
+% % QtotList         = [1.035   0.7445 1.2    0.8831  0.922   0.3973  0.8875  1.568  ]*1e6;
+% % QextList         = [2.07    1.769  3.224  4.61    2.907   0.7945  1.934   4.745  ]*1e6;
+% % -----updated with FP fitting------
+% QtotList           = [1.069]*1e6;
+% QextList           = [2.767]*1e6;
+% 
+% realwavelengthList = [1548.1];
+% 
+% kerrOverTotalList  = [0];
 
 
 % wavelengthList     = [1564];%1535:10:1555;
@@ -96,6 +137,8 @@ kerrOverTotalList  = [0];
 % kerrOverTotalList = 1 - [0.9319 0.9030 0.9299 0.8982 0.9003 0.9080 0.8970];
 % fitStartPower = 0.3; % lowest wg power to fit, ensure triangle appears.
 % fitEndPower = 2; % highest wg power to fit, ensure no comb appears.
+
+
 
 % %------20200211-----------%
 % wavelengthList = 1535:5:1565;
@@ -262,8 +305,8 @@ for count = 1:length(wavelengthList)
 %     fitIndex2 = 30:41;
 %     FWHMList1forfit = FWHMList1(fitIndex1,:);
 %     FWHMList2forfit = FWHMList2(fitIndex2,:);
-    fitStartPower = 2.5; % lowest wg power to fit, ensure triangle appears.
-    fitEndPower = 4; % highest wg power to fit, ensure no comb appears.
+    fitStartPower = 1.5; % lowest wg power to fit, ensure triangle appears.
+    fitEndPower = 3.5; % highest wg power to fit, ensure no comb appears.
 %     if wavelength < 1549 && wavelength > 1547 % 1548nm needs seperate start power
 %         fitStartPower = 0.55; 
 %     elseif wavelength < 1541 && wavelength > 1539 % 1540nm needs seperate start power
@@ -455,7 +498,7 @@ hold on
 % scatter(wavelengthList,QabsListOC,'LineWidth',2.0);
 xlabel('wavelength / nm');
 ylabel('Qabs');
-ylim([0 10]*1e6)
+% ylim([0 10]*1e6)
 title("Qabs for different wavelength");
 % legend({'under couple'})
 % legend({'under couple','over couple'})
