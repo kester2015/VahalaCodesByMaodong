@@ -8,38 +8,26 @@ MZID1 = 39.9553; %MHz
 % n2List = zeros(length(wavelengthList),1);
 % QabsList = zeros(length(wavelengthList),1);
 
- % %------20200807 Tantala-----------%
-filedirGolb = strcat("Z:\Qifan\Tantala\20200807-thermal-rawdata\Dev19\");
-count = 1;
-wavelengthList     = [1544   1548   1552];%1535:10:1555;
-outputVoltage1List = [1.676  1.601  1.190];
-outputPower1List   = [0.7215 0.7092 0.5153];%[1.221 1.637 1.846];%mW
-inputVoltage1List  = [4.260  3.730  2.697 ];%[1.77296 2.2588 2.4366]; %V
-inputPower1List    = [17.97  15.77  11.59];%[8.421 11.17 12.17];%mW
-outputVoltage2List = [1.640  1.689  1.171];%[0.89960 1.2781 1.1564]; %V
-outputPower2List   = [0.6737 0.7253 0.5300];%[1.196 1.489 1.704];%mW
-inputVoltage2List  = [4.266  3.708  2.717];%[1.773 2.1937 2.4256]; %V
-inputPower2List    = [17.44  15.21  12.21];%[8.548 10.55 12.24];%mW
-QtotList           = [1.348  0.8114 0.8994]*1e6;
-QextList           = [7.058  2.535  2.484]*1e6;
+%  % %------20200807 Tantala-----------%
+% filedirGolb = strcat("Z:\Qifan\Tantala\20200807-thermal-rawdata\Dev19\");
+% count = 1:3;
+% wavelengthList     = [1544   1548   1552];%1535:10:1555;
+% outputVoltage1List = [1.676  1.601  1.190];
+% outputPower1List   = [0.7215 0.7092 0.5153];%[1.221 1.637 1.846];%mW
+% inputVoltage1List  = [4.260  3.730  2.697 ];%[1.77296 2.2588 2.4366]; %V
+% inputPower1List    = [17.97  15.77  11.59];%[8.421 11.17 12.17];%mW
+% outputVoltage2List = [1.640  1.689  1.171];%[0.89960 1.2781 1.1564]; %V
+% outputPower2List   = [0.6737 0.7253 0.5300];%[1.196 1.489 1.704];%mW
+% inputVoltage2List  = [4.266  3.708  2.717];%[1.773 2.1937 2.4256]; %V
+% inputPower2List    = [17.44  15.21  12.21];%[8.548 10.55 12.24];%mW
+% QtotList           = [1.348  0.8114 0.8994]*1e6;
+% QextList           = [7.058  2.535  2.484]*1e6;
+% 
+% realwavelengthList = [1544.05  1548  1551.85];
+% 
+% kerrOverTotalList  = [0  0  0];
 
-realwavelengthList = [1544.05  1548  1551.85];
 
-kerrOverTotalList  = [0  0  0];
-
-wavelengthList     = wavelengthList(count);%1535:10:1555;
-outputVoltage1List = outputVoltage1List(count);
-outputPower1List   = outputPower1List(count);%[1.221 1.637 1.846];%mW
-inputVoltage1List  = inputVoltage1List(count);%[1.77296 2.2588 2.4366]; %V
-inputPower1List    = inputPower1List(count);%[8.421 11.17 12.17];%mW
-outputVoltage2List = outputVoltage2List(count);%[0.89960 1.2781 1.1564]; %V
-outputPower2List   = outputPower2List(count);%[1.196 1.489 1.704];%mW
-inputVoltage2List  = inputVoltage2List(count);%[1.773 2.1937 2.4256]; %V
-inputPower2List    = inputPower2List(count);%[8.548 10.55 12.24];%mW
-QtotList           = QtotList(count);
-QextList           = QextList(count);
-realwavelengthList = realwavelengthList(count);
-kerrOverTotalList  = kerrOverTotalList(count);
 
 % filedirGolb = strcat("Z:\Qifan\Tantala\20200807-thermal-rawdata\Dev18\");
 % wavelengthList     = [1548];%1535:10:1555;
@@ -63,23 +51,26 @@ kerrOverTotalList  = kerrOverTotalList(count);
 
 
 % % %------20200806 Tantala-----------%
-% count = 1;%1535nm
-% filedirGolb = strcat("D:\Measurement Data\Tantala-broadening\");
-% wavelengthList     = [1536   1548   1548.1   1564];%1535:10:1555;
-% outputVoltage1List = [1.651  1.016  1.555   0.960];
-% outputPower1List   = [0.9183 0.5081 0.8738  0.5536];%[1.221 1.637 1.846];%mW
-% inputVoltage1List  = [3.370  2.842  3.929   2.039];%[1.77296 2.2588 2.4366]; %V
-% inputPower1List    = [14.38  11.28  17.33   9.789 ];%[8.421 11.17 12.17];%mW
-% outputVoltage2List = [1.438  1.117  1.426   0.907];%[0.89960 1.2781 1.1564]; %V
-% outputPower2List   = [0.8606 0.5477 0.9026  0.4925];%[1.196 1.489 1.704];%mW
-% inputVoltage2List  = [3.223  2.909  3.902   2.012];%[1.773 2.1937 2.4256]; %V
-% inputPower2List    = [14.44  12.15  17.42   9.380];%[8.548 10.55 12.24];%mW
-% QtotList           = [1.005  0.788  1.069   1.673]*1e6;
-% QextList           = [2.01   1.576  2.767   3.346]*1e6;
-% realwavelengthList = [1536.25 1548 1548.1 1564.25];
-% kerrOverTotalList  = [0 0 0 0];
-% 
-% Q0List             = (QtotList.*QextList)./(QextList-QtotList);
+;%1535nm
+filedirGolb = strcat("D:\Measurement Data\Tantala-broadening\");
+wavelengthList     = [1536   1548   1548.1   1564];%1535:10:1555;
+outputVoltage1List = [1.651  1.016  1.555   0.960];
+outputPower1List   = [0.9183 0.5081 0.8738  0.5536];%[1.221 1.637 1.846];%mW
+inputVoltage1List  = [3.370  2.842  3.929   2.039];%[1.77296 2.2588 2.4366]; %V
+inputPower1List    = [14.38  11.28  17.33   9.789 ];%[8.421 11.17 12.17];%mW
+outputVoltage2List = [1.438  1.117  1.426   0.907];%[0.89960 1.2781 1.1564]; %V
+outputPower2List   = [0.8606 0.5477 0.9026  0.4925];%[1.196 1.489 1.704];%mW
+inputVoltage2List  = [3.223  2.909  3.902   2.012];%[1.773 2.1937 2.4256]; %V
+inputPower2List    = [14.44  12.15  17.42   9.380];%[8.548 10.55 12.24];%mW
+QtotList           = [1.005  0.788  1.069   1.673]*1e6;
+QextList           = [2.01   1.576  2.767   3.346]*1e6;
+realwavelengthList = [1536.25 1548 1548.1 1564.25];
+kerrOverTotalList  = [0 0 0 0];
+
+count = 1:length(wavelengthList);
+% count = 2;
+
+Q0List             = (QtotList.*QextList)./(QextList-QtotList);
 
 % count = 1;%1535nm
 % filedirGolb = strcat("Z:\Maodong\Tantala\20200806-thermal-rawdata\");
@@ -227,6 +218,19 @@ kerrOverTotalList  = kerrOverTotalList(count);
 % inputVoltage2List = [1.75927 1.9318 1.72166 1.71949 1.68182 1.58624]; %V
 % inputPower2List = [4.537 5.208 4.115 4.622 4.631 4.455];%mW
 
+wavelengthList     = wavelengthList(count);%1535:10:1555;
+outputVoltage1List = outputVoltage1List(count);
+outputPower1List   = outputPower1List(count);%[1.221 1.637 1.846];%mW
+inputVoltage1List  = inputVoltage1List(count);%[1.77296 2.2588 2.4366]; %V
+inputPower1List    = inputPower1List(count);%[8.421 11.17 12.17];%mW
+outputVoltage2List = outputVoltage2List(count);%[0.89960 1.2781 1.1564]; %V
+outputPower2List   = outputPower2List(count);%[1.196 1.489 1.704];%mW
+inputVoltage2List  = inputVoltage2List(count);%[1.773 2.1937 2.4256]; %V
+inputPower2List    = inputPower2List(count);%[8.548 10.55 12.24];%mW
+QtotList           = QtotList(count);
+QextList           = QextList(count);
+realwavelengthList = realwavelengthList(count);
+kerrOverTotalList  = kerrOverTotalList(count);
 %%
 
 matfileStart = 20; 
@@ -401,6 +405,11 @@ nT = 8.8e-6;
 % Aeff and dTdP from simulation
 Aeff = 0.934e-12;
 dTdP = 1685;%1570;
+
+n2List = zeros(1,length(wavelengthList));
+QabsAndKerrList = n2List;
+n2TOTList = n2List;
+QabsList = n2List;
 for count = 1:length(wavelengthList)
     %%
     load(strcat(filedirGolb,'meanSlope.mat'),'meanSlope');

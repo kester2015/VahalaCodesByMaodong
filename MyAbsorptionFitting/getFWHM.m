@@ -56,11 +56,11 @@ function [Base, FWHM] = getFWHM(filename)
 % 
 %     Trans = Trans_raw./fp_fit_result;
 
-    %             figure
-    %             plot((1:length(Trans_raw)).',Trans_raw)
-    %             hold on
-    %             scatter((1:length(Trans_raw)).',fp_fit_result);
-    %             title("FP fitting")
+%                 figure
+%                 plot((1:length(Trans_raw)).',Trans_raw)
+%                 hold on
+%                 scatter((1:length(Trans_raw)).',fp_fit_result);
+%                 title("FP fitting")
 
 
     %% Get dip
