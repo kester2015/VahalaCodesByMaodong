@@ -832,8 +832,9 @@ if strcmp(handles.data_status.String,'Data loaded')
         xlabel("wavelength/nm")
         ylabel("Q / Million")
         ylim([0 2*max(max(targeted_Q1),max(targeted_Q0))])
-        legend('Internal','Loaded','Total','Location','best')
+        legend('Internal','External','Total','Location','best')
         hold off
+        fprintf("lambda: %4.2fnm, Q0: %.4f, QE: %.4f, QT: %.4f \n",[299792458./targeted_freq,targeted_Q0,targeted_Q1,targeted_QL].');
     end
 end
 

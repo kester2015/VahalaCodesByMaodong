@@ -3,7 +3,7 @@
 clear
 clc
 
-filename = 'D:\Measurement Data\Tantala\20200721\disper\Dev19\pol1-1520-1570nm.mat';
+filename = 'C:\Users\Lab\Documents\Maodong\20200818\disper\Dev21\response_modefamily-1520-1570nm.mat';
 load(filename);
 
 data_old = data_matrix(:,2);
@@ -29,6 +29,7 @@ data_matrix(:,2)=data_new;
 
 
 newfilename = split(filename,'\');
+plotTitle = newfilename{end};
 newfilename{end} = ['filted-' newfilename{end}];
 newfilename = join(newfilename,'\');
 newfilename = newfilename{1};

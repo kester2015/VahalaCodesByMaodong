@@ -30,7 +30,7 @@ Config.Current = 100;
 % Device
 Device.laser1 = 'TLB6700';
 Device.laser2 = 'TLB6700';
-Device.osc = Infiniium('GPIB1::7::INSTR',1);
-% Device.osc = Infiniium('USB0::0x2A8D::0x904E::MY54200105::INSTR');
+% Device.osc = Infiniium('GPIB1::7::INSTR',1);
+Device.osc = Infiniium('USB0::0x2A8D::0x904E::MY54200105::INSTR');
 % Device.fg = Keysight33500('USB0::0x0957::0x2807::MY52402234::INSTR');
-save ('config.mat', 'Config', 'Device');
+save ('config.mat', 'Config', 'Device'); 
