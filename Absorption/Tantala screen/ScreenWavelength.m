@@ -5,7 +5,7 @@ laser1.connect;
 
 
 wlList = [];
-for wl = 1520:0.25:1570
+for wl = 1545:0.25:1555
     fg1.CH1(0);
     laser1.Move2Wavelength(wl);
     fg1.CH1(1);
