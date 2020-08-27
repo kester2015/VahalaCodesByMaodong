@@ -4,19 +4,29 @@ close all
 wavelengthList = 1535;%1535:10:1555;
 highNoiseThreshold = 0.2;
 
-for wavelength = wavelengthList
-%     filedirGolb = strcat("D:\Measurement Data\Absorption project\SiN\20200223\Row2Col1_Triangle\",num2str(wavelength));
 
-    filedir = strcat(filedirGolb,"nm-01-mat");
+filedirGolb = "Z:\Qifan\Tantala\20200820-thermal-rawdata\Dev21\"; % --20200819 Tantala ---
+
+% filedirGolb = "D:\Measurement Data\Tantala-broadening\"; % --20200810 Tantala ---
+% wavelengthList     = [1540   1545   1551   1556   1561];%1535:10:1555;
+
+%filedirGolb = strcat("D:\Measurement Data\Absorption project\SiN\20200223\Row2Col1_Triangle\",num2str(wavelength));
+% filedirGolb = "D:\Measurement Data\Absorption project\SiN\20200223\Row2Col1_Triangle\";
+
+for wavelength = wavelengthList
+    
+    filedir = strcat(filedirGolb,num2str(wavelength),"nm-01-mat");
     matfiles = dir(strcat(filedir,'\*.mat') );
     % extractFreq = 5; % Hz
     FWHMList1 = zeros(length(matfiles),2);
     transList = zeros(length(matfiles),1);
+%     plotnum = length(matfiles); % how many traces you want to plot
+    plotnum = 15;
 
 %     figure('Units', 'Normalized', 'OuterPosition', [2.1, 0.45, 0.55, 0.5]);
     figure;
     subplot(121)
-    for ii = 1:length(matfiles)
+    for ii = 1:round(length(matfiles)/plotnum):length(matfiles)
         filename = strcat(filedir, '\', matfiles(ii).name);
         [sweepFreq, EOMPower] = extractFreqAndPower(filename);
         if EOMPower < highNoiseThreshold
@@ -41,9 +51,9 @@ for wavelength = wavelengthList
 
 
     FWHMList1 = zeros(length(matfiles),2);
-    filedir = strcat(filedirGolb,"nm-02-mat");
+    filedir = strcat(filedirGolb,num2str(wavelength),"nm-02-mat");
     subplot(122)
-    for ii = 1:length(matfiles)
+    for ii = 1:round(length(matfiles)/plotnum):length(matfiles)
         filename = strcat(filedir, '\', matfiles(ii).name);
         [sweepFreq, EOMPower] = extractFreqAndPower(filename);
         if EOMPower < highNoiseThreshold

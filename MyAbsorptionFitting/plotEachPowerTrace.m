@@ -4,8 +4,12 @@ close all
 wavelengthList = 1535;%1535:10:1555;
 highNoiseThreshold = 0.2;
 
-filedirGolb = "D:\Measurement Data\Tantala-broadening\"; % --20200810 Tantala ---
-wavelengthList     = [1536   1548   1548.1   1564];%1535:10:1555;
+
+filedirGolb = "Z:\Qifan\Tantala\20200819-thermal-rawdata\Dev21\"; % --20200819 Tantala ---
+wavelengthList = [1540   1545   1551   1556   1561];
+% wavelengthList     = [1551 1553 1561 1564];
+% filedirGolb = "D:\Measurement Data\Tantala-broadening\"; % --20200810 Tantala ---
+% wavelengthList     = [1540   1545   1551   1556   1561];%1535:10:1555;
 
 %filedirGolb = strcat("D:\Measurement Data\Absorption project\SiN\20200223\Row2Col1_Triangle\",num2str(wavelength));
 % filedirGolb = "D:\Measurement Data\Absorption project\SiN\20200223\Row2Col1_Triangle\";

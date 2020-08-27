@@ -61,9 +61,9 @@ function [Base, FWHM] = getFWHM(filename,plotfig)
 
     %%
     
-%     Trans_phasor = hilbert(Trans_raw); % use phasor for non-parametric fit
-% 
-%     Trans_fp_phase = [0; cumsum(mod(diff(angle(Trans_phasor))+pi, 2*pi) - pi)] + angle(Trans_phasor(1));
+    Trans_phasor = hilbert(Trans_raw); % use phasor for non-parametric fit
+
+    Trans_fp_phase = [0; cumsum(mod(diff(angle(Trans_phasor))+pi, 2*pi) - pi)] + angle(Trans_phasor(1));
 
     %% Get dip
     [dip_y, dip_x] = min(Trans);
