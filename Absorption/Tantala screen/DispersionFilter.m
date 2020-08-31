@@ -3,7 +3,7 @@
 clear
 clc
 
-filename = 'C:\Users\Lab\Documents\Maodong\20200818\disper\Dev21\response_modefamily-1520-1570nm.mat';
+filename = 'C:\Users\Lab\Documents\Maodong\20200820\disper\Dev21\Two-mode-family-together-2-1520-1570nm.mat';
 load(filename);
 
 data_old = data_matrix(:,2);
