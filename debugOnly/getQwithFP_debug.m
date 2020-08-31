@@ -1,7 +1,6 @@
-function [Q0,Q1,QL] = getQwithFP(filename,lambda)
-%GETQWITHFP Summary of this function goes here
-%   Detailed explanation goes here
-
+    
+    filename = 'Z:\Qifan\Tantala\20200819\Dev21\triangle\4.46uW-1540.4nm.mat';
+    lambda = 1540;
     load(filename,'data_matrix');
     MZI_FSR = 39.9553;
     %% define data set to fit
@@ -25,7 +24,6 @@ function [Q0,Q1,QL] = getQwithFP(filename,lambda)
     fit_Lorentz_fp = fittype('(A0+B*cos((x-x1)/T*2*pi))*(1-LP/(LS^2+(x-x0)^2))','coefficients',{'A0','B','x1','T','LP','LS','x0'});
     fit_sine       = fittype(' A0+B*cos((x-x1)/T*2*pi)',                        'coefficients',{'A0','B','x1','T'});
 
-    fit_Lorentz_fp_fano = fittype('(A0+B*cos((x-x1)/T*2*pi))*((x-x0+F0)^2+LS^2-LP)/(LS^2+(x-x0)^2)','coefficients',{'A0','B','x1','T','LP','LS','x0','F0'});
     %% Fit FP background
     Q_trace_freq = abs(fft(Q_trace));
     % figure;
@@ -34,7 +32,7 @@ function [Q0,Q1,QL] = getQwithFP(filename,lambda)
     Q_trace_freq_temp(1) = 0;
     [amp_fp,pos_fp] = max(Q_trace_freq_temp(1:round(end/2)));
     fit_T_estimate = length(Q_trace_freq)/(pos_fp-1);
-    if pos_fp < 3
+    if pos_fp < 4
         fit_T_estimate = 2*length(Q_trace_freq);
     end
     fit_B_estimate = amp_fp/length(Q_trace_freq);
@@ -51,11 +49,11 @@ function [Q0,Q1,QL] = getQwithFP(filename,lambda)
     %         plot((1:length(Q_trace)).',MZI_trace);
     %         title("Original data")
 
-%             figure
-%             plot((1:length(Q_trace)).',Q_trace)
-%             hold on
-%             scatter((1:length(Q_trace)).',fp_fit_result);
-%             title("FP fitting")
+            figure
+            plot((1:length(Q_trace)).',Q_trace)
+            hold on
+            scatter((1:length(Q_trace)).',fp_fit_result);
+            title("FP fitting")
             
     %% Peak position find and parameter estimation
     % First get difference between FP background and Q_trace original data
@@ -102,12 +100,13 @@ function [Q0,Q1,QL] = getQwithFP(filename,lambda)
     % % Begin fitting Here
     
     % Give the peak position higher weight
-    fit_weight_dip = 0.1*ones(length(Q_trace_tofit),1);
+    fit_weight_dip = 0.01*ones(length(Q_trace_tofit),1);
 %     fit_weight_dip = zeros(length(Q_trace_tofit),1);
     fit_weight_fp = fit_weight_dip;
-    weight_start = max(pos_peak-5*linewidth_estimate,1);
-    weight_end   = min(pos_peak+5*linewidth_estimate,length(Q_trace_tofit));
-    fit_weight_dip(weight_start:weight_end) = 1; %10*max(round(length(Q_trace_tofit)/(weight_end-weight_start)),1);
+    weight_range = 3; % 5 times of linewidth;
+    weight_start = max(pos_peak-weight_range*linewidth_estimate,1);
+    weight_end   = min(pos_peak+weight_range*linewidth_estimate,length(Q_trace_tofit));
+    fit_weight_dip(weight_start:weight_end) = 1*Q_trace_tofit(weight_start:weight_end); %10*max(round(length(Q_trace_tofit)/(weight_end-weight_start)),1);
     fit_weight_fp(weight_start:weight_end) = 0;
     
 %     % first redo the FP (2nd fp)
@@ -126,17 +125,12 @@ function [Q0,Q1,QL] = getQwithFP(filename,lambda)
 %     fit_B_estimate = fp_fit_2.B;
 %     fit_x1_estimate = mod(fp_fit_2.x1, fp_fit_2.T);
 %     fit_T_estimate = fp_fit_2.T;
-%     
-%     Q_withfp_fit=fit( (1:length(Q_trace_tofit)).', Q_trace_tofit, fit_Lorentz_fp, ...
-%         'StartPoint', [fit_A0_estimate, fit_B_estimate, fit_x1_estimate, fit_T_estimate...
-%                         fit_LP_estimate, fit_LS_estimate, fit_x0_estimate],...
-%                     'Weight',fit_weight_dip ); % Lorentz with FP fit, {'A0','B','x1','T','LP','LS','x0'}
-                
-    Q_withfp_fit=fit( (1:length(Q_trace_tofit)).', Q_trace_tofit, fit_Lorentz_fp_fano, ...
+    
+    Q_withfp_fit=fit( (1:length(Q_trace_tofit)).', Q_trace_tofit, fit_Lorentz_fp, ...
         'StartPoint', [fit_A0_estimate, fit_B_estimate, fit_x1_estimate, fit_T_estimate...
-                        fit_LP_estimate, fit_LS_estimate, fit_x0_estimate 0],...
-                    'Weight',fit_weight_dip ); % Lorentz with FP fit, {'A0','B','x1','T','LP','LS','x0','F'}
-                
+                        fit_LP_estimate, fit_LS_estimate, fit_x0_estimate],...
+                    'Weight',fit_weight_dip ); % Lorentz with FP fit, {'A0','B','x1','T','LP','LS','x0'}
+
     Q_withfp_fit_result = Q_withfp_fit( (1:length(Q_trace_tofit)).' );
     kappa  = 2*abs(Q_withfp_fit.LS); % LS may be negative due to nonlinear fitting
     kappa0 = abs(Q_withfp_fit.LS)+sqrt(Q_withfp_fit.LS^2-Q_withfp_fit.LP);
@@ -191,22 +185,4 @@ function [Q0,Q1,QL] = getQwithFP(filename,lambda)
             scatter((1:length(Q_trace_tofit)).',Q_withfp_fit_result);
             hold on
             plot((1:length(Q_trace_tofit)).',fit_weight_dip*max(Q_trace_tofit))
-            title(sprintf("Q trace with FP fitting, %g nm\n Q0=%.4gM, Q1=%.4gM, Q=%.4gM, Trans=%.4g",lambda,Q0,Q1,QL,fitted_transmission))
-end
-
-
-
-%% MZI to Phase function
-function phase = MZI2Phase(trace_MZI)
-    trace_length = length(trace_MZI);
-    trace_MZI_tofit = trace_MZI;
-    % trace_MZI_tofit = sgolayfilt(trace_MZI, 1, 11);
-    Base = (max(trace_MZI_tofit) + min(trace_MZI_tofit))/2;
-    trace_MZI_phasor = hilbert(trace_MZI_tofit - Base); % use phasor for non-parametric fit
-
-    trace_MZI_phase = [0; cumsum(mod(diff(angle(trace_MZI_phasor))+pi, 2*pi) - pi)] + angle(trace_MZI_phasor(1));
-    % trace_MZI_phase = sgolayfilt(trace_MZI_phase, 1, 11);
-    phase = sgolayfilt(trace_MZI_phase, 2, round(trace_length/40)*2 + 1);
-    % phase = trace_MZI_phase;
-end
-
+            title(sprintf("Q trace with FP fitting, %g nm\n Q0=%.3gM, Q1=%.3gM, Q=%.3gM, Trans=%.4g",lambda,Q0,Q1,QL,fitted_transmission))

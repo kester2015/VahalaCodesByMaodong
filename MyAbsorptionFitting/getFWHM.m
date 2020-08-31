@@ -1,4 +1,4 @@
-function [Base, FWHM] = getFWHM(filename,plotfig)
+function [Base_voltage, FWHM] = getFWHM(filename,plotfig)
     if nargin == 1
         plotfig = 0;
     end
@@ -68,8 +68,9 @@ function [Base, FWHM] = getFWHM(filename,plotfig)
     %% Get dip
     [dip_y, dip_x] = min(Trans);
     Base = max(Trans);
+%     Base = Trans(dip_x);
     mid_y = (dip_y+Base)/2;
-    mid_x = [min(find(Trans < mid_y)), max(find(Trans < mid_y))];
+    mid_x = [find(Trans < mid_y, 1 ), find(Trans < mid_y, 1, 'last' )];
     % figure
     % hold on
     % plot(phase, MZI);
@@ -79,6 +80,7 @@ function [Base, FWHM] = getFWHM(filename,plotfig)
     % scatter(phase(mid_x), [mid_y mid_y]);
     count = (phase(mid_x(2)) - phase(mid_x(1)))/2/pi;
     FWHM = count;
+    Base_voltage = fp_fit_result(dip_x);
     %% Plot
     if plotfig
                 figure('Units', 'Normalized', 'OuterPosition', [0.4, 0.45, 0.65, 0.5])
