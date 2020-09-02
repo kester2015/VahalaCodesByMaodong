@@ -8,7 +8,9 @@ instrreset;
 Myfg1 = Keysight33500('USB0::0x0957::0x2C07::MY52814912::INSTR'); % lower
 Myfg2 = Keysight33500('USB0::0x0957::0x2607::MY52202388::INSTR'); % upper
 % Ocsillascope
-OSC = Infiniium('USB0::0x2A8D::0x904E::MY54200105::INSTR');
+% OSC = Infiniium('USB0::0x2A8D::0x904E::MY54200105::INSTR');
+OSC = Infiniium('USB0::0x2A8D::0x9049::MY55510176::INSTR',2);
+
 % OSC = Infiniium('GPIB1::7::INSTR',1); % = Device.osc;
 
 Myfg1.connect;

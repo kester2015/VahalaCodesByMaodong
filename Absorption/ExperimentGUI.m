@@ -542,6 +542,7 @@ switch handles.Method.Value
                 disp('No mode detected');
             end
             Data.Q_obj = Q_obj;
+            getQwithFP([filename,'.mat']); %Only used for Tantala, please comment this line later
         end
     case 2
         %% Dispersion Measurement

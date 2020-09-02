@@ -212,11 +212,10 @@ function [Q0,Q1,QL] = getQwithFP(filename,lambda)
             
             filename_tosave = strcat(filename(1:end-4),'-FPfitting.fig');
             if isfile(filename_tosave)
-                backup_filename = strcat(filename_tosave(1:end-4),'_',char(datetime('now','Format','yyMMdd_HHmmss')),'_bak.fig');
-                movefile(filename_tosave,backup_filename);
+                bck
+                movefile([filename,'.mat'],[filename,'_',char(datetime('now','Format','yyMMdd_HHmmss')),'_bak.mat']);
                 warning('Old file was renamed!')
             end
-            saveas(gcf,filename_tosave);
 end
 
 

@@ -32,6 +32,8 @@ Config.Piezo=50;
 Device.laser1 = 'TLB6700';
 Device.laser2 = 'TLB6700';
 % Device.osc = Infiniium('GPIB1::7::INSTR',1);
-Device.osc = Infiniium('USB0::0x2A8D::0x904E::MY54200105::INSTR',2);
+% Device.osc = Infiniium('USB0::0x2A8D::0x904E::MY54200105::INSTR',2); % 2.5G
+Device.osc = Infiniium('USB0::0x2A8D::0x9049::MY55510176::INSTR',2); % 1G
+
 Device.fg = Keysight33500('USB0::0x0957::0x2C07::MY52814912::0::INSTR');
 save ('config.mat', 'Config', 'Device');
