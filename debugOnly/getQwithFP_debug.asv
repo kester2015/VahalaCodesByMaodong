@@ -1,5 +1,4 @@
     
-    filename = 'Z:\Qifan\Tantala\20200901\Dev21\1.44uW-pol1-maxvpp-1548.3nm.mat';
     filename = 'Z:\Qifan\Tantala\20200901\Dev21\1.30uW-pol1-maxvpp-1542nm.mat';
 
     %GETQWITHFP Summary of this function goes here
@@ -224,7 +223,8 @@
 
     %% ------------ fit FP dip with interference ---------
 %             % % ----This part is actually a 2nd appearance in this file,
-%             % % ----rewrite only for convenience----
+%             rewrite only for c
+%             
 %             % %----------Give the peak position higher weight---------------
 %                 fit_weight_dip = 0.05*ones(length(Q_trace_tofit),1);
 %                 fit_weight_fp = fit_weight_dip;
