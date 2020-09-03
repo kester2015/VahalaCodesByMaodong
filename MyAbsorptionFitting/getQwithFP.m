@@ -34,6 +34,7 @@ function [Q0,Q1,QL] = getQwithFP(filename,lambda)
     fit_Lorentz_sine_fano = fittype('(A0+B*cos((x-x1)/T*2*pi))      *((x-x0+F0)^2+LS^2-LP)/(LS^2+(x-x0)^2)','coefficients',{'A0','B','x1','T','LP','LS','x0','F0'});
     fit_Lorentz_fp_fano   = fittype('(A0/( 1-B*cos((x-x1)/T*2*pi)) )*((x-x0+F0)^2+LS^2-LP)/(LS^2+(x-x0)^2)','coefficients',{'A0','B','x1','T','LP','LS','x0','F0'});
 
+
     %% Fit FP background
     Q_trace_freq = abs(fft(Q_trace));
     % figure;
@@ -104,20 +105,20 @@ function [Q0,Q1,QL] = getQwithFP(filename,lambda)
     fit_T_estimate = fp_fit.T;
     fit_LP_estimate = (1-transmission_estimate)*linewidth_estimate^2/4;
     fit_LS_estimate = linewidth_estimate/2;
-    fit_x0_estimate = pos_peak;
+    fit_x0_estimate = pos_peak;  
     
-    
-    % % Begin fitting Here
-    
-    % Give the peak position higher weight
+    %% ----------Give the peak position higher weight---------------
     fit_weight_dip = 0.05*ones(length(Q_trace_tofit),1);
 %     fit_weight_dip = zeros(length(Q_trace_tofit),1);
     fit_weight_fp = fit_weight_dip;
-    weight_start = max(pos_peak-10*linewidth_estimate,1);
-    weight_end   = min(pos_peak+10*linewidth_estimate,length(Q_trace_tofit));
+    weight_width = 30; % times of linewidth
+    weight_start = max(round(pos_peak - weight_width*linewidth_estimate/2),1);
+    weight_end   = min(round(pos_peak + weight_width*linewidth_estimate/2),length(Q_trace_tofit));
     fit_weight_dip(weight_start:weight_end) = 1; %10*max(round(length(Q_trace_tofit)/(weight_end-weight_start)),1);
     fit_weight_fp(weight_start:weight_end) = 0;
+    % ----------weighing module finished---------------
     
+    %% Begin fitting Here
     % first redo the FP (2nd fp)
     fp_fit_2 = fit( (1:length(Q_trace_tofit)).',Q_trace_tofit,fit_fp,...
         'StartPoint',[fit_A0_estimate fit_B_estimate length(Q_trace_freq)/2 fit_T_estimate],...
@@ -125,11 +126,11 @@ function [Q0,Q1,QL] = getQwithFP(filename,lambda)
     fp_fit_result_2 = fp_fit_2((1:length(Q_trace_tofit)).');%fp_fit.A0+fp_fit.B*cos(((1:length(Q_trace)).'-fp_fit.x1)/fp_fit.T*2*pi);
 
 %             figure
-%             plot((1:length(Q_trace_tofit)).',Q_trace_tofit)
+%             plot((1:length(Q_trace_tofit)).',Q_trace_tofit,'Linewidth',2.0)
 %             hold on
-%             scatter((1:length(Q_trace_tofit)).',fp_fit_result_2);
+%             scatter((1:length(Q_trace_tofit)).',fp_fit_result_2, 5);
 %             title("FP 2nd fitting")
-            
+%             
     fit_A0_estimate = fp_fit_2.A0;
     fit_B_estimate = fp_fit_2.B;
     fit_x1_estimate = mod(fp_fit_2.x1, fp_fit_2.T);
@@ -176,11 +177,11 @@ function [Q0,Q1,QL] = getQwithFP(filename,lambda)
     end
     % Q_baseline=Q_withfp_fit.A;
     % transmission=Q_withfp_fit(Q_withfp_fit.x0)/Q_withfp_fit.A;
-
+% 
 %             figure
-%             plot((1:length(Q_trace_tofit)).',Q_trace_tofit)
+%             plot((1:length(Q_trace_tofit)).',Q_trace_tofit,'Linewidth',2.0)
 %             hold on
-%             scatter((1:length(Q_trace_tofit)).',Q_withfp_fit_result);
+%             scatter((1:length(Q_trace_tofit)).',Q_withfp_fit_result,5);
 %             title("Q trace with FP fitting")
 
     %% Then fit MZI with Q trace
@@ -216,7 +217,84 @@ function [Q0,Q1,QL] = getQwithFP(filename,lambda)
                 movefile(filename_tosave,backup_filename);
                 warning('Old file was renamed!')
             end
-            saveas(gcf,filename_tosave);
+%             saveas(gcf,filename_tosave);
+    %% fit FP dip with interference
+            % ----------Give the peak position higher weight---------------
+                fit_weight_dip = 0.05*ones(length(Q_trace_tofit),1);
+            %     fit_weight_dip = zeros(length(Q_trace_tofit),1);
+                fit_weight_fp = fit_weight_dip;
+                weight_width = 10; % times of linewidth
+                weight_start = max(round(pos_peak - weight_width*linewidth_estimate/2),1);
+                weight_end   = min(round(pos_peak + weight_width*linewidth_estimate/2),length(Q_trace_tofit));
+                fit_weight_dip(weight_start:weight_end) = 1; %10*max(round(length(Q_trace_tofit)/(weight_end-weight_start)),1);
+                fit_weight_fp(weight_start:weight_end) = 0;
+                % ----------weighing module finished---------------
+%                 fit_weight_dip = 0.05*ones(length(Q_trace_tofit),1);
+                
+        r1r2 = ( 1-sqrt(1-fp_fit_2.B^2) )/fp_fit_2.B ;
+        fit_A0_estimate_new = fp_fit_2.A0 * (1+r1r2^2);
+        fit_B_estimate_new  = fp_fit_2.B  * (1+r1r2^2);
+        
+        
+        % % --------treat FP as free parameters, complex form--------------
+%         fit_interfere_complexform = fittype(@(A0,r,x1,T,k0,ke,x0,x)( A0.*abs((1i*(x-x0)+(k0-ke)/2)./(1i*(x-x0)+(k0+ke)/2)).^2 )./ (abs(1-r.*( (1i*(x-x0)+(k0-ke)/2)./(1i*(x-x0)+(k0+ke)/2) ).^2 .* exp(1i*2*pi*(x-x1)./T) ).^2)  );
+%         fit_interfere_complexform = fittype('( A0.*abs((1i*(x-x0)+(k0-ke)/2)./(1i*(x-x0)+(k0+ke)/2)).^2 )./ (abs(1-r.*( (1i*(x-x0)+(k0-ke)/2)./(1i*(x-x0)+(k0+ke)/2) ).^2 .* exp(1i*2*pi*(x-x1)./T) ).^2) ',...
+%                                             'coefficients',{'A0','r','x1','T','ke','k0','x0'});
+%         Q_withfp_interfere_fit = fit( (1:length(Q_trace_tofit)).', Q_trace_tofit, fit_interfere_complexform, ...
+%         'StartPoint', [fit_A0_estimate_new, r1r2, fit_x1_estimate, fit_T_estimate...
+%                         kappa0, 2*kappa-2*kappa0, fit_x0_estimate],...
+%                     'Weight',fit_weight_dip );
+
+        % % ----------treat FP as problem arguments, complex form------------
+        fit_interfere_complexform = fittype(@(A0,r,x1,T,k0,ke,x0,x)( A0.*abs((1i*(x-x0)+(k0-ke)/2)./(1i*(x-x0)+(k0+ke)/2)).^2 )./ (abs(1-r.*( (1i*(x-x0)+(k0-ke)/2)./(1i*(x-x0)+(k0+ke)/2) ).^2 .* exp(1i*2*pi*(x-x1)./T) ).^2)  );
+        fit_interfere_complexform = fittype('( A0.*abs((1i*(x-x0)+(k0-ke)/2)./(1i*(x-x0)+(k0+ke)/2)).^2 )./ (abs(1-r.*( (1i*(x-x0)+(k0-ke)/2)./(1i*(x-x0)+(k0+ke)/2) ).^2 .* exp(1i*2*pi*(x-x1)./T) ).^2) ',...
+                                            'coefficients',{'ke','k0','x0'},...
+                                            'problem',{'A0','r','x1','T'});
+        Q_withfp_interfere_fit = fit( (1:length(Q_trace_tofit)).', Q_trace_tofit, fit_interfere_complexform, ...
+                                    'StartPoint', [kappa0, 2*kappa-2*kappa0, fit_x0_estimate],...
+                                    'problem',{fit_A0_estimate_new, r1r2, fit_x1_estimate, fit_T_estimate},...
+                                    'Weight',fit_weight_dip );
+
+        % % --------treat FP as free parameters--------------
+%         fit_Lorentz_fp_interfere = fittype('( A0/( 1 + (B/2)^2*(1-LP/(LS^2+(x-x0)^2))^2 - B* (1-LP/(LS^2+(x-x0)^2)) *cos((x-x1)/T*2*pi + 2* atan(sqrt(LS^2-LP)/(x-x0)) - 2* atan( 2*abs(LS)/(x-x0) ) )))*(1-LP/(LS^2+(x-x0)^2))',...
+%                                          'coefficients',{'A0','B','x1','T','LP','LS','x0'});
+%         Q_withfp_interfere_fit = fit( (1:length(Q_trace_tofit)).', Q_trace_tofit, fit_Lorentz_fp_interfere, ...
+%         'StartPoint', [fit_A0_estimate_new, fit_B_estimate_new, fit_x1_estimate, fit_T_estimate...
+%                         fit_LP_estimate, fit_LS_estimate, fit_x0_estimate],...
+%                     'Weight',fit_weight_dip );
+        % % ----------treat FP as problem arguments------------
+%         fit_Lorentz_fp_interfere = fittype('( A0/( 1 + (B/2)^2*(1-LP/(LS^2+(x-x0)^2))^2 - B* (1-LP/(LS^2+(x-x0)^2)) *cos((x-x1)/T*2*pi + 2* atan(sqrt(LS^2-LP)/(x-x0)) - 2* atan( 2*abs(LS)/(x-x0) ) )))*(1-LP/(LS^2+(x-x0)^2))',...
+%                                          'coefficients',{'LP','LS','x0'}, 'problem',{'A0','B','x1','T'});
+%         Q_withfp_interfere_fit = fit( (1:length(Q_trace_tofit)).', Q_trace_tofit, fit_Lorentz_fp_interfere, ...
+%                     'StartPoint', [fit_LP_estimate, fit_LS_estimate, fit_x0_estimate],...
+%                     'problem',{fit_A0_estimate_new, fit_B_estimate_new, fit_x1_estimate, fit_T_estimate},...
+%                     'Weight',fit_weight_dip );
+        % % -------fitting code finished--------------
+        
+        
+        % % -------extract kappa from fitting results----------
+%         kappa  = 2*abs(Q_withfp_interfere_fit.LS); % LS may be negative due to nonlinear fitting
+%         kappa0 = abs(Q_withfp_interfere_fit.LS)+sqrt(Q_withfp_interfere_fit.LS^2-Q_withfp_interfere_fit.LP);
+%         fitted_transmission = 1-Q_withfp_interfere_fit.LP/Q_withfp_interfere_fit.LS^2;
+        kappa = Q_withfp_interfere_fit.k0 + Q_withfp_interfere_fit.ke;
+        kappa0 = Q_withfp_interfere_fit.k0;
+        fitted_transmission = (Q_withfp_interfere_fit.k0 - Q_withfp_interfere_fit.ke)/kappa;
+        
+        Q0=299792.458/lambda/( kappa0       /MZI_fit_T * MZI_FSR);
+        Q1=299792.458/lambda/((kappa-kappa0)/MZI_fit_T * MZI_FSR);
+        QL=299792.458/lambda/( kappa        /MZI_fit_T * MZI_FSR);
+        
+        Q_withfp_interfere_fit_result = Q_withfp_interfere_fit( (1:length(Q_trace_tofit)).' );
+        
+            figure
+            plot((1:length(Q_trace_tofit)).',Q_trace_tofit,'Linewidth',2.0)
+            hold on
+            plot_step = 1;
+            scatter((1:plot_step:length(Q_trace_tofit)).',Q_withfp_interfere_fit_result(1:plot_step:length(Q_trace_tofit)) ,5); % last parameter is Marker size
+            hold on
+            plot((1:length(Q_trace_tofit)).',fit_weight_dip*max(Q_trace_tofit))
+            title(sprintf("Q trace with FP fitting, INCLUDED interference, %g nm\n Q0=%.4gM, Q1=%.4gM, Q=%.4gM, Trans=%.4g",lambda,Q0,Q1,QL,fitted_transmission))
+ 
 end
 
 
