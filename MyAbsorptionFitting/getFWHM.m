@@ -25,7 +25,8 @@ function [Base_voltage, FWHM] = getFWHM(filename,plotfig)
     end
     Trans_raw = Trans;
     %% FP background filter
-    fit_sine = fittype(' A0+B*cos((x-x1)/T*2*pi)','coefficients',{'A0','B','x1','T'});
+    fit_sine = fittype(' A0 +  B*cos((x-x1)/T*2*pi) ','coefficients',{'A0','B','x1','T'});
+    fit_fp   = fittype(' A0/(1-B*cos((x-x1)/T*2*pi))','coefficients',{'A0','B','x1','T'});
     Q_trace_freq = abs(fft(Trans_raw));
 
     Q_trace_freq_temp = Q_trace_freq;
@@ -38,16 +39,35 @@ function [Base_voltage, FWHM] = getFWHM(filename,plotfig)
     fit_B_estimate = amp_fp/length(Q_trace_freq);
     fit_A0_estimate = mean(Trans_raw);
 
-    fp_fit = fit( (1:length(Trans_raw)).',Trans_raw,fit_sine,...
+    % --First do a rough fitting to find dip position
+    fp_fit_1 = fit( (1:length(Trans_raw)).',Trans_raw,fit_fp,...
         'StartPoint',[fit_A0_estimate fit_B_estimate length(Q_trace_freq)/2 fit_T_estimate],...
         'Weights',Trans_raw);
-    fp_fit_result = fp_fit((1:length(Trans_raw)).');%fp_fit.A0+fp_fit.B*cos(((1:length(Q_trace)).'-fp_fit.x1)/fp_fit.T*2*pi);
+    fp_fit_result_1 = fp_fit_1((1:length(Trans_raw)).');%fp_fit.A0+fp_fit.B*cos(((1:length(Q_trace)).'-fp_fit.x1)/fp_fit.T*2*pi);
+    fit_A0_estimate = fp_fit_1.A0;
+    fit_B_estimate  = fp_fit_1.B;
+    fit_x1_estimate = fp_fit_1.x1;
+    fit_T_estimate  = fp_fit_1.T;
+    
+    Trans_1 = Trans_raw./fp_fit_result_1;
+    [dip_y_est, dip_x_est] = min(Trans_1);
+    Base_est = max(Trans_1);
+    mid_y_est = (dip_y_est+Base_est)/2;
+    half_cut_est = Trans_1 < mid_y_est;
+    mid_x_est = [find(half_cut_est(1:dip_x_est)==0, 1,'last' ), find(half_cut_est(dip_x_est:end)==1, 1)+dip_x_est-1];
+    linewidth_est = abs(diff(mid_x_est));
+    
+    pos_fitrange = 5; % times of linewidth, Q to fit range
+    pos_fitstart = round(max(0.03*length(Trans_raw) , dip_x_est - 0.8*pos_fitrange*linewidth_est)); % fitting range is peak position ± pos_fitrange/2 linewidth
+    pos_fitend   = round(min(0.97*length(Trans_raw) , dip_x_est + 0.2*pos_fitrange*linewidth_est)); % fitting range is peak position ± pos_fitrange/2 linewidth
 
-    Trans = Trans_raw./fp_fit_result;
-
-    fp_fit = fit( (1:length(Trans_raw)).',Trans_raw,fit_sine,...
-        'StartPoint',[fit_A0_estimate fit_B_estimate length(Q_trace_freq)/2 fit_T_estimate],...
-        'Weights',Trans.^6);
+    fp_fit_weight = ones(size(Trans_raw));
+    fp_fit_weight(pos_fitstart:pos_fitend) = 0;
+    
+    
+    fp_fit = fit( (1:length(Trans_raw)).',Trans_raw,fit_fp,...
+        'StartPoint',[fit_A0_estimate fit_B_estimate fit_x1_estimate fit_T_estimate],...
+        'Weights',fp_fit_weight);
     fp_fit_result = fp_fit((1:length(Trans_raw)).');%fp_fit.A0+fp_fit.B*cos(((1:length(Q_trace)).'-fp_fit.x1)/fp_fit.T*2*pi);
 
     Trans = Trans_raw./fp_fit_result;
@@ -70,7 +90,8 @@ function [Base_voltage, FWHM] = getFWHM(filename,plotfig)
     Base = max(Trans);
 %     Base = Trans(dip_x);
     mid_y = (dip_y+Base)/2;
-    mid_x = [find(Trans < mid_y, 1 ), find(Trans < mid_y, 1, 'last' )];
+    half_cut = Trans < mid_y;
+    mid_x = [find(half_cut(1:dip_x)==0, 1,'last' ), find(half_cut(dip_x:end)==1, 1)+dip_x-1];
     % figure
     % hold on
     % plot(phase, MZI);
@@ -83,11 +104,13 @@ function [Base_voltage, FWHM] = getFWHM(filename,plotfig)
     Base_voltage = fp_fit_result(dip_x);
     %% Plot
     if plotfig
-                figure('Units', 'Normalized', 'OuterPosition', [0.4, 0.45, 0.65, 0.5])
+                figure('Units', 'Normalized', 'OuterPosition', [0.2, 0.45, 0.65, 0.5])
                 subplot(121)
-                plot((1:length(Trans_raw)).',Trans_raw)
+                plot((1:length(Trans_raw)).',Trans_raw,'Linewidth',2.0)
                 hold on
-                scatter((1:length(Trans_raw)).',fp_fit_result);
+                scatter((1:length(Trans_raw)).',fp_fit_result,5);
+                hold on
+                plot((1:length(Trans_raw)).',fp_fit_weight * max(Trans_raw)/max(fp_fit_weight));
                 title("FP fitting")
                 subplot(122)
                 plot((1:length(Trans)).',Trans)

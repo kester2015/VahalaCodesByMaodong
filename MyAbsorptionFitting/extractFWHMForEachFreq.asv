@@ -32,17 +32,17 @@ kerrOverTotalList  = [0.0353 0.0390 0.0332 0.0349 0.0353]/2;
 % % %------20200820 Tantala-----------%
 %1535nm
 filedirGolb = strcat("Z:\Qifan\Tantala\20200820-thermal-rawdata\Dev21\");
-wavelengthList     = [wavelengthList     1551.1   1561.1   1553   1564];%1535:10:1555;
+wavelengthList     = [wavelengthList 1551.1   1561.1   1553   1564];%1535:10:1555;
 outputVoltage1List = [outputVoltage1List 2.332  1.876  2.522  0.951];
-outputPower1List   = [outputPower1List   1.403  1.399  1.658  0.4556];%[1.221 1.637 1.846];%mW
-inputVoltage1List  = [inputVoltage1List  3.490  3.335  3.625  2.513];%[1.77296 2.2588 2.4366]; %V
-inputPower1List    = [inputPower1List    15.80  14.62  15.43  11.71];%[8.421 11.17 12.17];%mW
-outputVoltage2List = [outputVoltage2List 2.018  1.780  2.574  1.062];%[0.89960 1.2781 1.1564]; %V
-outputPower2List   = [outputPower2List   1.183  1.379  1.739  0.5243];%[1.196 1.489 1.704];%mW
-inputVoltage2List  = [inputVoltage2List  3.497  3.329  3.528  2.448];%[1.773 2.1937 2.4256]; %V
-inputPower2List    = [inputPower2List    15.03  15.29  16.06  10.61];%[8.548 10.55 12.24];%mW
-% QtotList           = [2.096  1.644  1.806  0.5354]*1e6;
-% QextList           = [8.754  6.114  7.413  1.482]*1e6;
+outputPower1List   = [1.403  1.399  1.658  0.4556];%[1.221 1.637 1.846];%mW
+inputVoltage1List  = [3.490  3.335  3.625  2.513];%[1.77296 2.2588 2.4366]; %V
+inputPower1List    = [15.80  14.62  15.43  11.71];%[8.421 11.17 12.17];%mW
+outputVoltage2List = [2.018  1.780  2.574  1.062];%[0.89960 1.2781 1.1564]; %V
+outputPower2List   = [1.183  1.379  1.739  0.5243];%[1.196 1.489 1.704];%mW
+inputVoltage2List  = [3.497  3.329  3.528  2.448];%[1.773 2.1937 2.4256]; %V
+inputPower2List    = [15.03  15.29  16.06  10.61];%[8.548 10.55 12.24];%mW
+QtotList           = [2.096  1.644  1.806  0.5354]*1e6;
+QextList           = [8.754  6.114  7.413  1.482]*1e6;
 realwavelengthList = [1551.4 1561.0  1553.05 1564.3];
 realwavelengthList = [1551.5 1561.0  1553.05 1564.3];
 kerrOverTotalList  = [0.0332/2 0.0353/2  0.0353/2  0.0353/2];
@@ -57,7 +57,7 @@ for ii = 1:length(wavelengthList)
     idx = contains(Q_matfilesName,num2str(realwavelengthList(ii)));
     thisQfile = Q_matfiles(idx).name;
     thisQfile = strcat(filedirGolb,'Q-traces\',thisQfile);
-    [Q0List(ii),QextList(ii),QtotList(ii),~] = getQwithFP(thisQfile,realwavelengthList(ii),1);
+    [Q0List(ii),QextList(ii),QtotList(ii)] = getQwithFP(thisQfile,realwavelengthList(ii),1);
 end
 QtotList = QtotList*1e6;
 QextList = QextList*1e6;

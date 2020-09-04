@@ -1,0 +1,132 @@
+close all
+clear
+clc
+%%
+Q_data_file = 'Z:\Qifan\Tantala\20200819\Dev21\triangle\4.46uW-1540.4nm.mat';
+load('Z:\Qifan\Tantala\20200819-thermal-rawdata\Dev21\1540nm-02-mat\Sweep_20Hz_Power_0.6V.mat','timeAxis','Ch2','Ch3')
+
+lambda = 1540.4;
+
+if length(timeAxis) > 1e4
+        timeAxis = timeAxis(1:round(length(timeAxis)/1e4):end);
+        Ch3= Ch3(1:round(length(Ch3)/1e4):end);
+        Ch2 = Ch2(1:round(length(Ch2)/1e4):end);
+end
+%     Ch2 = sgolayfilt(Ch2, 2, round(length(Ch2)/1000)*2 + 1);
+
+MZI = Ch3(1:end);
+Trans =  Ch2(1:end);
+
+if min(Trans)<0
+        PD_background = min(Trans);
+        Trans = Trans - PD_background;
+        warning("transmission < 0 in rawdata, PD background %d mV are added. critical coupling assumed.", PD_background/0.001);
+end
+Trans_raw = Trans;
+
+MZI_phase = MZI2Phase(MZI);
+MZI_period_local       = round(2*pi/mean( diff(MZI_phase) ) );
+MZI_fit_T = 4*pi*round(MZI_period_local/4) / ...
+        ( MZI_phase( round( min(length(MZI_phase)/2 + MZI_period_local/4, length(MZI_phase) )))...
+        - MZI_phase( round( max(length(MZI_phase)/2 - MZI_period_local/4, 1                 ))) );
+    
+%%  First fit FP background
+    fit_sine = fittype(' A0 +  B*cos((x-x1)/T*2*pi) ','coefficients',{'A0','B','x1','T'});
+    fit_fp   = fittype(' A0/(1-B*cos((x-x1)/T*2*pi))','coefficients',{'A0','B','x1','T'});
+    
+    Q_trace_freq = abs(fft(Trans_raw));
+    Q_trace_freq_temp = Q_trace_freq;
+    Q_trace_freq_temp(1) = 0;
+    Q_trace_freq_temp = Q_trace_freq_temp(1:round(length(Trans_raw)/2));
+    [amp_fp,pos_fp] = max(Q_trace_freq_temp);
+    fit_T_estimate = length(Q_trace_freq)/(pos_fp-1);
+    if pos_fp < 3
+        fit_T_estimate = 1*length(Q_trace_freq);
+    end
+    fit_B_estimate = amp_fp/length(Q_trace_freq);
+    fit_A0_estimate = mean(Trans_raw);
+
+    %fit_T_estimate_phase = fit_T_estimate * (MZI_phase(end)-MZI_phase(1))/length(Trans_raw);
+    
+    % --First do a rough fitting to find dip position
+    fp_fit_1 = fit( (1:length(Trans_raw)).',Trans_raw,fit_fp,...
+        'StartPoint',[fit_A0_estimate fit_B_estimate length(Q_trace_freq)/2 fit_T_estimate],...
+        'Weights',Trans_raw.^2);
+    fp_fit_result_1 = fp_fit_1((1:length(Trans_raw)).');%fp_fit.A0+fp_fit.B*cos(((1:length(Q_trace)).'-fp_fit.x1)/fp_fit.T*2*pi);
+    fit_A0_estimate = fp_fit_1.A0;
+    fit_B_estimate  = fp_fit_1.B;
+    fit_x1_estimate = fp_fit_1.x1;
+    fit_T_estimate  = fp_fit_1.T;
+    
+    Trans_normed_1 = Trans_raw./fp_fit_result_1;
+    [dip_y_est, dip_x_est] = min(Trans_normed_1);
+    Base_est = max(Trans_normed_1);
+    mid_y_est = (dip_y_est+Base_est)/2;
+    half_cut_est = Trans_normed_1 < mid_y_est;
+    mid_x_est = [find(half_cut_est(1:dip_x_est)==0, 1,'last' ), find(half_cut_est(dip_x_est:end)==1, 1)+dip_x_est-1];
+    linewidth_est = abs(diff(mid_x_est));
+    
+    pos_fitrange = 3; % times of linewidth, Q to fit range
+    pos_fitstart = round(max(0.03*length(Trans_raw) , dip_x_est - 0.8*pos_fitrange*linewidth_est)); % fitting range is peak position ± pos_fitrange/2 linewidth
+    pos_fitend   = round(min(0.97*length(Trans_raw) , dip_x_est + 0.2*pos_fitrange*linewidth_est)); % fitting range is peak position ± pos_fitrange/2 linewidth
+    fp_fit_weight = ones(size(Trans_raw));
+    fp_fit_weight(pos_fitstart:pos_fitend) = 0;
+    
+    
+    fp_fit = fit( (1:length(Trans_raw)).',Trans_raw,fit_fp,...
+        'StartPoint',[fit_A0_estimate fit_B_estimate fit_x1_estimate fit_T_estimate],...
+        'Weights',fp_fit_weight);
+    fp_fit_result = fp_fit((1:length(Trans_raw)).');%fp_fit.A0+fp_fit.B*cos(((1:length(Q_trace)).'-fp_fit.x1)/fp_fit.T*2*pi);
+
+    Trans_normed = Trans_raw./fp_fit_result;
+
+    [dip_y, dip_x] = min(Trans_normed);
+    Base = max(Trans_normed);
+%     Base = Trans(dip_x);
+    mid_y = (dip_y+Base)/2;
+    half_cut = Trans_normed < mid_y;
+    mid_x = [find(half_cut(1:dip_x)==0, 1,'last' ), find(half_cut(dip_x:end)==1, 1)+dip_x-1];
+    
+            figure
+            plot((1:length(Trans_raw)).',Trans_raw,'Linewidth',2.0)
+            hold on
+            scatter((1:length(Trans_raw)).',fp_fit_result, 5);
+            hold on
+            plot((1:length(Trans_raw)).',fp_fit_weight*max(Trans_raw)/max(fp_fit_weight))
+            title(sprintf("FP 2nd fitting result, %g nm",lambda));
+%% 2. Fit mode parameters using Q measurement data
+    [~,~,~,mode_paras] = getQwithFP(Q_data_file);
+    kappa0 = mode_paras(5);
+    kappae = mode_paras(6);
+%% 
+
+
+
+%% MZI to Phase function
+function phase = MZI2Phase(trace_MZI)
+    trace_length = length(trace_MZI);
+    trace_MZI_tofit = trace_MZI;
+    % trace_MZI_tofit = sgolayfilt(trace_MZI, 1, 11);
+    Base = (max(trace_MZI_tofit) + min(trace_MZI_tofit))/2;
+    trace_MZI_phasor = hilbert(trace_MZI_tofit - Base); % use phasor for non-parametric fit
+
+    trace_MZI_phase = [0; cumsum(mod(diff(angle(trace_MZI_phasor))+pi, 2*pi) - pi)] + angle(trace_MZI_phasor(1));
+    % trace_MZI_phase = sgolayfilt(trace_MZI_phase, 1, 11);
+    phase = sgolayfilt(trace_MZI_phase, 2, round(trace_length/40)*2 + 1);
+    % phase = trace_MZI_phase;
+end
+
+%% Interactivity power
+function a2 = interCavityP(x, x0,alpha, k, ke, fp_fit)
+    ss = size(x);
+    if ss(1) < ss(2)
+        x = x.';
+    end % make sure column vector
+    para1 = alpha^2 * ones(size(x));
+    para2 = -2*(x-x0)*alpha;
+    para3 = (x-x0).^2 + (k/2)^2;
+    para4 = -ke * fp_fit(x);
+    solution_quartic = CardanRoots([para1 para2 para3 para4]);
+    solution_quartic(imag(solution_quartic)~=0) = -Inf; % remove imaginary solutions
+    a2 = max(solution_quartic,[],2);
+end
