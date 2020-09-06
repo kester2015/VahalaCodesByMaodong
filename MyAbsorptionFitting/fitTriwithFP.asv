@@ -74,16 +74,27 @@ function [findmin_fit_result] = fitTriwithFP(data_filename, mode_Q0, mode_Qe, la
         half_cut_est = Trans_normed_1 < mid_y_est;
         mid_x_est = [find(half_cut_est(1:dip_x_est)==0, 1,'last' ), find(half_cut_est(dip_x_est:end)==1, 1)+dip_x_est-1];
         linewidth_est = abs(diff(mid_x_est));
-
-        pos_fitrange = 3; % times of linewidth, Q to fit range
-        pos_fitstart = round(max(0.03*length(Trans_raw) , dip_x_est - 0.8*pos_fitrange*linewidth_est)); % fitting range is peak position ± pos_fitrange/2 linewidth
-        pos_fitend   = round(min(0.97*length(Trans_raw) , dip_x_est + 0.2*pos_fitrange*linewidth_est)); % fitting range is peak position ± pos_fitrange/2 linewidth
+        
         fp_fit_weight = ones(size(Trans_raw));
         dip_fit_weight = fp_fit_weight;
+        pos_fitrange = 1; % times of linewidth, Q to fit range
+        pos_fitstart = round(max(0.03*length(Trans_raw) , dip_x_est - 1.8*pos_fitrange*linewidth_est)); % fitting range is peak position ± pos_fitrange/2 linewidth
+        pos_fitend   = round(min(0.97*length(Trans_raw) , dip_x_est + 0.2*pos_fitrange*linewidth_est)); % fitting range is peak position ± pos_fitrange/2 linewidth
         fp_fit_weight(pos_fitstart:pos_fitend) = 0;
-        dip_fit_weight(pos_fitstart:pos_fitend) = 1;
-
-
+        pos_fitstart = round(max(0.03*length(Trans_raw) , dip_x_est - 1.8*pos_fitrange*linewidth_est)); % fitting range is peak position ± pos_fitrange/2 linewidth
+        pos_fitend   = round(min(0.97*length(Trans_raw) , dip_x_est + 0.2*pos_fitrange*linewidth_est)); % fitting range is peak position ± pos_fitrange/2 linewidth
+        dip_fit_weight(pos_fitstart:pos_fitend) = 10;
+        
+        start_discard = round(0.05*length(Trans_raw) );
+        end_discard = round( 0.95*length(Trans_raw) );
+        fp_fit_weight(1:start_discard) = 0;
+        fp_fit_weight(end_discard:end) = 0;
+        start_discard = round(0.40*length(Trans_raw) );
+        end_discard = round( 0.85*length(Trans_raw) );
+        dip_fit_weight(1:start_discard) = 0;
+        dip_fit_weight(end_discard:end) = 0;
+        
+        
         fp_fit = fit( (1:length(Trans_raw)).',Trans_raw,fit_fp,...
             'StartPoint',[fit_A0_estimate fit_B_estimate fit_x1_estimate fit_T_estimate],...
             'Weights',fp_fit_weight);
@@ -98,13 +109,13 @@ function [findmin_fit_result] = fitTriwithFP(data_filename, mode_Q0, mode_Qe, la
         half_cut = Trans_normed < mid_y;
         mid_x = [find(half_cut(1:dip_x)==0, 1,'last' ), find(half_cut(dip_x:end)==1, 1)+dip_x-1];
 
-%                 figure
-%                 plot((1:length(Trans_raw)).',Trans_raw,'Linewidth',2.0)
-%                 hold on
-%                 scatter((1:length(Trans_raw)).',fp_fit_result, 5);
-%                 hold on
-%                 plot((1:length(Trans_raw)).',fp_fit_weight*max(Trans_raw)/max(fp_fit_weight))
-%                 title(sprintf("FP 2nd fitting result, %g nm",lambda));
+                figure
+                plot((1:length(Trans_raw)).',Trans_raw,'Linewidth',2.0)
+                hold on
+                scatter((1:length(Trans_raw)).',fp_fit_result, 5);
+                hold on
+                plot((1:length(Trans_raw)).',fp_fit_weight*max(Trans_raw)/max(fp_fit_weight))
+                title(sprintf("FP 2nd fitting result, %g nm",lambda));
                 
     %% 2. Fit mode parameters using Q measurement data
 %         [mode_Q0,mode_Qe,mode_QT,~] = getQwithFP(Q_data_file);
@@ -147,19 +158,32 @@ function [findmin_fit_result] = fitTriwithFP(data_filename, mode_Q0, mode_Qe, la
     %% 4. fit begins here
     tic
 %     findmin_fun = @(paras)LCL(modtrans_residual(paras(1),paras(2),paras(3),paras(4),paras(5),paras(6),paras(7),paras(8),(1:length(Trans_raw)).',Trans_raw) ,dip_fit_weight);
-%     findmin_start_point = [fp_fit.A0*(1+r1r2^2), r1r2, fp_fit.x1, fp_fit.T, kappa0, kappae, mid_x(1), 5*alpha_est];
+%     findmin_start_point = [fp_fit.A0*(1+r1r2^2), r1r2, fp_fit.x1, fp_fit.T, kappa0, kappae, mid_x(1), 0.5*alpha_est];
 %     %         options = optimset('MaxFunEvals',5000);
 %     findmin_fit_result = fminsearch(findmin_fun,findmin_start_point);
-%     triangle_fit_result = modtrans(findmin_fit_result(1),findmin_fit_result(2),findmin_fit_result(3),...
-%                                    findmin_fit_result(4),findmin_fit_result(5),findmin_fit_result(6),...
-%                                    findmin_fit_result(7),findmin_fit_result(8),(1:length(Trans_raw)).');
 
+    %--fix Q version----
+%     findmin_fun = @(paras)LCL(modtrans_residual(paras(1),paras(2),paras(3),paras(4),kappa0,kappae,paras(5),paras(6),(1:length(Trans_raw)).',Trans_raw) ,dip_fit_weight);
+%     findmin_start_point = [fp_fit.A0*(1+r1r2^2), r1r2, fp_fit.x1, fp_fit.T, mid_x(1), 2*alpha_est];
+%     %         options = optimset('MaxFunEvals',5000);
+%     findmin_fit_result = fminsearch(findmin_fun,findmin_start_point);
+%     findmin_fit_result = [findmin_fit_result(1:4), kappa0, kappae, findmin_fit_result(5:6)]; 
+    
     findmin_fun = @(paras)LCL(modtrans_residual(fp_fit.A0*(1+r1r2^2),r1r2,fp_fit.x1,fp_fit.T,kappa0,kappae,paras(1),paras(2),(1:length(Trans_raw)).',Trans_raw) ,dip_fit_weight);
-    findmin_start_point = [mid_x(1), 5*alpha_est];
+    findmin_start_point = [mid_x(1), 0.2*alpha_est];
     %         options = optimset('MaxFunEvals',5000);
     findmin_fit_result = fminsearch(findmin_fun,findmin_start_point);
-    triangle_fit_result = modtrans(fp_fit.A0*(1+r1r2^2),r1r2,fp_fit.x1,fp_fit.T,kappa0,kappae,...
-                                   findmin_fit_result(1),findmin_fit_result(2),(1:length(Trans_raw)).');
+    findmin_fit_result = [fp_fit.A0*(1+r1r2^2), r1r2, fp_fit.x1, fp_fit.T, kappa0, kappae, findmin_fit_result]; 
+    
+%     triangle_fit_result = modtrans(fp_fit.A0*(1+r1r2^2),r1r2,fp_fit.x1,fp_fit.T,kappa0,kappae,...
+%                                    findmin_fit_result(1),findmin_fit_result(2),(1:length(Trans_raw)).');
+    triangle_fit_result = modtrans(findmin_fit_result(1),findmin_fit_result(2),findmin_fit_result(3),...
+                                   findmin_fit_result(4),findmin_fit_result(5),findmin_fit_result(6),...
+                                   findmin_fit_result(7),findmin_fit_result(8),(1:length(Trans_raw)).');
+    
+%    triangle_fit_result = modtrans(fp_fit.A0*(1+r1r2^2),r1r2,fp_fit.x1,fp_fit.T,kappa0,kappae,...
+%                                    mid_x(1), 0.5*alpha_est,(1:length(Trans_raw)).');
+
 
                 figure
                 plot((1:length(Trans_raw)).',Trans_raw,'Linewidth',2.0)
@@ -191,6 +215,9 @@ function [findmin_fit_result] = fitTriwithFP(data_filename, mode_Q0, mode_Qe, la
                 end
     toc
     
+    %%
+    omegaOverX = 2*pi*(MZI_FSR*1e6)/MZI_fit_T;
+    findmin_fit_result(end+1) = omegaOverX^2 * findmin_fit_result(end);
 
 end
 
@@ -211,7 +238,7 @@ end
 
 function res = modtrans_residual(A0,r,x1,T,k0,ke,x0,alpha,  x,   trans)
     % trans is the real transmission. calculate residual
-    res = trans - modtrans(A0,r,x1,T,k0,ke,x0,alpha, x);
+    res = (trans - modtrans(A0,r,x1,T,k0,ke,x0,alpha, x))./trans;
 end
 
 function loss = QLF(rr,weight) %Quadratic Loss Function
