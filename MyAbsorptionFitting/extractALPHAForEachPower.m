@@ -31,37 +31,37 @@ clc
 %     inputVoltage2 = inputVoltage2List(count); %V
 %     inputPower2 = inputPower2List(count);%mW
     
-    wavelength = 1541.9;
-    outputVoltage1 = 2.4; %V
-    outputPower1 = 3.196;%mW
-    inputPower1 = 24.30;%mW
-    outputVoltage2 = 2.1; %V
-    outputPower2 = 2.676;%mW
-    inputPower2 = 18.69;%mW
-      Q_data_filename = 'Z:\Qifan\Tantala\20200905-thermal-rawdata\Q-maxvpp-redo-1541.9nm.mat'
+%     wavelength = 1541.9;
+%     outputVoltage1 = 2.4; %V
+%     outputPower1 = 3.196;%mW
+%     inputPower1 = 24.30;%mW
+%     outputVoltage2 = 2.1; %V
+%     outputPower2 = 2.676;%mW
+%     inputPower2 = 18.69;%mW
+%       Q_data_filename = 'C:\Users\leona\iCloudDrive\Work\data\Q-maxvpp-redo-1541.9nm.mat';
     
-%     wavelength = 1543.5;
-%     outputVoltage1 = 2.71; %V
-%     outputPower1 = 1.181;%mW
-%     inputPower1 = 7.820;%mW
-%     outputVoltage2 = 2.62; %V
-%     outputPower2 = 1.123;%mW
-%     inputPower2 = 7.737;%mW
-%     Q_data_filename = 'Z:\Qifan\Tantala\20200905-thermal-rawdata\Q-maxvpp-1543.5nm.mat';
+    wavelength = 1543.5;
+    outputVoltage1 = 2.71; %V
+    outputPower1 = 1.181;%mW
+    inputPower1 = 7.820;%mW
+    outputVoltage2 = 2.62; %V
+    outputPower2 = 1.123;%mW
+    inputPower2 = 7.737;%mW
+    Q_data_filename = 'C:\Users\leona\iCloudDrive\Work\data\Q-maxvpp-1543.5nm.mat';
 
-    wavelength = 1547;
-    outputVoltage1 = (2.106+2.16)/2; %V
-    outputPower1 = 2.764;%mW
-    inputPower1 = 37.63;%mW
-    outputVoltage2 = 1.01; %V
-    outputPower2 = 1.374;%mW
-    inputPower2 = 23.18;%mW
-    Q_data_filename = 'Z:\Qifan\Tantala\20200905-thermal-rawdata\Q-maxvpp-after-1546.65nm.mat';
+%     wavelength = 1547;
+%     outputVoltage1 = (2.106+2.16)/2; %V
+%     outputPower1 = 2.764;%mW
+%     inputPower1 = 37.63;%mW
+%     outputVoltage2 = 1.01; %V
+%     outputPower2 = 1.374;%mW
+%     inputPower2 = 23.18;%mW
+%     Q_data_filename = 'Z:\Qifan\Tantala\20200905-thermal-rawdata\Q-maxvpp-after-1546.65nm.mat';
     
     kerrOverTotal = 0.0353/2;
 %%
 
-filedirGlob = 'Z:\Qifan\Tantala\20200905-thermal-rawdata\Dev21\1542nm-01-mat';
+filedirGlob = 'C:\Users\leona\iCloudDrive\Work\data\1543.5nm-02-mat';
 powerList = 2.2:-0.1:0.3;
 
 lambda = wavelength;
@@ -84,7 +84,7 @@ save(strcat(filedirGlob,'\Fitting_results\coefficients.mat'),'fitting_results');
 
 %%
 close all
-filedirGlob = 'Z:\Qifan\Tantala\20200905-thermal-rawdata\Dev21\1542nm-02-mat';
+filedirGlob = 'C:\Users\leona\iCloudDrive\Work\data\1543.5nm-02-mat';
 load(strcat(filedirGlob,'\Fitting_results\coefficients.mat'),'fitting_results');
 %     Qabs_est = 3 * 1e6;
     c = 299792458;
