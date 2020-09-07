@@ -39,7 +39,7 @@ function [findmin_fit_result] = fitTriwithFP(data_filename, mode_Q0, mode_Qe, la
             - MZI_phase( round( max(length(MZI_phase)/2 - MZI_period_local/4, 1                 ))) );
 x_freq=(MZI_phase/2/pi*2*pi/mean( diff(MZI_phase) )).';
     %%  First fit FP background
-        fit_sine = fittype(' A0 +  B*cos((x-x1)/T*2*pi) ','coefficients',{'A0','B','x1','T'});
+    fit_sine = fittype(' A0 +  B*cos((x-x1)/T*2*pi) ','coefficients',{'A0','B','x1','T'});
     fit_fp   = fittype(' A0   /     ( 1-B*cos( (x-x1)/T*2*pi) )','coefficients',{'A0','B','x1','T'});
 %     fit_fp   = fittype(' A0*abs(1 / ( 1-B*exp(-(x-x1)/T*2*pi) ) ).^2','coefficients',{'A0','B','x1','T'});
 
@@ -55,9 +55,9 @@ x_freq=(MZI_phase/2/pi*2*pi/mean( diff(MZI_phase) )).';
     fit_B_estimate = amp_fp/length(Q_trace_freq);
     fit_A0_estimate = mean(Trans_raw);
 
-fp_fit_1 = fit( x_freq.',Trans_raw,fit_fp,...
-        'StartPoint',[fit_A0_estimate fit_B_estimate length(Q_trace_freq)/2 fit_T_estimate],...
-        'Weights',Trans_raw.^2);
+    fp_fit_1 = fit( x_freq.',Trans_raw,fit_fp,...
+                'StartPoint',[fit_A0_estimate fit_B_estimate length(Q_trace_freq)/2 fit_T_estimate],...
+                'Weights',Trans_raw.^2);
     fp_fit_result_1 = fp_fit_1(x_freq.');%fp_fit.A0+fp_fit.B*cos(((1:length(Q_trace)).'-fp_fit.x1)/fp_fit.T*2*pi);
     fit_A0_estimate = fp_fit_1.A0;
     fit_B_estimate  = fp_fit_1.B;
@@ -125,8 +125,8 @@ fp_fit_1 = fit( x_freq.',Trans_raw,fit_fp,...
     % alpha_est = alpha_est *  (MZI_fit_T / (MZI_FSR*1e6)) ; % unit Num/W
     % 
 
-    r1r2=fp_fit.B/2;
-    %r1r2 = ( 1-sqrt(1-fp_fit.B^2) )/fp_fit.B;
+	%     r1r2=fp_fit.B/2;
+    r1r2 = ( 1-sqrt(1-fp_fit.B^2) )/fp_fit.B;
 
     %             figure
     %             plot((1:length(Trans_raw)).',Trans_raw,'Linewidth',2.0)
@@ -155,10 +155,10 @@ fp_fit_1 = fit( x_freq.',Trans_raw,fit_fp,...
 %     findmin_fit_result = fminsearch(findmin_fun,findmin_start_point);
 %     findmin_fit_result = [findmin_fit_result(1:4), kappa0, kappae, findmin_fit_result(5:6)]; 
     findmin_fun = @(paras)LCL(modtrans_residual(fp_fit.A0*(1+r1r2^2),r1r2,fp_fit.x1,fp_fit.T,kappa0,kappae,paras(1),paras(2),x_freq.',Trans_raw) ,dip_fit_weight);
-findmin_start_point = [mid_x(1), 0.5*alpha_est];
-%         options = optimset('MaxFunEvals',5000);
-findmin_fit_result = fminsearch(findmin_fun,findmin_start_point);
-triangle_fit_result = modtrans(fp_fit.A0*(1+r1r2^2),r1r2,fp_fit.x1,fp_fit.T,kappa0,kappae,...
+    findmin_start_point = [mid_x(1), 0.5*alpha_est];
+    %         options = optimset('MaxFunEvals',5000);
+    findmin_fit_result = fminsearch(findmin_fun,findmin_start_point);
+    triangle_fit_result = modtrans(fp_fit.A0*(1+r1r2^2),r1r2,fp_fit.x1,fp_fit.T,kappa0,kappae,...
                                findmin_fit_result(1),findmin_fit_result(2),x_freq.');
 %     findmin_fun = @(paras)LCL(modtrans_residual(fp_fit.A0*(1+r1r2^2),r1r2,fp_fit.x1,fp_fit.T,kappa0,kappae,paras(1),paras(2),(1:length(Trans_raw)).',Trans_raw) ,dip_fit_weight);
 %     findmin_start_point = [mid_x(1), 0.2*alpha_est];
@@ -176,7 +176,7 @@ triangle_fit_result = modtrans(fp_fit.A0*(1+r1r2^2),r1r2,fp_fit.x1,fp_fit.T,kapp
 %                                    mid_x(1), 0.5*alpha_est,(1:length(Trans_raw)).');
 
 
-                figure
+            figure
             plot(x_freq.',Trans_raw,'Linewidth',2.0)
 %             hold on
 %             scatter((1:length(Trans_raw)).',fp_fit_result, 5);
@@ -276,7 +276,9 @@ end
 function output = transOutput(x, x0, alpha, k, ke, fp_fit)
     Tran = cavitytransT(x, x0, alpha, k, ke, fp_fit);
     r1r2 = ( 1-sqrt(1-fp_fit.B^2) )/fp_fit.B ;
-    % r1r2=fp_fit.B/2;
+    % r1r2=fp_fit.B/2; % B/2 is not correct. actually 2r/(1+r^2) is equal to B.
+    % % ---The following two output expressions are actually equivalant. Checked by Maodong.---
+    % output = fp_fit.A0 * (1+r1r2^2)* abs( Tran./(1 - r1r2*Tran.^2.*exp(-1i*2*pi*(x-fp_fit.x1)/fp_fit.T)) ).^2;
     output = fp_fit(x).* abs( (1 - r1r2.*exp(-1i*2*pi*(x-fp_fit.x1)/fp_fit.T)) ).^2 .* abs( Tran./(1 - r1r2*Tran.^2.*exp(-1i*2*pi*(x-fp_fit.x1)/fp_fit.T)) ).^2;
 end
 %% MZI to Phase function

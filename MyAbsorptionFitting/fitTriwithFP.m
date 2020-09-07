@@ -276,7 +276,8 @@ end
 function output = transOutput(x, x0, alpha, k, ke, fp_fit)
     Tran = cavitytransT(x, x0, alpha, k, ke, fp_fit);
     r1r2 = ( 1-sqrt(1-fp_fit.B^2) )/fp_fit.B ;
-    % r1r2=fp_fit.B/2;
+    % r1r2=fp_fit.B/2; % B/2 is not correct. actually 2r/(1+r^2) is equal to B.
+    % % ---The following two output expressions are actually equivalant. Checked by Maodong.---
     % output = fp_fit.A0 * (1+r1r2^2)* abs( Tran./(1 - r1r2*Tran.^2.*exp(-1i*2*pi*(x-fp_fit.x1)/fp_fit.T)) ).^2;
     output = fp_fit(x).* abs( (1 - r1r2.*exp(-1i*2*pi*(x-fp_fit.x1)/fp_fit.T)) ).^2 .* abs( Tran./(1 - r1r2*Tran.^2.*exp(-1i*2*pi*(x-fp_fit.x1)/fp_fit.T)) ).^2;
 end

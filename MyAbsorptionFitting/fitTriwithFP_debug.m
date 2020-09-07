@@ -131,8 +131,8 @@ alpha_est = 10*alpha_est;
 % alpha_est = alpha_est *  (MZI_fit_T / (MZI_FSR*1e6)) ; % unit Num/W
 % 
 
-%r1r2 = ( 1-sqrt(1-fp_fit.B^2) )/fp_fit.B;
-r1r2=fp_fit.B/2;
+r1r2 = ( 1-sqrt(1-fp_fit.B^2) )/fp_fit.B;
+% r1r2=fp_fit.B/2;
 
 %             figure
 %             plot((1:length(Trans_raw)).',Trans_raw,'Linewidth',2.0)
@@ -230,17 +230,17 @@ end
 
 %% Cavity Transmission function
 function T = cavitytransT(x, x0, alpha, k, ke, fp_fit)
-k0 = k - ke;
-a2 = interCavityP(x, x0,alpha, k, ke, fp_fit);
-T = (1i*(x-x0-alpha*a2)+(k0-ke)/2)./(1i*(x-x0-alpha*a2)+(k0+ke)/2);
+    k0 = k - ke;
+    a2 = interCavityP(x, x0,alpha, k, ke, fp_fit);
+    T = (1i*(x-x0-alpha*a2)+(k0-ke)/2)./(1i*(x-x0-alpha*a2)+(k0+ke)/2);
 end
 
 %% On waveguide output function
 function output = transOutput(x, x0, alpha, k, ke, fp_fit)
-Tran = cavitytransT(x, x0, alpha, k, ke, fp_fit);
-%r1r2 = ( 1-sqrt(1-fp_fit.B^2) )/fp_fit.B ;
-r1r2=fp_fit.B/2;
-output = fp_fit(x).* abs( (1 - r1r2.*exp(-1i*2*pi*(x-fp_fit.x1)/fp_fit.T)) ).^2 .* abs( Tran./(1 - r1r2*Tran.^2.*exp(-1i*2*pi*(x-fp_fit.x1)/fp_fit.T)) ).^2;
+    Tran = cavitytransT(x, x0, alpha, k, ke, fp_fit);
+    r1r2 = ( 1-sqrt(1-fp_fit.B^2) )/fp_fit.B ;
+    % r1r2=fp_fit.B/2;
+    output = fp_fit(x).* abs( (1 - r1r2.*exp(-1i*2*pi*(x-fp_fit.x1)/fp_fit.T)) ).^2 .* abs( Tran./(1 - r1r2*Tran.^2.*exp(-1i*2*pi*(x-fp_fit.x1)/fp_fit.T)) ).^2;
 end
 
 %% MZI to Phase function
