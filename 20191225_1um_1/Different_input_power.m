@@ -10,7 +10,7 @@ Myfg2 = Keysight33500('USB0::0x0957::0x2607::MY52202388::INSTR'); % upper
 % Ocsillascope
 % OSC = Infiniium('USB0::0x2A8D::0x904E::MY54200105::INSTR');
 OSC = Infiniium('USB0::0x2A8D::0x9049::MY55510176::INSTR',2);
-% OSC = Infiniium('USB0::0x2A8D::0x904E::MY54200105::INSTR',2); % 1G
+% OSC = Infiniium('USB0::0x2A8D::0x904E::MY54200105::INSTR',2); 
 
 
 % OSC = Infiniium('GPIB1::7::INSTR',1); % = Device.osc;
@@ -31,12 +31,12 @@ OSC.connect;
 
 
 % filedirToSave = ['\\131.215.238.124\Vahala Group\Qifan\Tantala\' datestr(now,'yyyymmdd') '-thermal-rawdata\1548nm-02'];
-filedirToSave = ['Z:\Qifan\Tantala\' datestr(now,'yyyymmdd') '-thermal-rawdata\Dev21\1543.5nm-02'];
+filedirToSave = ['Z:\Qifan\Tantala\' datestr(now,'yyyymmdd') '-thermal-rawdata\Dev21\1562.6nm-02'];
 
 
 % VAOM = 0.01:0.005:1;
 % VAOM = [2.3:-0.1:2, 2:-0.01:0.7, 0.7:-0.1:0.3]; % new device: Optical attenuator
-VAOM = 2.3:-0.01:0.3;
+VAOM = [2.0:-0.1:0];
 
 Myfg2.DC1 = 0;
 

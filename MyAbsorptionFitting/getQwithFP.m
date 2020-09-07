@@ -388,14 +388,31 @@ function [Q0, Q1, QL,findmin_fit_result] = getQwithFP(filename,lambda,tosave)
             
             
             if tosave
-                % --------save fig----------
-                filename_tosave = strcat(filename(1:end-4),'-FPfitting.fig');
-                if isfile(filename_tosave)
-                    backup_filename = strcat(filename_tosave(1:end-4),'_',char(datetime('now','Format','yyMMdd_HHmmss')),'_bak.fig');
-                    movefile(filename_tosave,backup_filename);
-                    warning('Old file was renamed!')
-                end
-                saveas(gcf,filename_tosave);
+%                 % --------save fig----------
+%                 filename_tosave = strcat(filename(1:end-4),'-FPfitting.fig');
+%                 if isfile(filename_tosave)
+%                     backup_filename = strcat(filename_tosave(1:end-4),'_',char(datetime('now','Format','yyMMdd_HHmmss')),'_bak.fig');
+%                     movefile(filename_tosave,backup_filename);
+%                     warning('Old file was renamed!')
+%                 end
+%                 saveas(gcf,filename_tosave);
+                
+                tt = strfind(filename,'\');
+                    file_tosave_dir = filename(1:tt(end));
+                    file_tosave_dir = strcat(file_tosave_dir,'Fitting_results');
+                   if ~isfolder(file_tosave_dir)
+                       mkdir(file_tosave_dir);
+                   end
+                    % --------save fig----------
+                    filename_tosave = strcat(file_tosave_dir,'\',filename(tt(end)+1:end-4),'-FP-Q-fitting.fig');
+%                     if isfile(filename_tosave)
+%                         backup_filename = strcat(filename_tosave(1:end-4),'_',char(datetime('now','Format','yyMMdd_HHmmss')),'_bak.fig');
+%                         movefile(filename_tosave,backup_filename);
+%                         warning('Old file was renamed!')
+%                     end
+                    saveas(gcf,filename_tosave);
+                    filename_tosave = strcat(file_tosave_dir,'\',filename(tt(end)+1:end-4),'-FP-Q-fitting.png');
+                    saveas(gcf,filename_tosave);
             end
 end
 

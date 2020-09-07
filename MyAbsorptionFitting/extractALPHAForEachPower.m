@@ -61,10 +61,8 @@ clc
 %%
 
 filedirGlob = 'Z:\Qifan\Tantala\20200905-thermal-rawdata\Dev21\1543.5nm-02-mat';
-powerList = 2.2:-0.1:0.3;
+powerList = 2.2:-0.3:0.3;
 
-
-Q_data_filename = 'D:\Measurement Data\Tantala summary\Q-traces\4.72uW-1561nm.mat';
 lambda = wavelength;
 
 [mode_Q0, mode_Qe,~,~] = getQwithFP(Q_data_filename);
