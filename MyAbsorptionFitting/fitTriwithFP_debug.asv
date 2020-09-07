@@ -2,10 +2,10 @@
 % clear
 % clc
 %%
-Q_data_file = 'Z:\Qifan\Tantala\20200819\Dev21\triangle\4.46uW-1540.4nm.mat';
-load('D:\Measurement Data\Tantala summary\1540nm-01-mat\Sweep_20Hz_Power_0.64V.mat','timeAxis','Ch2','Ch3')
+Q_data_file = 'C:\Users\leona\OneDrive\Desktop\tantala\Q-maxvpp-redo-1541.9nm.mat';
+load('C:\Users\leona\iCloudDrive\Work\data\1542nm-01-mat\Sweep_20Hz_Power_0.3V.mat','timeAxis','Ch2','Ch3')
 
-lambda = 1540.4;
+lambda = 1542;
 MZI_FSR = 39.9553; % MHz
 
 % function fitTriwithFP_main(data_filename,lambda,)
@@ -39,7 +39,7 @@ MZI_period_local       = round(2*pi/mean( diff(MZI_phase) ) );
 MZI_fit_T = 4*pi*round(MZI_period_local/4) / ...
         ( MZI_phase( round( min(length(MZI_phase)/2 + MZI_period_local/4, length(MZI_phase) )))...
         - MZI_phase( round( max(length(MZI_phase)/2 - MZI_period_local/4, 1                 ))) );
-
+x_freq=(MZI_phase/2/pi*2*pi/mean( diff(MZI_phase) )).';
 %%  First fit FP background
     fit_sine = fittype(' A0 +  B*cos((x-x1)/T*2*pi) ','coefficients',{'A0','B','x1','T'});
     fit_fp   = fittype(' A0   /     ( 1-B*cos( (x-x1)/T*2*pi) )','coefficients',{'A0','B','x1','T'});
@@ -60,10 +60,10 @@ MZI_fit_T = 4*pi*round(MZI_period_local/4) / ...
     %fit_T_estimate_phase = fit_T_estimate * (MZI_phase(end)-MZI_phase(1))/length(Trans_raw);
 
     % --First do a rough fitting to find dip position
-    fp_fit_1 = fit( (1:length(Trans_raw)).',Trans_raw,fit_fp,...
+    fp_fit_1 = fit( x_freq.',Trans_raw,fit_fp,...
         'StartPoint',[fit_A0_estimate fit_B_estimate length(Q_trace_freq)/2 fit_T_estimate],...
         'Weights',Trans_raw.^2);
-    fp_fit_result_1 = fp_fit_1((1:length(Trans_raw)).');%fp_fit.A0+fp_fit.B*cos(((1:length(Q_trace)).'-fp_fit.x1)/fp_fit.T*2*pi);
+    fp_fit_result_1 = fp_fit_1(x_freq.');%fp_fit.A0+fp_fit.B*cos(((1:length(Q_trace)).'-fp_fit.x1)/fp_fit.T*2*pi);
     fit_A0_estimate = fp_fit_1.A0;
     fit_B_estimate  = fp_fit_1.B;
     fit_x1_estimate = fp_fit_1.x1;
@@ -83,13 +83,13 @@ MZI_fit_T = 4*pi*round(MZI_period_local/4) / ...
     fp_fit_weight = ones(size(Trans_raw));
     dip_fit_weight = fp_fit_weight;
     fp_fit_weight(pos_fitstart:pos_fitend) = 0;
-    dip_fit_weight(pos_fitstart:pos_fitend) = 10;
+    dip_fit_weight(pos_fitstart:pos_fitend) = 1;
 
 
-    fp_fit = fit( (1:length(Trans_raw)).',Trans_raw,fit_fp,...
+    fp_fit = fit( x_freq.',Trans_raw,fit_fp,...
         'StartPoint',[fit_A0_estimate fit_B_estimate fit_x1_estimate fit_T_estimate],...
         'Weights',fp_fit_weight);
-    fp_fit_result = fp_fit((1:length(Trans_raw)).');%fp_fit.A0+fp_fit.B*cos(((1:length(Q_trace)).'-fp_fit.x1)/fp_fit.T*2*pi);
+    fp_fit_result = fp_fit(x_freq.');%fp_fit.A0+fp_fit.B*cos(((1:length(Q_trace)).'-fp_fit.x1)/fp_fit.T*2*pi);
 
     Trans_normed = Trans_raw./fp_fit_result;
 
@@ -101,14 +101,14 @@ MZI_fit_T = 4*pi*round(MZI_period_local/4) / ...
     mid_x = [find(half_cut(1:dip_x)==0, 1,'last' ), find(half_cut(dip_x:end)==1, 1)+dip_x-1];
 
             figure
-            plot((1:length(Trans_raw)).',Trans_raw,'Linewidth',2.0)
+            plot(x_freq.',Trans_raw,'Linewidth',2.0)
             hold on
-            scatter((1:length(Trans_raw)).',fp_fit_result, 5);
+            scatter(x_freq.',fp_fit_result, 5);
             hold on
-            plot((1:length(Trans_raw)).',fp_fit_weight*max(Trans_raw)/max(fp_fit_weight))
+            plot(x_freq.',fp_fit_weight*max(Trans_raw)/max(fp_fit_weight))
             title(sprintf("FP 2nd fitting result, %g nm",lambda));
 %% 2. Fit mode parameters using Q measurement data
-%     [mode_Q0,mode_Qe,mode_QT,~] = getQwithFP(Q_data_file);
+%    [mode_Q0,mode_Qe,mode_QT,~] = getQwithFP(Q_data_file);
     kappa0 = 299792.458/lambda/( mode_Q0 /MZI_fit_T * MZI_FSR );
     kappae = 299792.458/lambda/( mode_Qe /MZI_fit_T * MZI_FSR );
 % %     kappa0 = 299792458/(lambda*1e-9)/( mode_Q0 * 1e6 );
@@ -131,7 +131,8 @@ alpha_est = 10*alpha_est;
 % alpha_est = alpha_est *  (MZI_fit_T / (MZI_FSR*1e6)) ; % unit Num/W
 % 
 
-r1r2 = ( 1-sqrt(1-fp_fit.B^2) )/fp_fit.B;
+%r1r2 = ( 1-sqrt(1-fp_fit.B^2) )/fp_fit.B;
+r1r2=fp_fit.B/2;
 
 %             figure
 %             plot((1:length(Trans_raw)).',Trans_raw,'Linewidth',2.0)
@@ -148,29 +149,29 @@ r1r2 = ( 1-sqrt(1-fp_fit.B^2) )/fp_fit.B;
 
 %% 4. fit begins here
 tic
-findmin_fun = @(paras)LCL(modtrans_residual(paras(1),paras(2),paras(3),paras(4),paras(5),paras(6),paras(7),paras(8),(1:length(Trans_raw)).',Trans_raw) ,dip_fit_weight);
-findmin_start_point = [fp_fit.A0*(1+r1r2^2), r1r2, fp_fit.x1, fp_fit.T, kappa0, kappae, mid_x(1), 5*alpha_est];
-%         options = optimset('MaxFunEvals',5000);
-findmin_fit_result = fminsearch(findmin_fun,findmin_start_point);
-triangle_fit_result = modtrans(findmin_fit_result(1),findmin_fit_result(2),findmin_fit_result(3),...
-                               findmin_fit_result(4),findmin_fit_result(5),findmin_fit_result(6),...
-                               findmin_fit_result(7),findmin_fit_result(8),(1:length(Trans_raw)).');
-
-% findmin_fun = @(paras)LCL(modtrans_residual(fp_fit.A0*(1+r1r2^2),r1r2,fp_fit.x1,fp_fit.T,kappa0,kappae,paras(1),paras(2),(1:length(Trans_raw)).',Trans_raw) ,dip_fit_weight);
-% findmin_start_point = [mid_x(1), 5*alpha_est];
+% findmin_fun = @(paras)LCL(modtrans_residual(paras(1),paras(2),paras(3),paras(4),paras(5),paras(6),paras(7),paras(8),(1:length(Trans_raw)).',Trans_raw) ,dip_fit_weight);
+% findmin_start_point = [fp_fit.A0*(1+r1r2^2), r1r2, fp_fit.x1, fp_fit.T, kappa0, kappae, mid_x(1), 5*alpha_est];
 % %         options = optimset('MaxFunEvals',5000);
 % findmin_fit_result = fminsearch(findmin_fun,findmin_start_point);
-% triangle_fit_result = modtrans(fp_fit.A0*(1+r1r2^2),r1r2,fp_fit.x1,fp_fit.T,kappa0,kappae,...
-%                                findmin_fit_result(1),findmin_fit_result(2),(1:length(Trans_raw)).');
+% triangle_fit_result = modtrans(findmin_fit_result(1),findmin_fit_result(2),findmin_fit_result(3),...
+%                                findmin_fit_result(4),findmin_fit_result(5),findmin_fit_result(6),...
+%                                findmin_fit_result(7),findmin_fit_result(8),(1:length(Trans_raw)).');
+
+findmin_fun = @(paras)LCL(modtrans_residual(fp_fit.A0*(1+r1r2^2),r1r2,fp_fit.x1,fp_fit.T,kappa0,kappae,paras(1),paras(2),x_freq.',Trans_raw) ,dip_fit_weight);
+findmin_start_point = [mid_x(1), 0.5*alpha_est];
+%         options = optimset('MaxFunEvals',5000);
+findmin_fit_result = fminsearch(findmin_fun,findmin_start_point);
+triangle_fit_result = modtrans(fp_fit.A0*(1+r1r2^2),r1r2,fp_fit.x1,fp_fit.T,kappa0,kappae,...
+                               findmin_fit_result(1),findmin_fit_result(2),x_freq.');
 
             figure
-            plot((1:length(Trans_raw)).',Trans_raw,'Linewidth',2.0)
+            plot(x_freq.',Trans_raw,'Linewidth',2.0)
 %             hold on
 %             scatter((1:length(Trans_raw)).',fp_fit_result, 5);
             hold on
-            scatter((1:length(Trans_raw)).',triangle_fit_result, 5 );
+            scatter(x_freq.',triangle_fit_result, 5 );
             hold on
-            plot((1:length(Trans_raw)).',dip_fit_weight*max(Trans_raw)/max(dip_fit_weight))
+            plot(x_freq.',dip_fit_weight*max(Trans_raw)/max(dip_fit_weight))
             title(sprintf("FP and Triangle fitting result, %g nm",lambda));            
 toc
 
@@ -237,8 +238,9 @@ end
 %% On waveguide output function
 function output = transOutput(x, x0, alpha, k, ke, fp_fit)
 Tran = cavitytransT(x, x0, alpha, k, ke, fp_fit);
-r1r2 = ( 1-sqrt(1-fp_fit.B^2) )/fp_fit.B ;
-output = fp_fit.A0 * (1+r1r2^2)* abs( Tran./(1 - r1r2*Tran.^2.*exp(-1i*2*pi*(x-fp_fit.x1)/fp_fit.T)) ).^2;
+%r1r2 = ( 1-sqrt(1-fp_fit.B^2) )/fp_fit.B ;
+r1r2=fp_fit.B/2;
+output = fp_fit(x)** abs( Tran./(1 - r1r2*Tran.^2.*exp(-1i*2*pi*(x-fp_fit.x1)/fp_fit.T)) ).^2;
 end
 
 %% MZI to Phase function

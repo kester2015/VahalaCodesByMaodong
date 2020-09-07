@@ -115,7 +115,7 @@ function [Q0, Q1, QL,findmin_fit_result] = getQwithFP(filename,lambda,tosave)
     fit_x0_estimate = pos_peak;  
     
     %% ----------Give the peak position higher weight---------------
-    fit_weight_dip = 0.05*ones(length(Q_trace_tofit),1);
+    fit_weight_dip = 1*ones(length(Q_trace_tofit),1);
 %     fit_weight_dip = zeros(length(Q_trace_tofit),1);
     fit_weight_fp = fit_weight_dip;
     weight_width = 20; % times of linewidth
@@ -130,20 +130,26 @@ function [Q0, Q1, QL,findmin_fit_result] = getQwithFP(filename,lambda,tosave)
 %     fit_weight_dip(weight_start:weight_end) = 100; %10*max(round(length(Q_trace_tofit)/(weight_end-weight_start)),1);
 %     fit_weight_fp(weight_start:weight_end) = 0;
     % ----------weighing module finished---------------
-    
+    MZI_trace_local_start  = pos_fitstart;%max(round(0.03*length(MZI_trace_tofit)) , pos_peak - 10*linewidth_estimate);
+    MZI_local_local_end    = pos_fitend;%min(round(0.97*length(MZI_trace_tofit)) , pos_peak + 10*linewidth_estimate);
+    MZI_trace_local        = MZI_trace_tofit;%(MZI_trace_local_start:MZI_local_local_end);
+    MZI_trace_local_phasor = hilbert(MZI_trace_local-mean(MZI_trace_local));
+    MZI_trace_local_phase  = [0;cumsum(mod(diff(angle(MZI_trace_local_phasor))+pi,2*pi)-pi)]+angle(MZI_trace_local_phasor(1));
+    MZI_period_local       = round(2*pi/mean( angle(MZI_trace_local_phasor(2:end)./MZI_trace_local_phasor(1:end-1) ) ) );
+    x_freq=(MZI_trace_local_phase/2/pi*2*pi/mean( diff(MZI_trace_local_phase) )).';
     %% Begin fitting Here
     % first redo the FP (2nd fp)
-    fp_fit_2 = fit( (1:length(Q_trace_tofit)).',Q_trace_tofit,fit_fp,...
+    fp_fit_2 = fit( x_freq.',Q_trace_tofit,fit_fp,...
         'StartPoint',[fit_A0_estimate fit_B_estimate length(Q_trace_freq)/2 fit_T_estimate],...
         'Weight',fit_weight_fp);
-    fp_fit_result_2 = fp_fit_2((1:length(Q_trace_tofit)).');%fp_fit.A0+fp_fit.B*cos(((1:length(Q_trace)).'-fp_fit.x1)/fp_fit.T*2*pi);
+    fp_fit_result_2 = fp_fit_2(x_freq.');%fp_fit.A0+fp_fit.B*cos(((1:length(Q_trace)).'-fp_fit.x1)/fp_fit.T*2*pi);
 
 %             figure
             figure('Units', 'Normalized', 'OuterPosition', [0.1, 0.45, 0.75, 0.5])
             subplot(131)
-            plot((1:length(Q_trace_tofit)).',Q_trace_tofit,'Linewidth',2.0)
+            plot(x_freq.',Q_trace_tofit,'Linewidth',2.0)
             hold on
-            scatter((1:length(Q_trace_tofit)).',fp_fit_result_2, 5);
+            scatter(x_freq.',fp_fit_result_2, 5);
             title(sprintf("FP 2nd fitting result, %g nm",lambda));
 
     fit_A0_estimate = fp_fit_2.A0;
@@ -151,7 +157,7 @@ function [Q0, Q1, QL,findmin_fit_result] = getQwithFP(filename,lambda,tosave)
     fit_x1_estimate = mod(fp_fit_2.x1, fp_fit_2.T);
     fit_T_estimate = fp_fit_2.T;
 %     
-    Q_withfp_fit=fit( (1:length(Q_trace_tofit)).', Q_trace_tofit, fit_Lorentz_fp, ...
+    Q_withfp_fit=fit( x_freq.', Q_trace_tofit, fit_Lorentz_fp, ...
         'StartPoint', [fit_A0_estimate, fit_B_estimate, fit_x1_estimate, fit_T_estimate...
                         fit_LP_estimate, fit_LS_estimate, fit_x0_estimate],...
                     'Weight',fit_weight_dip ); % Lorentz with FP fit, {'A0','B','x1','T','LP','LS','x0'}
@@ -168,7 +174,7 @@ function [Q0, Q1, QL,findmin_fit_result] = getQwithFP(filename,lambda,tosave)
 %                         fit_LP_estimate, fit_LS_estimate, fit_x0_estimate 0],...
 %                     'Weight',fit_weight_dip ); % Lorentz with FP fit, {'A0','B','x1','T','LP','LS','x0','F'}
                  
-    Q_withfp_fit_result = Q_withfp_fit( (1:length(Q_trace_tofit)).' );
+    Q_withfp_fit_result = Q_withfp_fit( x_freq.' );
     kappa  = 2*abs(Q_withfp_fit.LS); % LS may be negative due to nonlinear fitting
     kappa0 = abs(Q_withfp_fit.LS)+sqrt(Q_withfp_fit.LS^2-Q_withfp_fit.LP);
     fitted_transmission = 1-Q_withfp_fit.LP/Q_withfp_fit.LS^2;
@@ -181,9 +187,9 @@ function [Q0, Q1, QL,findmin_fit_result] = getQwithFP(filename,lambda,tosave)
             warning("transmission < 0 in fitting result. Critical coupling are assumed. kappa0 = kappa/2.");
         else % In this case probabily the fitting process are failed. Contact Maodong for more help.
             figure
-            plot((1:length(Q_trace_tofit)).',Q_trace_tofit)
+            plot(x_freq.',Q_trace_tofit)
             hold on
-            scatter((1:length(Q_trace_tofit)).',Q_withfp_fit_result);
+            scatter(x_freq.',Q_withfp_fit_result);
             title("Q trace with FP fitting")
             % Of course you can increase the 0.05 threshold to pass this
             % checkpoint, as long as you can tolerate the fititng result.
@@ -201,13 +207,7 @@ function [Q0, Q1, QL,findmin_fit_result] = getQwithFP(filename,lambda,tosave)
 %             title("Q trace with FP fitting")
 
     %% Then fit MZI with Q trace
-    MZI_trace_local_start  = max(round(0.05*length(MZI_trace_tofit)) , pos_peak - 10*linewidth_estimate);
-    MZI_local_local_end    = min(round(0.95*length(MZI_trace_tofit)) , pos_peak + 10*linewidth_estimate);
-    MZI_trace_local        = MZI_trace_tofit(MZI_trace_local_start:MZI_local_local_end);
-    MZI_trace_local_phasor = hilbert(MZI_trace_local-mean(MZI_trace_local));
-    MZI_trace_local_phase  = [0;cumsum(mod(diff(angle(MZI_trace_local_phasor))+pi,2*pi)-pi)]+angle(MZI_trace_local_phasor(1));
-    MZI_period_local       = round(2*pi/mean( angle(MZI_trace_local_phasor(2:end)./MZI_trace_local_phasor(1:end-1) ) ) );
-
+    
     % MZI_fit_T = 4*pi*round(MZI_period_local/4) /( MZI_trace_local_phase(round(min(end/2 + MZI_period_local/4,end))) - MZI_trace_local_phase(round(max(end/2 - MZI_period_local/4,1))) );
     MZI_fit_T = 4*pi*round(MZI_period_local/4) / ...
         ( MZI_trace_local_phase( round( min(length(MZI_trace_local_phase)/2 + MZI_period_local/4, length(MZI_trace_local_phase) )))...
@@ -219,12 +219,12 @@ function [Q0, Q1, QL,findmin_fit_result] = getQwithFP(filename,lambda,tosave)
     
 %             figure
             subplot(132)
-            plot((1:length(Q_trace_tofit)).',Q_trace_tofit,'Linewidth',2.0)
+            plot(x_freq.',Q_trace_tofit,'Linewidth',2.0)
             hold on
             plot_step = 1;
-            scatter((1:plot_step:length(Q_trace_tofit)).',Q_withfp_fit_result(1:plot_step:length(Q_trace_tofit)) ,5); % last parameter is Marker size
+            scatter(x_freq.',Q_withfp_fit_result(1:plot_step:length(Q_trace_tofit)) ,5); % last parameter is Marker size
             hold on
-            plot((1:length(Q_trace_tofit)).',fit_weight_dip*max(Q_trace_tofit)/max(fit_weight_dip));
+            plot(x_freq.',fit_weight_dip*max(Q_trace_tofit)/max(fit_weight_dip));
             title(sprintf("Q trace with FP fitting, NO FP, %g nm\n Q0=%.4gM, Q1=%.4gM, Q=%.4gM, Trans=%.4g",lambda,Q0,Q1,QL,fitted_transmission))
             
             % % --------save fig----------
@@ -336,6 +336,7 @@ function [Q0, Q1, QL,findmin_fit_result] = getQwithFP(filename,lambda,tosave)
 %             title(sprintf("Q trace with FP fitting, INCLUDED interference, %g nm\n Q0=%.4gM, Q1=%.4gM, Q=%.4gM, Trans=%.4g",lambda,Q0,Q1,QL,fitted_transmission))
 %% -- Write my own fminsearch to fit --
             % % ----This part is actually a 3rd appearance in this file,
+
 %             % % ----rewrite only for convenience----
 %             % %----------Give the peak position higher weight---------------
 %                 fit_weight_dip = 0.05*ones(length(Q_trace_tofit),1);
@@ -346,13 +347,23 @@ function [Q0, Q1, QL,findmin_fit_result] = getQwithFP(filename,lambda,tosave)
 %                 fit_weight_dip(weight_start:weight_end) = 1; %10*max(round(length(Q_trace_tofit)/(weight_end-weight_start)),1);
 %                 fit_weight_fp(weight_start:weight_end) = 0;
 %             % % ----------weighing module finished---------------
+            % % ----rewrite only for convenience----
+            % %----------Give the peak position higher weight---------------
+                fit_weight_dip = 1*ones(length(Q_trace_tofit),1);
+                fit_weight_fp = fit_weight_dip;
+                weight_width = 10; % times of linewidth
+                weight_start = max(round(pos_peak - weight_width*linewidth_estimate/2),1);
+                weight_end   = min(round(pos_peak + weight_width*linewidth_estimate/2),length(Q_trace_tofit));
+                fit_weight_dip(weight_start:weight_end) = 1; %10*max(round(length(Q_trace_tofit)/(weight_end-weight_start)),1);
+                fit_weight_fp(weight_start:weight_end) = 0;
+            % % ----------weighing module finished---------------
 
         Q0_findmin_estimate = 1.8; % Estimate Q0 should be around 1.8M
         Q1_findmin_estimate = 8.0; % Estimate Qe should be around 8.0M
         kappa0_findmin_estimate = 299792.458/lambda/( Q0_findmin_estimate /MZI_fit_T * MZI_FSR);
         kappae_findmin_estimate = 299792.458/lambda/( Q1_findmin_estimate /MZI_fit_T * MZI_FSR);
         
-        findmin_fun = @(paras)LCL(modtrans_residual(paras(1),paras(2),paras(3),paras(4),paras(5),paras(6),paras(7),(1:length(Q_trace_tofit)).',Q_trace_tofit) ,fit_weight_dip);
+        findmin_fun = @(paras)LCL(modtrans_residual(paras(1),paras(2),paras(3),paras(4),paras(5),paras(6),paras(7),x_freq.',Q_trace_tofit) ,fit_weight_dip);
         findmin_start_point = [fit_A0_estimate_new, r1r2, fit_x1_estimate, fit_T_estimate, kappa0_findmin_estimate, kappae_findmin_estimate,fit_x0_estimate];
 %         options = optimset('MaxFunEvals',5000);
         findmin_fit_result = fminsearch(findmin_fun,findmin_start_point);
@@ -364,15 +375,15 @@ function [Q0, Q1, QL,findmin_fit_result] = getQwithFP(filename,lambda,tosave)
 
 %             figure
             subplot(133)
-            plot((1:length(Q_trace_tofit)).',Q_trace_tofit,'Linewidth',2.0)
+            plot(x_freq.',Q_trace_tofit,'Linewidth',2.0)
             hold on
             plot_step = 1;
             %scatter((1:plot_step:length(Q_trace_tofit)).',Q_withfp_interfere_fit_result(1:plot_step:length(Q_trace_tofit)) ,5); % last parameter is Marker size
-            scatter((1:plot_step:length(Q_trace_tofit)).', modtrans(findmin_fit_result(1),findmin_fit_result(2),findmin_fit_result(3),...
+            scatter(x_freq.', modtrans(findmin_fit_result(1),findmin_fit_result(2),findmin_fit_result(3),...
                                                                     findmin_fit_result(4),findmin_fit_result(5),findmin_fit_result(6),...
-                                                                    findmin_fit_result(7), (1:plot_step:length(Q_trace_tofit)).' ) ,5);
+                                                                    findmin_fit_result(7), x_freq.' ) ,5);
             hold on
-            plot((1:length(Q_trace_tofit)).',fit_weight_dip*max(Q_trace_tofit)/max(fit_weight_dip));
+            plot(x_freq.',fit_weight_dip*max(Q_trace_tofit)/max(fit_weight_dip));
             title(sprintf("Q trace with FP fitting, INCLUDED interference, %g nm\n Q0=%.4gM, Q1=%.4gM, Q=%.4gM, Trans=%.4g",lambda,Q0,Q1,QL,fitted_transmission))
             
             

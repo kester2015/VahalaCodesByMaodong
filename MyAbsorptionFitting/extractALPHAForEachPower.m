@@ -18,33 +18,62 @@ clc
 % % QextList           = [9.465  5.879  7.543  4.255  5.897]*1e6;
 % realwavelengthList = [1540.4 1545.1 1551.4 1556.2 1561.0];
 % kerrOverTotalList  = [0.0353 0.0390 0.0332 0.0349 0.0353]/2;
+% 
+% count = 5;
+%     wavelength = wavelengthList(count);
+%     outputVoltage1 = outputVoltage1List(count); %V
+%     outputPower1 = outputPower1List(count);%mW
+%     inputVoltage1 = inputVoltage1List(count); %V
+%     inputPower1 = inputPower1List(count);%mW
+%     outputVoltage2 = outputVoltage2List(count); %V
+%     outputPower2 = outputPower2List(count);%mW
+%     inputVoltage2 = inputVoltage2List(count); %V
+%     inputPower2 = inputPower2List(count);%mW
+    
+%     wavelength = 1541.9;
+%     outputVoltage1 = 2.4; %V
+%     outputPower1 = 3.196;%mW
+%     inputPower1 = 24.30;%mW
+%     outputVoltage2 = 2.1; %V
+%     outputPower2 = 2.676;%mW
+%     inputPower2 = 18.69;%mW
+%       Q_data_filename = 'Z:\Qifan\Tantala\20200905-thermal-rawdata\Q-maxvpp-redo-1541.9nm.mat';
+    
+    wavelength = 1543.5;
+    outputVoltage1 = 2.71; %V
+    outputPower1 = 1.181;%mW
+    inputPower1 = 7.820;%mW
+    outputVoltage2 = 2.62; %V
+    outputPower2 = 1.123;%mW
+    inputPower2 = 7.737;%mW
+    Q_data_filename = 'Z:\Qifan\Tantala\20200905-thermal-rawdata\Q-maxvpp-1543.5nm.mat';
 
-
-    count = 5;
-    wavelength = wavelengthList(count);
-    outputVoltage1 = outputVoltage1List(count); %V
-    outputPower1 = outputPower1List(count);%mW
-    inputVoltage1 = inputVoltage1List(count); %V
-    inputPower1 = inputPower1List(count);%mW
-    outputVoltage2 = outputVoltage2List(count); %V
-    outputPower2 = outputPower2List(count);%mW
-    inputVoltage2 = inputVoltage2List(count); %V
-    inputPower2 = inputPower2List(count);%mW
-
+%     wavelength = 1547;
+%     outputVoltage1 = (2.106+2.16)/2; %V
+%     outputPower1 = 2.764;%mW
+%     inputPower1 = 37.63;%mW
+%     outputVoltage2 = 1.01; %V
+%     outputPower2 = 1.374;%mW
+%     inputPower2 = 23.18;%mW
+%     Q_data_filename = 'Z:\Qifan\Tantala\20200905-thermal-rawdata\Q-maxvpp-after-1546.65nm.mat';
+    
+    kerrOverTotal = 0.0353/2;
 %%
 
-filedirGlob = 'D:\Measurement Data\Tantala summary\1561nm-02-mat';
-powerList = 0.01:0.1:1;
+filedirGlob = 'Z:\Qifan\Tantala\20200905-thermal-rawdata\Dev21\1543.5nm-02-mat';
+powerList = 2.2:-0.1:0.3;
 
-lambda = 1561;
+
 Q_data_filename = 'D:\Measurement Data\Tantala summary\Q-traces\4.72uW-1561nm.mat';
+lambda = wavelength;
+
 [mode_Q0, mode_Qe,~,~] = getQwithFP(Q_data_filename);
 
 
 %%
 close all
 
-fitting_results = zeros(length(powerList),4);
+fitting_results = zeros(length(powerList),10);
 fitting_results(:,1) = powerList';
 for ii = 1:length(powerList)
     pp = powerList(ii);
@@ -53,7 +82,12 @@ for ii = 1:length(powerList)
     fitting_results(ii,2:end) = fitTriwithFP(this_filename,mode_Q0, mode_Qe,lambda,1);
 end
 
+save(strcat(filedirGlob,'\Fitting_results\coefficients.mat'),'fitting_results');
+
 %%
+close all
+% filedirGlob = 'C:\Users\leona\iCloudDrive\Work\data\1543.5nm-02-mat';
+% load(strcat(filedirGlob,'\Fitting_results\coefficients.mat'),'fitting_results');
 %     Qabs_est = 3 * 1e6;
     c = 299792458;
     % n0 = 2.0573;
@@ -65,14 +99,31 @@ end
     Aeff = 1.0575e-12;
     dTdP = 613;%1685;%1570;
     
-    PoverV = (sqrt(inputPower2*outputPower2)*1e-3)/outputVoltage2; %sqrt(inputVoltage2*outputVoltage2);
+    
+    power_corr_factor = (1 - abs( fitting_results(:,3) ) );
+    
+    PoverV = (sqrt(inputPower2*outputPower2)*1e-3)/outputVoltage2;
+
+
     alpha_each_volt = fitting_results(:,end)/PoverV;
     Qabs_each_volt = nT * dTdP *(2*pi*c/lambda*1e9)^2/n0./alpha_each_volt;
-
     
-save(strcat(filedirGlob,'\Fitting_results\coefficients.mat'),'fitting_results');
+    Qabs_each_volt = Qabs_each_volt./power_corr_factor;
+    
+    
+    n2_each_volt = 0.0353/2 * n0 * (2*pi*r*Aeff) * (2*pi*c/lambda*1e9)./Qabs_each_volt *dTdP * nT/c;
+    
+
+
 figure
 plot(fitting_results(:,1),Qabs_each_volt/1e6);
-xlabel('voltage/V');
-ylabel('Qabs/Million')
-title('alpha fitting result at different voltage')
+xlabel('voltage / V');
+ylabel('Q abs / M')
+title('Qabs fitting result at different voltage')
+
+figure
+
+plot(fitting_results(:,1),n2_each_volt);
+xlabel('voltage / V');
+ylabel('n2');
+title('n2 fitting result at different voltage')
