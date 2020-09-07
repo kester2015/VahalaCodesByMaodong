@@ -123,6 +123,12 @@ function [Q0, Q1, QL,findmin_fit_result] = getQwithFP(filename,lambda,tosave)
     weight_end   = min(round(pos_peak + weight_width*linewidth_estimate/2),length(Q_trace_tofit));
     fit_weight_dip(weight_start:weight_end) = 1; %10*max(round(length(Q_trace_tofit)/(weight_end-weight_start)),1);
     fit_weight_fp(weight_start:weight_end) = 0;
+    
+%     weight_width = 2; % times of linewidth
+%     weight_start = max(round(pos_peak - weight_width*linewidth_estimate/2),1);
+%     weight_end   = min(round(pos_peak + weight_width*linewidth_estimate/2),length(Q_trace_tofit));
+%     fit_weight_dip(weight_start:weight_end) = 100; %10*max(round(length(Q_trace_tofit)/(weight_end-weight_start)),1);
+%     fit_weight_fp(weight_start:weight_end) = 0;
     % ----------weighing module finished---------------
     
     %% Begin fitting Here
@@ -330,16 +336,16 @@ function [Q0, Q1, QL,findmin_fit_result] = getQwithFP(filename,lambda,tosave)
 %             title(sprintf("Q trace with FP fitting, INCLUDED interference, %g nm\n Q0=%.4gM, Q1=%.4gM, Q=%.4gM, Trans=%.4g",lambda,Q0,Q1,QL,fitted_transmission))
 %% -- Write my own fminsearch to fit --
             % % ----This part is actually a 3rd appearance in this file,
-            % % ----rewrite only for convenience----
-            % %----------Give the peak position higher weight---------------
-                fit_weight_dip = 0.05*ones(length(Q_trace_tofit),1);
-                fit_weight_fp = fit_weight_dip;
-                weight_width = 10; % times of linewidth
-                weight_start = max(round(pos_peak - weight_width*linewidth_estimate/2),1);
-                weight_end   = min(round(pos_peak + weight_width*linewidth_estimate/2),length(Q_trace_tofit));
-                fit_weight_dip(weight_start:weight_end) = 1; %10*max(round(length(Q_trace_tofit)/(weight_end-weight_start)),1);
-                fit_weight_fp(weight_start:weight_end) = 0;
-            % % ----------weighing module finished---------------
+%             % % ----rewrite only for convenience----
+%             % %----------Give the peak position higher weight---------------
+%                 fit_weight_dip = 0.05*ones(length(Q_trace_tofit),1);
+%                 fit_weight_fp = fit_weight_dip;
+%                 weight_width = 10; % times of linewidth
+%                 weight_start = max(round(pos_peak - weight_width*linewidth_estimate/2),1);
+%                 weight_end   = min(round(pos_peak + weight_width*linewidth_estimate/2),length(Q_trace_tofit));
+%                 fit_weight_dip(weight_start:weight_end) = 1; %10*max(round(length(Q_trace_tofit)/(weight_end-weight_start)),1);
+%                 fit_weight_fp(weight_start:weight_end) = 0;
+%             % % ----------weighing module finished---------------
 
         Q0_findmin_estimate = 1.8; % Estimate Q0 should be around 1.8M
         Q1_findmin_estimate = 8.0; % Estimate Qe should be around 8.0M

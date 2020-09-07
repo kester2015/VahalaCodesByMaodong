@@ -20,7 +20,7 @@ realwavelengthList = [1540.4 1545.1 1551.4 1556.2 1561.0];
 kerrOverTotalList  = [0.0353 0.0390 0.0332 0.0349 0.0353]/2;
 
 
-count = 1;
+count = 5;
     wavelength = wavelengthList(count);
     outputVoltage1 = outputVoltage1List(count); %V
     outputPower1 = outputPower1List(count);%mW
@@ -33,11 +33,11 @@ count = 1;
 
 %%
 
-filedirGlob = 'D:\Measurement Data\Tantala summary\1540nm-02-mat';
+filedirGlob = 'D:\Measurement Data\Tantala summary\1561nm-02-mat';
 powerList = 0.01:0.1:1;
 
-lambda = 1540.4;
-Q_data_filename = 'D:\Measurement Data\Tantala summary\Q-traces\4.46uW-1540.4nm.mat';
+lambda = 1561;
+Q_data_filename = 'D:\Measurement Data\Tantala summary\Q-traces\4.72uW-1561nm.mat';
 [mode_Q0, mode_Qe,~,~] = getQwithFP(Q_data_filename);
 
 
@@ -65,14 +65,14 @@ end
     Aeff = 1.0575e-12;
     dTdP = 613;%1685;%1570;
     
-    PoverV = (sqrt(inputPower2*outputPower2)*1e-3)/sqrt(inputVoltage1*outputVoltage1);
+    PoverV = (sqrt(inputPower2*outputPower2)*1e-3)/outputVoltage2; %sqrt(inputVoltage2*outputVoltage2);
     alpha_each_volt = fitting_results(:,end)/PoverV;
     Qabs_each_volt = nT * dTdP *(2*pi*c/lambda*1e9)^2/n0./alpha_each_volt;
 
     
 save(strcat(filedirGlob,'\Fitting_results\coefficients.mat'),'fitting_results');
 figure
-plot(fitting_results(:,1),Qabs_each_volt);
+plot(fitting_results(:,1),Qabs_each_volt/1e6);
 xlabel('voltage/V');
-ylabel('alpha/??unit??')
+ylabel('Qabs/Million')
 title('alpha fitting result at different voltage')
