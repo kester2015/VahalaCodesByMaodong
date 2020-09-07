@@ -39,15 +39,38 @@ clc
 %     outputPower2 = 2.676;%mW
 %     inputPower2 = 18.69;%mW
 %       Q_data_filename = 'Z:\Qifan\Tantala\20200905-thermal-rawdata\Q-maxvpp-redo-1541.9nm.mat';
+%     
+
+
+%     wavelength = 1543.5;
+%     outputVoltage1 = 2.71; %V
+%     outputPower1 = 1.181;%mW
+%     inputPower1 = 7.820;%mW
+%     outputVoltage2 = 2.62; %V
+%     outputPower2 = 1.123;%mW
+%     inputPower2 = 7.737;%mW
+%     Q_data_filename = 'Z:\Qifan\Tantala\20200905-thermal-rawdata\Q-maxvpp-1543.5nm.mat';
     
-    wavelength = 1543.5;
-    outputVoltage1 = 2.71; %V
-    outputPower1 = 1.181;%mW
-    inputPower1 = 7.820;%mW
-    outputVoltage2 = 2.62; %V
-    outputPower2 = 1.123;%mW
-    inputPower2 = 7.737;%mW
-    Q_data_filename = 'Z:\Qifan\Tantala\20200905-thermal-rawdata\Q-maxvpp-1543.5nm.mat';
+%     
+%     
+%     wavelength = 1551.4;
+%     outputVoltage1 = 2.68; %V
+%     outputPower1 = 0.971;%mW
+%     inputPower1 = 8.560;%mW
+%     outputVoltage2 = 2.45; %V
+%     outputPower2 = 0.898;%mW
+%     inputPower2 = 8.726;%mW
+%     Q_data_filename = 'Z:\Qifan\Tantala\20200906-thermal-rawdata\Q-maxvpp-redo-1551.325nm.mat';
+    
+    wavelength = 1562.6;
+    outputVoltage1 = 2.63; %V
+    outputPower1 = 1.258;%mW
+    inputPower1 = 8.587;%mW
+    outputVoltage2 = 2.51; %V
+    outputPower2 = 1.187;%mW
+    inputPower2 = 8.453;%mW
+    Q_data_filename = 'Z:\Qifan\Tantala\20200906-thermal-rawdata\Q-maxvpp-1562.652nm.mat';
+
 
 %     wavelength = 1547;
 %     outputVoltage1 = (2.106+2.16)/2; %V
@@ -61,8 +84,8 @@ clc
     kerrOverTotal = 0.0353/2;
 %%
 
-filedirGlob = 'Z:\Qifan\Tantala\20200905-thermal-rawdata\Dev21\1543.5nm-02-mat';
-powerList = 2.2:-0.1:0.3;
+filedirGlob = 'Z:\Qifan\Tantala\20200906-thermal-rawdata\Dev21\1562.6nm-02-mat';
+powerList = 2.0:-0.1:0.3;
 
 lambda = wavelength;
 [mode_Q0, mode_Qe,~,~] = getQwithFP(Q_data_filename);
@@ -85,7 +108,7 @@ save(strcat(filedirGlob,'\Fitting_results\coefficients.mat'),'fitting_results');
 %%
 close all
 % filedirGlob = 'C:\Users\leona\iCloudDrive\Work\data\1543.5nm-02-mat';
-% load(strcat(filedirGlob,'\Fitting_results\coefficients.mat'),'fitting_results');
+load(strcat(filedirGlob,'\Fitting_results\coefficients.mat'),'fitting_results');
 %     Qabs_est = 3 * 1e6;
     c = 299792458;
     % n0 = 2.0573;
@@ -101,6 +124,8 @@ close all
     power_corr_factor = (1 - abs( fitting_results(:,3) ) );
     
     PoverV = (sqrt(inputPower2*outputPower2)*1e-3)/outputVoltage2;
+%     PoverV = (sqrt(inputPower1*outputPower1)*1e-3)/outputVoltage1;
+
     alpha_each_volt = fitting_results(:,end)/PoverV;
     Qabs_each_volt = nT * dTdP *(2*pi*c/lambda*1e9)^2/n0./alpha_each_volt;
     
@@ -108,7 +133,6 @@ close all
     
     
     n2_each_volt = 0.0353/2 * n0 * (2*pi*r*Aeff) * (2*pi*c/lambda*1e9)./Qabs_each_volt *dTdP * nT/c;
-    
 
 
 figure

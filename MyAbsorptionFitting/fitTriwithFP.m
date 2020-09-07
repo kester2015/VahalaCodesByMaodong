@@ -190,9 +190,9 @@ x_freq=(MZI_phase/2/pi*2*pi/mean( diff(MZI_phase) )).';
                     tt = strfind(data_filename,'\');
                     file_tosave_dir = data_filename(1:tt(end));
                     file_tosave_dir = strcat(file_tosave_dir,'Fitting_results');
-%                    if ~isfolder(file_tosave_dir)
-%                        mkdir(file_tosave_dir);
-%                    end
+                   if ~isfolder(file_tosave_dir)
+                       mkdir(file_tosave_dir);
+                   end
                     % --------save fig----------
                     filename_tosave = strcat(file_tosave_dir,'\',data_filename(tt(end)+1:end-4),'-FPTrifitting.fig');
 %                     if isfile(filename_tosave)
