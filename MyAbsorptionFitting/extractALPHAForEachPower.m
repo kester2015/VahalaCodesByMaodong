@@ -38,7 +38,7 @@ clc
 %     outputVoltage2 = 2.1; %V
 %     outputPower2 = 2.676;%mW
 %     inputPower2 = 18.69;%mW
-%       Q_data_filename = 'C:\Users\leona\iCloudDrive\Work\data\Q-maxvpp-redo-1541.9nm.mat';
+%       Q_data_filename = 'Z:\Qifan\Tantala\20200905-thermal-rawdata\Q-maxvpp-redo-1541.9nm.mat';
     
     wavelength = 1543.5;
     outputVoltage1 = 2.71; %V
@@ -47,7 +47,7 @@ clc
     outputVoltage2 = 2.62; %V
     outputPower2 = 1.123;%mW
     inputPower2 = 7.737;%mW
-    Q_data_filename = 'C:\Users\leona\iCloudDrive\Work\data\Q-maxvpp-1543.5nm.mat';
+    Q_data_filename = 'Z:\Qifan\Tantala\20200905-thermal-rawdata\Q-maxvpp-1543.5nm.mat';
 
 %     wavelength = 1547;
 %     outputVoltage1 = (2.106+2.16)/2; %V
@@ -61,7 +61,7 @@ clc
     kerrOverTotal = 0.0353/2;
 %%
 
-filedirGlob = 'C:\Users\leona\iCloudDrive\Work\data\1543.5nm-02-mat';
+filedirGlob = 'Z:\Qifan\Tantala\20200905-thermal-rawdata\Dev21\1543.5nm-02-mat';
 powerList = 2.2:-0.1:0.3;
 
 lambda = wavelength;
@@ -84,8 +84,8 @@ save(strcat(filedirGlob,'\Fitting_results\coefficients.mat'),'fitting_results');
 
 %%
 close all
-filedirGlob = 'C:\Users\leona\iCloudDrive\Work\data\1543.5nm-02-mat';
-load(strcat(filedirGlob,'\Fitting_results\coefficients.mat'),'fitting_results');
+% filedirGlob = 'C:\Users\leona\iCloudDrive\Work\data\1543.5nm-02-mat';
+% load(strcat(filedirGlob,'\Fitting_results\coefficients.mat'),'fitting_results');
 %     Qabs_est = 3 * 1e6;
     c = 299792458;
     % n0 = 2.0573;
