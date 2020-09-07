@@ -123,6 +123,12 @@ function [Q0, Q1, QL,findmin_fit_result] = getQwithFP(filename,lambda,tosave)
     weight_end   = min(round(pos_peak + weight_width*linewidth_estimate/2),length(Q_trace_tofit));
     fit_weight_dip(weight_start:weight_end) = 1; %10*max(round(length(Q_trace_tofit)/(weight_end-weight_start)),1);
     fit_weight_fp(weight_start:weight_end) = 0;
+    
+%     weight_width = 2; % times of linewidth
+%     weight_start = max(round(pos_peak - weight_width*linewidth_estimate/2),1);
+%     weight_end   = min(round(pos_peak + weight_width*linewidth_estimate/2),length(Q_trace_tofit));
+%     fit_weight_dip(weight_start:weight_end) = 100; %10*max(round(length(Q_trace_tofit)/(weight_end-weight_start)),1);
+%     fit_weight_fp(weight_start:weight_end) = 0;
     % ----------weighing module finished---------------
     MZI_trace_local_start  = pos_fitstart;%max(round(0.03*length(MZI_trace_tofit)) , pos_peak - 10*linewidth_estimate);
     MZI_local_local_end    = pos_fitend;%min(round(0.97*length(MZI_trace_tofit)) , pos_peak + 10*linewidth_estimate);
@@ -330,6 +336,17 @@ function [Q0, Q1, QL,findmin_fit_result] = getQwithFP(filename,lambda,tosave)
 %             title(sprintf("Q trace with FP fitting, INCLUDED interference, %g nm\n Q0=%.4gM, Q1=%.4gM, Q=%.4gM, Trans=%.4g",lambda,Q0,Q1,QL,fitted_transmission))
 %% -- Write my own fminsearch to fit --
             % % ----This part is actually a 3rd appearance in this file,
+
+%             % % ----rewrite only for convenience----
+%             % %----------Give the peak position higher weight---------------
+%                 fit_weight_dip = 0.05*ones(length(Q_trace_tofit),1);
+%                 fit_weight_fp = fit_weight_dip;
+%                 weight_width = 10; % times of linewidth
+%                 weight_start = max(round(pos_peak - weight_width*linewidth_estimate/2),1);
+%                 weight_end   = min(round(pos_peak + weight_width*linewidth_estimate/2),length(Q_trace_tofit));
+%                 fit_weight_dip(weight_start:weight_end) = 1; %10*max(round(length(Q_trace_tofit)/(weight_end-weight_start)),1);
+%                 fit_weight_fp(weight_start:weight_end) = 0;
+%             % % ----------weighing module finished---------------
             % % ----rewrite only for convenience----
             % %----------Give the peak position higher weight---------------
                 fit_weight_dip = 1*ones(length(Q_trace_tofit),1);
@@ -371,14 +388,31 @@ function [Q0, Q1, QL,findmin_fit_result] = getQwithFP(filename,lambda,tosave)
             
             
             if tosave
-                % --------save fig----------
-                filename_tosave = strcat(filename(1:end-4),'-FPfitting.fig');
-                if isfile(filename_tosave)
-                    backup_filename = strcat(filename_tosave(1:end-4),'_',char(datetime('now','Format','yyMMdd_HHmmss')),'_bak.fig');
-                    movefile(filename_tosave,backup_filename);
-                    warning('Old file was renamed!')
-                end
-                saveas(gcf,filename_tosave);
+%                 % --------save fig----------
+%                 filename_tosave = strcat(filename(1:end-4),'-FPfitting.fig');
+%                 if isfile(filename_tosave)
+%                     backup_filename = strcat(filename_tosave(1:end-4),'_',char(datetime('now','Format','yyMMdd_HHmmss')),'_bak.fig');
+%                     movefile(filename_tosave,backup_filename);
+%                     warning('Old file was renamed!')
+%                 end
+%                 saveas(gcf,filename_tosave);
+                
+                tt = strfind(filename,'\');
+                    file_tosave_dir = filename(1:tt(end));
+                    file_tosave_dir = strcat(file_tosave_dir,'Fitting_results');
+                   if ~isfolder(file_tosave_dir)
+                       mkdir(file_tosave_dir);
+                   end
+                    % --------save fig----------
+                    filename_tosave = strcat(file_tosave_dir,'\',filename(tt(end)+1:end-4),'-FP-Q-fitting.fig');
+%                     if isfile(filename_tosave)
+%                         backup_filename = strcat(filename_tosave(1:end-4),'_',char(datetime('now','Format','yyMMdd_HHmmss')),'_bak.fig');
+%                         movefile(filename_tosave,backup_filename);
+%                         warning('Old file was renamed!')
+%                     end
+                    saveas(gcf,filename_tosave);
+                    filename_tosave = strcat(file_tosave_dir,'\',filename(tt(end)+1:end-4),'-FP-Q-fitting.png');
+                    saveas(gcf,filename_tosave);
             end
 end
 

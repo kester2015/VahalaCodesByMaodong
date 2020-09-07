@@ -291,16 +291,7 @@ classdef Infiniium < handle
         function SetVertScale(Obj, Chan, scale)
             % Chan is int from 1-4, specify channel
             % scale is a 2-dim array, specify bottom and top voltage.
-            if length(scale) ~= 2
-                error('invalid input scale, length 2 array required.')
-            end
-            numOfVertDiv = 8; % 8 divisions on oscilloscope
-            voltPerDiv = abs(diff(scale)) / numOfVertDiv;
-            voltOffset = mean(scale);
-            tt1 = strcat(':CHAN',num2str(Chan),":SCAL ",num2str(voltPerDiv));
-            tt2 = strcat(':CHAN',num2str(Chan),":OFFS ",num2str(voltOffset));
-            Obj.Write(tt1);
-            Obj.Write(tt2);
+            numOfVertDiv = 8;
         end
     end
     

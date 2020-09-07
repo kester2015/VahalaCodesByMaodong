@@ -3,7 +3,7 @@ clear
 clc
 %%
 % % %------20200819 Tantala-----------%
-%1535nm
+% %1535nm
 % % filedirGolb = strcat("Z:\Qifan\Tantala\20200819-thermal-rawdata\Dev21\");
 % wavelengthList     = [1540   1545   1551   1556   1561];%1535:10:1555;
 % outputVoltage1List = [1.855  1.819  2.373  3.064  2.245];
@@ -18,7 +18,6 @@ clc
 % % QextList           = [9.465  5.879  7.543  4.255  5.897]*1e6;
 % realwavelengthList = [1540.4 1545.1 1551.4 1556.2 1561.0];
 % kerrOverTotalList  = [0.0353 0.0390 0.0332 0.0349 0.0353]/2;
-% 
 % 
 % count = 5;
 %     wavelength = wavelengthList(count);
@@ -87,7 +86,9 @@ clc
 filedirGlob = 'Z:\Qifan\Tantala\20200906-thermal-rawdata\Dev21\1562.6nm-02-mat';
 powerList = 2.0:-0.1:0.3;
 
+
 lambda = wavelength;
+
 [mode_Q0, mode_Qe,~,~] = getQwithFP(Q_data_filename);
 
 
@@ -126,6 +127,7 @@ load(strcat(filedirGlob,'\Fitting_results\coefficients.mat'),'fitting_results');
     PoverV = (sqrt(inputPower2*outputPower2)*1e-3)/outputVoltage2;
 %     PoverV = (sqrt(inputPower1*outputPower1)*1e-3)/outputVoltage1;
 
+
     alpha_each_volt = fitting_results(:,end)/PoverV;
     Qabs_each_volt = nT * dTdP *(2*pi*c/lambda*1e9)^2/n0./alpha_each_volt;
     
@@ -142,6 +144,7 @@ ylabel('Q abs / M')
 title('Qabs fitting result at different voltage')
 
 figure
+
 plot(fitting_results(:,1),n2_each_volt);
 xlabel('voltage / V');
 ylabel('n2');

@@ -4,6 +4,12 @@ function [findmin_fit_result] = fitTriwithFP(data_filename, mode_Q0, mode_Qe, la
         tosave = 0;
     end
     load(data_filename,'timeAxis','Ch2','Ch3');
+    if ~exist('timeAxis','var')
+        load(data_filename,'data_matrix');
+        timeAxis = data_matrix(:,1);
+        Ch2 = data_matrix(:,2);
+        Ch3 = data_matrix(:,3);
+    end
     MZI_FSR = 39.9553; % MHz
 
     % function fitTriwithFP_main(data_filename,lambda,)
@@ -50,7 +56,7 @@ x_freq=(MZI_phase/2/pi*2*pi/mean( diff(MZI_phase) )).';
     [amp_fp,pos_fp] = max(Q_trace_freq_temp);
     fit_T_estimate = length(Q_trace_freq)/(pos_fp-1);
     if pos_fp < 3
-        fit_T_estimate = 1*length(Q_trace_freq);
+        fit_T_estimate = 0.5*length(Q_trace_freq);
     end
     fit_B_estimate = amp_fp/length(Q_trace_freq);
     fit_A0_estimate = mean(Trans_raw);
@@ -72,7 +78,7 @@ x_freq=(MZI_phase/2/pi*2*pi/mean( diff(MZI_phase) )).';
     mid_x_est = [find(half_cut_est(1:dip_x_est)==0, 1,'last' ), find(half_cut_est(dip_x_est:end)==1, 1)+dip_x_est-1];
     linewidth_est = abs(diff(mid_x_est));
 
-    pos_fitrange = 3; % times of linewidth, Q to fit range
+    pos_fitrange = 4; % times of linewidth, Q to fit range
     pos_fitstart = round(max(0.03*length(Trans_raw) , dip_x_est - 0.8*pos_fitrange*linewidth_est)); % fitting range is peak position ± pos_fitrange/2 linewidth
     pos_fitend   = round(min(0.97*length(Trans_raw) , dip_x_est + 0.2*pos_fitrange*linewidth_est)); % fitting range is peak position ± pos_fitrange/2 linewidth
     fp_fit_weight = ones(size(Trans_raw));
@@ -95,7 +101,9 @@ x_freq=(MZI_phase/2/pi*2*pi/mean( diff(MZI_phase) )).';
     half_cut = Trans_normed < mid_y;
     mid_x = [find(half_cut(1:dip_x)==0, 1,'last' ), find(half_cut(dip_x:end)==1, 1)+dip_x-1];
 
-               figure
+            figure('Units', 'Normalized', 'OuterPosition', [0.1, 0.25, 0.6, 0.5])
+            subplot(121)
+%             figure
             plot(x_freq.',Trans_raw,'Linewidth',2.0)
             hold on
             scatter(x_freq.',fp_fit_result, 5);
@@ -176,7 +184,8 @@ x_freq=(MZI_phase/2/pi*2*pi/mean( diff(MZI_phase) )).';
 %                                    mid_x(1), 0.5*alpha_est,(1:length(Trans_raw)).');
 
 
-            figure
+%             figure
+            subplot(122)
             plot(x_freq.',Trans_raw,'Linewidth',2.0)
 %             hold on
 %             scatter((1:length(Trans_raw)).',fp_fit_result, 5);
@@ -194,14 +203,14 @@ x_freq=(MZI_phase/2/pi*2*pi/mean( diff(MZI_phase) )).';
                        mkdir(file_tosave_dir);
                    end
                     % --------save fig----------
-                    filename_tosave = strcat(file_tosave_dir,'\',data_filename(tt(end)+1:end-4),'-FPTrifitting.fig');
+                    filename_tosave = strcat(file_tosave_dir,'\',data_filename(tt(end)+1:end-4),'-FP-Tri-fitting.fig');
 %                     if isfile(filename_tosave)
 %                         backup_filename = strcat(filename_tosave(1:end-4),'_',char(datetime('now','Format','yyMMdd_HHmmss')),'_bak.fig');
 %                         movefile(filename_tosave,backup_filename);
 %                         warning('Old file was renamed!')
 %                     end
                     saveas(gcf,filename_tosave);
-                    filename_tosave = strcat(file_tosave_dir,'\',data_filename(tt(end)+1:end-4),'-FPTrifitting.png');
+                    filename_tosave = strcat(file_tosave_dir,'\',data_filename(tt(end)+1:end-4),'-FP-Tri-fitting.png');
                     saveas(gcf,filename_tosave);
                 end
     toc
