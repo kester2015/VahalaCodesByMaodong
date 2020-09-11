@@ -41,34 +41,35 @@ clc
 %     
 
 
-%     wavelength = 1543.5;
-%     outputVoltage1 = 2.71; %V
-%     outputPower1 = 1.181;%mW
-%     inputPower1 = 7.820;%mW
-%     outputVoltage2 = 2.62; %V
-%     outputPower2 = 1.123;%mW
-%     inputPower2 = 7.737;%mW
-%     Q_data_filename = 'Z:\Qifan\Tantala\20200905-thermal-rawdata\Q-maxvpp-1543.5nm.mat';
+    wavelength = 1543.5;
+    outputVoltage1 = 2.71; %V
+    outputPower1 = 1.181;%mW
+    inputPower1 = 7.820;%mW
+    outputVoltage2 = 2.62; %V
+    outputPower2 = 1.123;%mW
+    inputPower2 = 7.737;%mW
+    Q_data_filename = 'Z:\Qifan\Tantala\20200905-thermal-rawdata\Q-maxvpp-1543.5nm.mat';
+    kerrOverTotal = 0.0193;
     
-%     
-%     
-%     wavelength = 1551.4;
-%     outputVoltage1 = 2.68; %V
-%     outputPower1 = 0.971;%mW
-%     inputPower1 = 8.560;%mW
-%     outputVoltage2 = 2.45; %V
-%     outputPower2 = 0.898;%mW
-%     inputPower2 = 8.726;%mW
-%     Q_data_filename = 'Z:\Qifan\Tantala\20200906-thermal-rawdata\Q-maxvpp-redo-1551.325nm.mat';
     
-    wavelength = 1562.6;
-    outputVoltage1 = 2.63; %V
-    outputPower1 = 1.258;%mW
-    inputPower1 = 8.587;%mW
-    outputVoltage2 = 2.51; %V
-    outputPower2 = 1.187;%mW
-    inputPower2 = 8.453;%mW
-    Q_data_filename = 'Z:\Qifan\Tantala\20200906-thermal-rawdata\Q-maxvpp-1562.652nm.mat';
+    wavelength = 1551.4;
+    outputVoltage1 = 2.68; %V
+    outputPower1 = 0.971;%mW
+    inputPower1 = 8.560;%mW
+    outputVoltage2 = 2.45; %V
+    outputPower2 = 0.898;%mW
+    inputPower2 = 8.726;%mW
+    Q_data_filename = 'Z:\Qifan\Tantala\20200906-thermal-rawdata\Q-maxvpp-redo-1551.325nm.mat';
+    kerrOverTotal = 0.0174;
+    
+%     wavelength = 1562.6;
+%     outputVoltage1 = 2.63; %V
+%     outputPower1 = 1.258;%mW
+%     inputPower1 = 8.587;%mW
+%     outputVoltage2 = 2.51; %V
+%     outputPower2 = 1.187;%mW
+%     inputPower2 = 8.453;%mW
+%     Q_data_filename = 'Z:\Qifan\Tantala\20200906-thermal-rawdata\Q-maxvpp-1562.652nm.mat';
 
 
 %     wavelength = 1547;
@@ -80,10 +81,11 @@ clc
 %     inputPower2 = 23.18;%mW
 %     Q_data_filename = 'Z:\Qifan\Tantala\20200905-thermal-rawdata\Q-maxvpp-after-1546.65nm.mat';
     
-    kerrOverTotal = 0.0353/2;
+%     kerrOverTotal = 0.0353/2;
 %%
 
-filedirGlob = 'Z:\Qifan\Tantala\20200906-thermal-rawdata\Dev21\1562.6nm-02-mat';
+% filedirGlob = 'Z:\Qifan\Tantala\20200906-thermal-rawdata\Dev21\1551.4nm-02-mat';
+filedirGlob = 'Z:\Qifan\Tantala\20200905-thermal-rawdata\Dev21\1543.5nm-02-mat';
 powerList = 2.0:-0.1:0.3;
 
 
@@ -107,7 +109,7 @@ end
 save(strcat(filedirGlob,'\Fitting_results\coefficients.mat'),'fitting_results');
 
 %%
-close all
+% close all
 % filedirGlob = 'C:\Users\leona\iCloudDrive\Work\data\1543.5nm-02-mat';
 load(strcat(filedirGlob,'\Fitting_results\coefficients.mat'),'fitting_results');
 %     Qabs_est = 3 * 1e6;
@@ -134,7 +136,7 @@ load(strcat(filedirGlob,'\Fitting_results\coefficients.mat'),'fitting_results');
     Qabs_each_volt = Qabs_each_volt./power_corr_factor;
     
     
-    n2_each_volt = 0.0353/2 * n0 * (2*pi*r*Aeff) * (2*pi*c/lambda*1e9)./Qabs_each_volt *dTdP * nT/c;
+    n2_each_volt = kerrOverTotal * n0 * (2*pi*r*Aeff) * (2*pi*c/lambda*1e9)./Qabs_each_volt *dTdP * nT/c;
 
 
 figure

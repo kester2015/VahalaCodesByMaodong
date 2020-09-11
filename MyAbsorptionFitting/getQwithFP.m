@@ -58,11 +58,11 @@ function [Q0, Q1, QL,findmin_fit_result] = getQwithFP(filename,lambda,tosave)
     fp_fit_result = fp_fit((1:length(Q_trace)).');%fp_fit.A0+fp_fit.B*cos(((1:length(Q_trace)).'-fp_fit.x1)/fp_fit.T*2*pi);
 
 
-    %         figure
-    %         plot((1:length(Q_trace)).',Q_trace);
-    %         hold on
-    %         plot((1:length(Q_trace)).',MZI_trace);
-    %         title("Original data")
+%             figure
+%             plot((1:length(Q_trace)).',Q_trace);
+%             hold on
+%             plot((1:length(Q_trace)).',MZI_trace);
+%             title("Original data")
 
 %             figure
 %             plot((1:length(Q_trace)).',Q_trace)
@@ -118,17 +118,31 @@ function [Q0, Q1, QL,findmin_fit_result] = getQwithFP(filename,lambda,tosave)
     fit_weight_dip = 1*ones(length(Q_trace_tofit),1);
 %     fit_weight_dip = zeros(length(Q_trace_tofit),1);
     fit_weight_fp = fit_weight_dip;
-    weight_width = 20; % times of linewidth
-    weight_start = max(round(pos_peak - weight_width*linewidth_estimate/2),1);
-    weight_end   = min(round(pos_peak + weight_width*linewidth_estimate/2),length(Q_trace_tofit));
-    fit_weight_dip(weight_start:weight_end) = 1; %10*max(round(length(Q_trace_tofit)/(weight_end-weight_start)),1);
-    fit_weight_fp(weight_start:weight_end) = 0;
     
-%     weight_width = 2; % times of linewidth
-%     weight_start = max(round(pos_peak - weight_width*linewidth_estimate/2),1);
-%     weight_end   = min(round(pos_peak + weight_width*linewidth_estimate/2),length(Q_trace_tofit));
-%     fit_weight_dip(weight_start:weight_end) = 100; %10*max(round(length(Q_trace_tofit)/(weight_end-weight_start)),1);
-%     fit_weight_fp(weight_start:weight_end) = 0;
+    weight_width = 20; % times of linewidth
+    weight_start = max(round(pos_peak - 1.0*weight_width*linewidth_estimate/2),1);
+    weight_end   = min(round(pos_peak + 1.0*weight_width*linewidth_estimate/2),length(Q_trace_tofit));
+%     fit_weight_dip(weight_start:weight_end) = 1; %10*max(round(length(Q_trace_tofit)/(weight_end-weight_start)),1);
+    fit_weight_fp(weight_start:weight_end) = 0;
+% % % %     --------Delete these lines later, --------
+% % % %     --------for a mode with accompany mode at side------
+% % % %         fit_weight_fp(weight_end:end) = 10;
+% % % %         weight_start = max(round(pos_peak + 0.7*weight_width*linewidth_estimate/2),1);
+% % % %         weight_end   = min(round(pos_peak + 1.1*weight_width*linewidth_estimate/2),length(Q_trace_tofit));
+% % % %         fit_weight_fp(weight_start:weight_end) = 0;
+        
+    
+    weight_width = 5; % times of linewidth
+    weight_start = max(round(pos_peak - 1.0*weight_width*linewidth_estimate/2),1);
+    weight_end   = min(round(pos_peak + 1.0*weight_width*linewidth_estimate/2),length(Q_trace_tofit));
+    fit_weight_dip(weight_start:weight_end) = 1; %10*max(round(length(Q_trace_tofit)/(weight_end-weight_start)),1);
+% % % %     --------Delete these lines later--------
+% % % %     --------for a mode with accompany mode at side------
+% % % %         weight_start = max(round(pos_peak + 0.7*20*linewidth_estimate/2),1);
+% % % %         weight_end   = min(round(pos_peak + 1.1*20*linewidth_estimate/2),length(Q_trace_tofit));
+% % % %         fit_weight_dip(weight_start:weight_end) = 0;
+% % % %         fit_weight_dip(weight_end:end) = 1;
+        
     % ----------weighing module finished---------------
     MZI_trace_local_start  = pos_fitstart;%max(round(0.03*length(MZI_trace_tofit)) , pos_peak - 10*linewidth_estimate);
     MZI_local_local_end    = pos_fitend;%min(round(0.97*length(MZI_trace_tofit)) , pos_peak + 10*linewidth_estimate);
@@ -150,6 +164,8 @@ function [Q0, Q1, QL,findmin_fit_result] = getQwithFP(filename,lambda,tosave)
             plot(x_freq.',Q_trace_tofit,'Linewidth',2.0)
             hold on
             scatter(x_freq.',fp_fit_result_2, 5);
+            hold on
+            plot(x_freq.',fit_weight_fp*max(Q_trace_tofit)/max(fit_weight_fp));
             title(sprintf("FP 2nd fitting result, %g nm",lambda));
 
     fit_A0_estimate = fp_fit_2.A0;
@@ -339,24 +355,14 @@ function [Q0, Q1, QL,findmin_fit_result] = getQwithFP(filename,lambda,tosave)
 
 %             % % ----rewrite only for convenience----
 %             % %----------Give the peak position higher weight---------------
-%                 fit_weight_dip = 0.05*ones(length(Q_trace_tofit),1);
+%                 fit_weight_dip = 1*ones(length(Q_trace_tofit),1);
 %                 fit_weight_fp = fit_weight_dip;
-%                 weight_width = 10; % times of linewidth
+%                 weight_width = 2; % times of linewidth
 %                 weight_start = max(round(pos_peak - weight_width*linewidth_estimate/2),1);
 %                 weight_end   = min(round(pos_peak + weight_width*linewidth_estimate/2),length(Q_trace_tofit));
-%                 fit_weight_dip(weight_start:weight_end) = 1; %10*max(round(length(Q_trace_tofit)/(weight_end-weight_start)),1);
+%                 fit_weight_dip(weight_start:weight_end) = 50; %10*max(round(length(Q_trace_tofit)/(weight_end-weight_start)),1);
 %                 fit_weight_fp(weight_start:weight_end) = 0;
 %             % % ----------weighing module finished---------------
-            % % ----rewrite only for convenience----
-            % %----------Give the peak position higher weight---------------
-                fit_weight_dip = 1*ones(length(Q_trace_tofit),1);
-                fit_weight_fp = fit_weight_dip;
-                weight_width = 10; % times of linewidth
-                weight_start = max(round(pos_peak - weight_width*linewidth_estimate/2),1);
-                weight_end   = min(round(pos_peak + weight_width*linewidth_estimate/2),length(Q_trace_tofit));
-                fit_weight_dip(weight_start:weight_end) = 1; %10*max(round(length(Q_trace_tofit)/(weight_end-weight_start)),1);
-                fit_weight_fp(weight_start:weight_end) = 0;
-            % % ----------weighing module finished---------------
 
         Q0_findmin_estimate = 1.8; % Estimate Q0 should be around 1.8M
         Q1_findmin_estimate = 8.0; % Estimate Qe should be around 8.0M
@@ -386,6 +392,19 @@ function [Q0, Q1, QL,findmin_fit_result] = getQwithFP(filename,lambda,tosave)
             plot(x_freq.',fit_weight_dip*max(Q_trace_tofit)/max(fit_weight_dip));
             title(sprintf("Q trace with FP fitting, INCLUDED interference, %g nm\n Q0=%.4gM, Q1=%.4gM, Q=%.4gM, Trans=%.4g",lambda,Q0,Q1,QL,fitted_transmission))
             
+            % --------- Plot another one to save ---------
+                    figure;
+                    plot(x_freq.',Q_trace_tofit,'Linewidth',2.0)
+                    hold on
+                    plot_step = 1;
+                    %scatter((1:plot_step:length(Q_trace_tofit)).',Q_withfp_interfere_fit_result(1:plot_step:length(Q_trace_tofit)) ,5); % last parameter is Marker size
+                    scatter(x_freq.', modtrans(findmin_fit_result(1),findmin_fit_result(2),findmin_fit_result(3),...
+                                                                            findmin_fit_result(4),findmin_fit_result(5),findmin_fit_result(6),...
+                                                                            findmin_fit_result(7), x_freq.' ) ,5);
+                    hold on
+                    plot(x_freq.',fit_weight_dip*max(Q_trace_tofit)/max(fit_weight_dip));
+                    title(sprintf("Q trace with FP fitting, INCLUDED interference, %g nm\n Q0=%.4gM, Q1=%.4gM, Q=%.4gM, Trans=%.4g",lambda,Q0,Q1,QL,fitted_transmission))
+
             
             if tosave
 %                 % --------save fig----------
