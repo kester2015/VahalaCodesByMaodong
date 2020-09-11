@@ -521,6 +521,7 @@ switch handles.Method.Value
             disp(['wavelength ', num2str(lambda(idx)), ' nm in progress...'])
             ReadTrace(filename,Device.osc,point,Config.trans_ch,Config.mzi_ch,0,str2double(handles.edit34.String) );
             Device.osc.Run;
+            Device.osc.HighRes;
             load([filename,'.mat'],'data_matrix','-mat');
             if exist('data_matrix','var')
                 trans = data_matrix(:,2);
@@ -542,7 +543,7 @@ switch handles.Method.Value
                 disp('No mode detected');
             end
             Data.Q_obj = Q_obj;
-            getQwithFP([filename,'.mat']); %Only used for Tantala, please comment this line later
+            getQwithFP([filename,'.mat'],lambda,1); %Only used for Tantala, please comment this line later
         end
     case 2
         %% Dispersion Measurement

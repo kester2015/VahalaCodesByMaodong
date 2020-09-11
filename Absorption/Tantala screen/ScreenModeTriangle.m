@@ -4,14 +4,15 @@
 %!!!!!!!!!!!! Set lambda !!!!!!!!!!!
 
 % lambda = 1553.4;
-lambda = input('operation wavelength:');
+lambda = input('operation wavelength:')
 
 global Config Device;
 
 instrreset;
 % Myfg1 = Keysight33500('USB0::0x0957::0x2C07::MY52814912::INSTR'); % lower
 Myfg2 = Keysight33500('USB0::0x0957::0x2607::MY52202388::INSTR'); % upper
-OSC = Infiniium('USB0::0x2A8D::0x9049::MY55510176::INSTR',2);
+% OSC = Infiniium('USB0::0x2A8D::0x9049::MY55510176::INSTR',2);%1G
+OSC = Infiniium('USB0::0x2A8D::0x904E::MY54200105::INSTR',2);%2.5G
 % if ~Myfg1.isconnected
 %     Myfg1.connect;
 % end
