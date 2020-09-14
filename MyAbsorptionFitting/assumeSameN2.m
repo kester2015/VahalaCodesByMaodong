@@ -4,6 +4,8 @@ n2_1551 = sqrt(1.6374*2.3275)*1e-19;
 
 n2 = mean([n2_1543 n2_1551]);
 
+% n2 = 6.223e-19;
+
 tt = table2array(readtable('Z:\Qifan\Tantala\VNA experiment\20200909\kerroverthermal.xlsx'));
 lambdaList = tt(:,1);
 kerrOverTotalList = tt(:,2);
@@ -27,8 +29,11 @@ QabsList = (2*pi*c./lambdaList*1e9) * dTdP * nT * neff * (2*pi*r*Aeff) / c / n2 
 
 figure
 scatter(lambdaList ,QabsList/1e6);
+hold on
+scatter(lambdaList, tt(:,3),'*');
 xlabel('lambda / nm');
 ylabel('Q abs / M')
+legend({'Q abs','Q0'})
 title('Qabs fitting result at different wavelength')
 ylim([0 8])
 

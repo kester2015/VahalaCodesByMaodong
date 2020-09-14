@@ -132,7 +132,8 @@ Myfg2.DC2 = 1.0;
 Myfg1.Freq1 =[Freq0 Vpp Offset];
 OSC.Run;
 
-sound(sin(2*pi*25*(1:4000)/100));
+% sound(sin(2*pi*25*(1:4000)/100));
+tts('Measurement Completed');
 Myfg1.disconnect;
 Myfg2.disconnect;
 OSC.disconnect;

@@ -84,8 +84,8 @@ clc
 %     kerrOverTotal = 0.0353/2;
 %%
 
-% filedirGlob = 'Z:\Qifan\Tantala\20200906-thermal-rawdata\Dev21\1551.4nm-02-mat';
-filedirGlob = 'Z:\Qifan\Tantala\20200905-thermal-rawdata\Dev21\1543.5nm-02-mat';
+filedirGlob = 'Z:\Qifan\Tantala\20200906-thermal-rawdata\Dev21\1551.4nm-01-mat';
+% filedirGlob = 'Z:\Qifan\Tantala\20200905-thermal-rawdata\Dev21\1543.5nm-02-mat';
 powerList = 2.0:-0.1:0.3;
 
 
@@ -126,8 +126,8 @@ load(strcat(filedirGlob,'\Fitting_results\coefficients.mat'),'fitting_results');
     
     power_corr_factor = (1 - abs( fitting_results(:,3) ) );
     
-    PoverV = (sqrt(inputPower2*outputPower2)*1e-3)/outputVoltage2;
-%     PoverV = (sqrt(inputPower1*outputPower1)*1e-3)/outputVoltage1;
+%     PoverV = (sqrt(inputPower2*outputPower2)*1e-3)/outputVoltage2;
+    PoverV = (sqrt(inputPower1*outputPower1)*1e-3)/outputVoltage1;
 
 
     alpha_each_volt = fitting_results(:,end)/PoverV;
@@ -140,14 +140,13 @@ load(strcat(filedirGlob,'\Fitting_results\coefficients.mat'),'fitting_results');
 
 
 figure
-plot(fitting_results(:,1),Qabs_each_volt/1e6);
-xlabel('voltage / V');
+scatter(fitting_results(:,2),Qabs_each_volt/1e6);
+xlabel('OSC voltage / V');
 ylabel('Q abs / M')
 title('Qabs fitting result at different voltage')
 
 figure
-
-plot(fitting_results(:,1),n2_each_volt);
-xlabel('voltage / V');
+scatter(fitting_results(:,2),n2_each_volt);
+xlabel('OSC voltage / V');
 ylabel('n2');
 title('n2 fitting result at different voltage')
