@@ -31,7 +31,7 @@ OSC.connect;
 
 
 % filedirToSave = ['\\131.215.238.124\Vahala Group\Qifan\Tantala\' datestr(now,'yyyymmdd') '-thermal-rawdata\1548nm-02'];
-filedirToSave = ['Z:\Qifan\AlGaAs\' datestr(now,'yyyymmdd') '-thermal-rawdata\No5\1535.4nm-02'];
+filedirToSave = ['Z:\Qifan\AlGaAs\' datestr(now,'yyyymmdd') '-thermal-rawdata\No5\1535.4nm-01'];
 
 
 % VAOM = 0.01:0.005:1;

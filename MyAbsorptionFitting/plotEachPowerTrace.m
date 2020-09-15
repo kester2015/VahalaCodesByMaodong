@@ -1,5 +1,5 @@
 
-% close all
+close all
 
 wavelengthList = 1535;%1535:10:1555;
 highNoiseThreshold = 0.2;
@@ -7,6 +7,9 @@ highNoiseThreshold = 0.2;
 
 filedirGolb = "Z:\Qifan\Tantala\20200819-thermal-rawdata\Dev21\"; % --20200819 Tantala ---
 wavelengthList = [1540   1545   1551   1556   1561];
+
+filedirGolb = "Z:\Qifan\AlGaAs\20200211\"; % --20200211 AlGaAs ---
+wavelengthList = [1535 1540 1545 1550 1555 1560];
 
 % filedirGolb = "Z:\Maodong\Measurement Data\Absorption project\20200130\";
 % wavelengthList = [1540 1545];
