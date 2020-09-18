@@ -3,11 +3,11 @@ clear
 clc
 %%
 lambda = 1535.4;
-data_filename = 'Z:\Qifan\AlGaAs\20200915-thermal-rawdata\No5\1535.4nm-01-mat\Sweep_20Hz_Power_0.1V.mat' ;
+data_filename = 'Z:\Qifan\AlGaAs\20200915-thermal-rawdata\No5\1542.6nm-01-mat\Sweep_20Hz_Power_0.1V.mat' ;
 
-Q_data_filename = 'Z:\Qifan\AlGaAs\20200915-thermal-rawdata\redo-after-1535.4nm.mat';
+Q_data_filename = 'Z:\Qifan\AlGaAs\20200915-thermal-rawdata\pol1-after-1542.6nm.mat';
 load(Q_data_filename,'data_matrix');
-Q_obj = Q_trace_fit(data_matrix(:,2),data_matrix(:,3),39.9553,1535.4, 0.4,'fanomzi');
+Q_obj = Q_trace_fit(data_matrix(:,2),data_matrix(:,3),39.9553,1542.6, 0.4,'fanomzi');
 mode_Q = Q_obj.get_Q;
 mode_Q0 = mode_Q(1)
 mode_Qe = mode_Q(2)
@@ -126,22 +126,38 @@ x_freq=(MZI_phase/2/pi*2*pi/mean( diff(MZI_phase) )).';
     options = optimset('MaxFunEvals',500000);
     
     
-%     % -- fit everything (x0&alpha, Q, and bg) --
-%     findmin_fun = @(paras)LCL(modtrans_residual(paras(1),paras(2),paras(3),paras(4),paras(5),x_freq.',Trans_raw) ,dip_fit_weight);
-%     findmin_start_point = [bg_base, kappa0,kappae, mid_x(1), 0.5*alpha_est];
-%     findmin_fit_result = fminsearch(findmin_fun,findmin_start_point,options);
-%     triangle_fit_result = modtrans(findmin_fit_result(1),...
-%                                findmin_fit_result(2),findmin_fit_result(3),findmin_fit_result(4),findmin_fit_result(5),x_freq.');
-% %                            
-
-% %    -- fit everything except Q0 (x0&alpha, Qe, and bg) --
-    findmin_fun = @(paras)LCL(modtrans_residual(paras(1),kappa0,paras(2),paras(3),paras(4),x_freq.',Trans_raw) ,dip_fit_weight);
-    findmin_start_point = [bg_base, kappae, mid_x(1), 0.5*alpha_est];
+    % -- fit everything (x0&alpha, Q, and bg) --
+    findmin_fun = @(paras)LCL(modtrans_residual(paras(1),paras(2),paras(3),paras(4),paras(5),x_freq.',Trans_raw) ,dip_fit_weight);
+    findmin_start_point = [bg_base, kappa0,kappae, mid_x(1), 0.5*alpha_est];
     findmin_fit_result = fminsearch(findmin_fun,findmin_start_point,options);
     triangle_fit_result = modtrans(findmin_fit_result(1),...
-                               kappa0,findmin_fit_result(2),findmin_fit_result(3),findmin_fit_result(4),x_freq.');
-    findmin_fit_result = [findmin_fit_result(1), kappa0, findmin_fit_result(2:4)];
-    
+                               findmin_fit_result(2),findmin_fit_result(3),findmin_fit_result(4),findmin_fit_result(5),x_freq.');
+% %                            
+% % % %    -- fit not fit bg only--
+%     findmin_fun = @(paras)LCL(modtrans_residual(bg_base,paras(1),paras(2),paras(3),paras(4),x_freq.',Trans_raw) ,dip_fit_weight);
+%     findmin_start_point = [kappa0, kappae, mid_x(1), 0.1*alpha_est];
+%     findmin_fit_result = fminsearch(findmin_fun,findmin_start_point,options);
+%     triangle_fit_result = modtrans(bg_base,...
+%                                findmin_fit_result(1),findmin_fit_result(2),findmin_fit_result(3),findmin_fit_result(4),x_freq.');
+%     findmin_fit_result = [bg_base, findmin_fit_result(1:4)];
+
+
+% % %    -- fit everything except Q0 (x0&alpha, Qe, and bg) --
+%     findmin_fun = @(paras)LCL(modtrans_residual(paras(1),kappa0,paras(2),paras(3),paras(4),x_freq.',Trans_raw) ,dip_fit_weight);
+%     findmin_start_point = [bg_base, kappae, mid_x(1), 0.05*alpha_est];
+%     findmin_fit_result = fminsearch(findmin_fun,findmin_start_point,options);
+%     triangle_fit_result = modtrans(findmin_fit_result(1),...
+%                                kappa0,findmin_fit_result(2),findmin_fit_result(3),findmin_fit_result(4),x_freq.');
+%     findmin_fit_result = [findmin_fit_result(1), kappa0, findmin_fit_result(2:4)];
+
+% % %    -- fit (x0&alpha, Qe,) not fit bg --
+    findmin_fun = @(paras)LCL(modtrans_residual(bg_base,kappa0,paras(1),paras(2),paras(3),x_freq.',Trans_raw) ,dip_fit_weight);
+    findmin_start_point = [kappae, mid_x(1), 0.05*alpha_est];
+    findmin_fit_result = fminsearch(findmin_fun,findmin_start_point,options);
+    triangle_fit_result = modtrans(bg_base,...
+                               kappa0,findmin_fit_result(1),findmin_fit_result(2),findmin_fit_result(3),x_freq.');
+    findmin_fit_result = [bg_base, kappa0, findmin_fit_result(1:3)];
+   
 %     % --fit bg and x0,alpha version
 %     findmin_fun = @(paras)LCL(modtrans_residual(paras(1),kappa0,kappae,paras(2),paras(3),x_freq.',Trans_raw) ,dip_fit_weight);
 %     findmin_start_point = [bg_base, mid_x(1), 0.05*alpha_est];
