@@ -2,7 +2,7 @@ close all
 clear
 clc
 %% get resonance shift over temperature
-filedirGlob = 'Z:\Qifan\Tantala\20200821\Dev21\dndT';
+filedirGlob = 'Z:\Qifan\AlGaAs\20200916\dndTat1551';
 matfiles = dir(strcat(filedirGlob,'\*.mat') );
 matfilesName = {matfiles.name};
 
@@ -44,9 +44,9 @@ ylabel('Resonance pos/MHz');
 resonance_shift = coeff(1);%MHz/C
 
 %%
-n0 = 2.0573;
+n0 = 3.3;
 c = 299792458;
-lambda = 1551.4e-9;
+lambda = 1551.0e-9;
 f = c/lambda;
 nT = -n0/f*resonance_shift*1e6;
 %%
@@ -60,8 +60,8 @@ function Temperature = getTemperature(filename)
     filename = char(filename);
     tt = strsplit(filename,'\');
     tt = tt{end};
-    tt = strsplit(tt,'-');
-    Temperature = str2double( tt{1}(1:end-1) );
+%     tt = strsplit(tt,'-');
+    Temperature = str2double( tt(1:end-5) );
 end
 
 function phase = MZI2Phase(trace_MZI)
