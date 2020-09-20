@@ -18,31 +18,31 @@ MZI_FSR = 39.9553; % MHz
 %     kerrOverTotal = 0.0681;
 %     
     
-    wavelength = 1542.6;
+%     wavelength = 1542.6;
+%     lambda = wavelength;
+%     outputVoltage1 = 2.862; %V
+%     outputPower1 = 0.7467;%mW
+%     inputPower1 = 6.280;%mW
+%     outputVoltage2 = 2.720; %V
+%     outputPower2 = 0.7383;%mW
+%     inputPower2 = 6.422;%mW
+%     Q_data_filename = 'Z:\Qifan\AlGaAs\20200915-thermal-rawdata\pol1-after-1542.6nm.mat';
+%     filedirGlob = 'Z:\Qifan\AlGaAs\20200915-thermal-rawdata\No5\1542.6nm-01-mat';
+%     kerrOverTotal = 0.0681;
+%     
+    
+    wavelength = 1545.9;
     lambda = wavelength;
-    outputVoltage1 = 2.862; %V
-    outputPower1 = 0.7467;%mW
-    inputPower1 = 6.280;%mW
-    outputVoltage2 = 2.720; %V
-    outputPower2 = 0.7383;%mW
-    inputPower2 = 6.422;%mW
-    Q_data_filename = 'Z:\Qifan\AlGaAs\20200915-thermal-rawdata\pol1-after-1542.6nm.mat';
-    filedirGlob = 'Z:\Qifan\AlGaAs\20200915-thermal-rawdata\No5\1542.6nm-01-mat';
+    outputVoltage1 = 2.846; %V
+    outputPower1 = 0.7646;%mW
+    inputPower1 = 6.984;%mW
+    outputVoltage2 = 2.896; %V
+    outputPower2 = 0.7607;%mW
+    inputPower2 = 6.879;%mW
+    Q_data_filename = 'Z:\Qifan\AlGaAs\20200915-thermal-rawdata\after-1545.9nm.mat';
+    filedirGlob = 'Z:\Qifan\AlGaAs\20200915-thermal-rawdata\No5\1545.9nm-02-mat';
     kerrOverTotal = 0.0681;
 %     
-%     
-%     wavelength = 1545.9;
-%     lambda = wavelength;
-%     outputVoltage1 = 2.846; %V
-%     outputPower1 = 0.7646;%mW
-%     inputPower1 = 6.984;%mW
-%     outputVoltage2 = 2.896; %V
-%     outputPower2 = 0.7607;%mW
-%     inputPower2 = 6.879;%mW
-%     Q_data_filename = 'Z:\Qifan\AlGaAs\20200915-thermal-rawdata\after-1545.9nm.mat';
-%     filedirGlob = 'Z:\Qifan\AlGaAs\20200915-thermal-rawdata\No5\1545.9nm-02-mat';
-%     kerrOverTotal = 0.0681;
-% %     
 %     
 %     
 %     wavelength = 1551.8;
@@ -89,7 +89,7 @@ MZI_FSR = 39.9553; % MHz
 
 % filedirGlob = 'Z:\Qifan\Tantala\20200906-thermal-rawdata\Dev21\1551.4nm-01-mat';
 % filedirGlob = 'Z:\Qifan\Tantala\20200905-thermal-rawdata\Dev21\1543.5nm-02-mat';
-powerList = 2.0:-0.1:1.0;
+powerList = 2.0:-0.1:0.3;
 
 load(Q_data_filename,'data_matrix');
 Q_obj = Q_trace_fit(data_matrix(:,2),data_matrix(:,3),MZI_FSR,wavelength, 0.4,'fanomzi'); % 0.4 is sensitivity
@@ -110,12 +110,11 @@ for ii = 1:length(powerList)
     close all
     this_filename = strcat(filedirGlob,'\Sweep_20Hz_Power_',num2str(pp),'V.mat');
     temp = fitTriFlatBG(this_filename,mode_Q0, mode_Qe,lambda,1);
-    fitting_results(ii,2:end) = temp;
-%     accept_ask = input("Do you accept this fitting result? (Yes:1, No:0): ");
-%     if accept_ask == 1
-%         fitting_results(end+1,1) = pp;
-%         fitting_results(end+1,2:end) = temp;
-%     end
+    accept_ask = input("Do you accept this fitting result? (Yes:1, No:0): ");
+    if accept_ask == 1
+        fitting_results(end+1,1) = pp;
+        fitting_results(end+1,2:end) = temp;
+    end
 end
 
 save(strcat(filedirGlob,'\Fitting_results\coefficients.mat'),'fitting_results');
