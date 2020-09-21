@@ -77,7 +77,7 @@ x_freq=(MZI_phase/2/pi*2*pi/mean( diff(MZI_phase) )).';
     
     dip_fit_weight = zeros(size(Trans_raw));%+0.1* linewidth_est/length(Trans_raw);
     dip_fit_weight(pos_fitstart:pos_fitend  ) = 1;
-    bg_fit_weight = 1.5;
+    bg_fit_weight = 3;
     dip_fit_weight(pos_fitstart:pos_dipstart) = bg_fit_weight;
     dip_fit_weight(pos_dipend  :pos_fitend  ) = bg_fit_weight;
     %% 2. Fit mode parameters using Q measurement data
@@ -164,7 +164,7 @@ x_freq=(MZI_phase/2/pi*2*pi/mean( diff(MZI_phase) )).';
 %                            
     % --fit x0,alpha, bg version
     findmin_fun = @(paras)LCL(modtrans_residual(paras(1),kappa0,kappae,paras(2),paras(3),x_freq.',Trans_raw) ,dip_fit_weight);
-    findmin_start_point = [bg_base, mid_x(1), 0.05*alpha_est];
+    findmin_start_point = [bg_base, mid_x(1)-0.5*linewidth_est, 0.7*alpha_est];
     findmin_fit_result = fminsearch(findmin_fun,findmin_start_point);
     triangle_fit_result = modtrans(findmin_fit_result(1),kappa0,kappae,...
                                findmin_fit_result(2),findmin_fit_result(3),x_freq.');

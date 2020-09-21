@@ -77,7 +77,7 @@ x_freq=(MZI_phase/2/pi*2*pi/mean( diff(MZI_phase) )).';
     
     dip_fit_weight = zeros(size(Trans_raw));%+0.1* linewidth_est/length(Trans_raw);
     dip_fit_weight(pos_fitstart:pos_fitend  ) = 1;
-    bg_fit_weight = 1.5;
+    bg_fit_weight = 3;
     dip_fit_weight(pos_fitstart:pos_dipstart) = bg_fit_weight;
     dip_fit_weight(pos_dipend  :pos_fitend  ) = bg_fit_weight;
     %% 2. Fit mode parameters using Q measurement data
@@ -99,6 +99,8 @@ x_freq=(MZI_phase/2/pi*2*pi/mean( diff(MZI_phase) )).';
     dTdP = 613;%1685;%1570;
     alpha_est = nT * dTdP *(2*pi*c/lambda)^2/n0/Qabs_est;   % unit Hz^2/W
     alpha_est = 10*alpha_est;
+    
+    alpha_est = 24000;
     % alpha_est = alpha_est / ( sqrt(inputPower2 *outputPower2) * 1e-3 / sqrt(inputVoltage2 * outputVoltage2)); % in unit of power;
     % alpha_est = alpha_est *  (MZI_fit_T / (MZI_FSR*1e6)) ; % unit Num/W
     % 
@@ -124,12 +126,12 @@ x_freq=(MZI_phase/2/pi*2*pi/mean( diff(MZI_phase) )).';
     options = optimset('MaxFunEvals',500000);
     
 %     
-%     % -- fit everything (x0&alpha, Q, and bg) --
-    findmin_fun = @(paras)LCL(modtrans_residual(paras(1),paras(2),paras(3),paras(4),paras(5),x_freq.',Trans_raw) ,dip_fit_weight);
-    findmin_start_point = [bg_base, kappa0,kappae, mid_x(1), 0.5*alpha_est];
-    findmin_fit_result = fminsearch(findmin_fun,findmin_start_point,options);
-    triangle_fit_result = modtrans(findmin_fit_result(1),...
-                               findmin_fit_result(2),findmin_fit_result(3),findmin_fit_result(4),findmin_fit_result(5),x_freq.');
+% %     % -- fit everything (x0&alpha, Q, and bg) --
+%     findmin_fun = @(paras)LCL(modtrans_residual(paras(1),paras(2),paras(3),paras(4),paras(5),x_freq.',Trans_raw) ,dip_fit_weight);
+%     findmin_start_point = [bg_base, kappa0,kappae, mid_x(1), 0.5*alpha_est];
+%     findmin_fit_result = fminsearch(findmin_fun,findmin_start_point,options);
+%     triangle_fit_result = modtrans(findmin_fit_result(1),...
+%                                findmin_fit_result(2),findmin_fit_result(3),findmin_fit_result(4),findmin_fit_result(5),x_freq.');
 
 
 
@@ -159,14 +161,14 @@ x_freq=(MZI_phase/2/pi*2*pi/mean( diff(MZI_phase) )).';
 %                                kappa0,findmin_fit_result(1),findmin_fit_result(2),findmin_fit_result(3),x_freq.');
 %     findmin_fit_result = [bg_base, kappa0, findmin_fit_result(1:3)];
 %     
-% %                            
-%     % --fit x0,alpha, bg version
-%     findmin_fun = @(paras)LCL(modtrans_residual(paras(1),kappa0,kappae,paras(2),paras(3),x_freq.',Trans_raw) ,dip_fit_weight);
-%     findmin_start_point = [bg_base, mid_x(1), 0.05*alpha_est];
-%     findmin_fit_result = fminsearch(findmin_fun,findmin_start_point);
-%     triangle_fit_result = modtrans(findmin_fit_result(1),kappa0,kappae,...
-%                                findmin_fit_result(2),findmin_fit_result(3),x_freq.');
-%     findmin_fit_result = [findmin_fit_result(1), kappa0, kappae, findmin_fit_result(2:3)]; 
+%                            
+    % --fit x0,alpha, bg version
+    findmin_fun = @(paras)LCL(modtrans_residual(paras(1),kappa0,kappae,paras(2),paras(3),x_freq.',Trans_raw) ,dip_fit_weight);
+    findmin_start_point = [bg_base, mid_x(1)-0.5*linewidth_est, 1.2*alpha_est];
+    findmin_fit_result = fminsearch(findmin_fun,findmin_start_point);
+    triangle_fit_result = modtrans(findmin_fit_result(1),kappa0,kappae,...
+                               findmin_fit_result(2),findmin_fit_result(3),x_freq.');
+    findmin_fit_result = [findmin_fit_result(1), kappa0, kappae, findmin_fit_result(2:3)]; 
 
 % %     --fit x0 and alpha version---
 %     findmin_fun = @(paras)LCL(modtrans_residual(bg_base,kappa0,kappae,paras(1),paras(2),x_freq.',Trans_raw) ,dip_fit_weight);

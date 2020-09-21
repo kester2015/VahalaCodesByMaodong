@@ -1,5 +1,5 @@
 
-
+MZI_FSR = 39.9553;
 
 %!!!!!!!!!!!! Set lambda !!!!!!!!!!!
 
@@ -29,8 +29,8 @@ if ~isfolder(filedirGlob)
     mkdir(filedirGlob)
 end
 
-Q_measure_volt = 2.0; % FunctionGenerator voltage when measure Q
-Tri_measure_volt = 0.3;
+Q_measure_volt = 1.95; % FunctionGenerator voltage when measure Q
+Tri_measure_volt = 0.3;%1.0;
 Q_measure_scale = [-0.1 0.7]; % OSC scale when measure Q
 Tri_measure_scale = [-0.05 3.4];
 
@@ -99,7 +99,19 @@ close all
 qdata_filename = strcat(qdata_filename,'.mat');
 tridata_filename = strcat(tridata_filename,'.mat');
 %%
-[mode_Q0,mode_Qe,~,~] = getQwithFP(qdata_filename,lambda,1);
-trifit_result = fitTriwithFP(tridata_filename, mode_Q0,mode_Qe,lambda,1);
+
+% [mode_Q0,mode_Qe,~,~] = getQwithFP(qdata_filename,lambda,1);
+% 
+% trifit_result = fitTriwithFP(tridata_filename, mode_Q0,mode_Qe,lambda,1);
+
+%%
+
+load(qdata_filename,'data_matrix');
+Q_obj = Q_trace_fit(data_matrix(:,2),data_matrix(:,3),MZI_FSR,lambda, 0.4,'fanomzi'); % 0.4 is sensitivity
+mode_Q = Q_obj.get_Q;
+mode_Q0 = mode_Q(1)
+mode_Qe = mode_Q(2)
+
+trifit_result = fitTriFlatBG(tridata_filename,mode_Q0, mode_Qe,lambda,1);
 
 
