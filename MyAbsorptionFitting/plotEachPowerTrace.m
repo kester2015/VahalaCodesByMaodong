@@ -2,8 +2,8 @@
 close all
 
 wavelengthList = 1535;%1535:10:1555;
-highNoiseThreshold = 0.2;
-
+highNoiseThreshold = 1.6;
+highPowerThreshold = 0;
 
 filedirGolb = "Z:\Qifan\Tantala\20200819-thermal-rawdata\Dev21\"; % --20200819 Tantala ---
 wavelengthList = [1540   1545   1551   1556   1561];
@@ -11,6 +11,9 @@ wavelengthList = [1540   1545   1551   1556   1561];
 filedirGolb = "Z:\Qifan\AlGaAs\20200211\"; % --20200211 AlGaAs ---
 wavelengthList = [1535 1540 1545 1550 1555 1560];
 
+filedirGolb = 'Z:\Qifan\AlGaAs\20200915-thermal-rawdata\No5\';
+wavelengthList = [1535.4 1542.6 1545.9 1551.8 1554.9 1560.1];
+% wavelengthList =          1542.6;
 % filedirGolb = "Z:\Maodong\Measurement Data\Absorption project\20200130\";
 % wavelengthList = [1540 1545];
 % wavelengthList     = [1551 1553 1561 1564];
@@ -36,7 +39,7 @@ for wavelength = wavelengthList
     for ii = 1:round(length(matfiles)/plotnum):length(matfiles)
         filename = strcat(filedir, '\', matfiles(ii).name);
         [sweepFreq, EOMPower] = extractFreqAndPower(filename);
-        if EOMPower < highNoiseThreshold
+        if EOMPower > highNoiseThreshold || EOMPower < highPowerThreshold
             continue;
         end
 
@@ -63,7 +66,7 @@ for wavelength = wavelengthList
     for ii = 1:round(length(matfiles)/plotnum):length(matfiles)
         filename = strcat(filedir, '\', matfiles(ii).name);
         [sweepFreq, EOMPower] = extractFreqAndPower(filename);
-        if EOMPower < highNoiseThreshold
+        if EOMPower > highNoiseThreshold || EOMPower < highPowerThreshold
             continue;
         end
         load(filename,'timeAxis','Ch2');
