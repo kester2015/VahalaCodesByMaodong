@@ -40,7 +40,7 @@ MZI_FSR = 39.9553; % MHz
     outputPower2 = 0.7607;%mW
     inputPower2 = 6.879;%mW
     Q_data_filename = 'Z:\Qifan\AlGaAs\20200915-thermal-rawdata\after-1545.9nm.mat';
-    filedirGlob = 'Z:\Qifan\AlGaAs\20200915-thermal-rawdata\No5\1545.9nm-02-mat';
+    filedirGlob = 'Z:\Qifan\AlGaAs\20200915-thermal-rawdata\No5\1545.9nm-01-mat';
     kerrOverTotal = 0.0681;
 %     
 %     

@@ -1,6 +1,6 @@
 
-n2_1543 = sqrt(1.6685*1.6379)*1e-19;
-n2_1551 = sqrt(1.6374*2.3275)*1e-19;
+n2_1543 = sqrt(2.3026*2.3497)*1e-19;
+n2_1551 = sqrt(2.3624*3.2699)*1e-19;
 
 n2 = mean([n2_1543 n2_1551]);
 
@@ -32,7 +32,7 @@ scatter(lambdaList ,QabsList/1e6);
 hold on
 scatter(lambdaList, tt(:,3),'*');
 xlabel('lambda / nm');
-ylabel('Q abs / M')
+ylabel('Q abs(WG) / M')
 legend({'Q abs','Q0'})
 title('Qabs fitting result at different wavelength')
 ylim([0 8])
