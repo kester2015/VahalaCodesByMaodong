@@ -31,17 +31,18 @@ MZI_FSR = 39.9553; % MHz
 %     kerrOverTotal = 0.0681;
 %     
 %     
-    wavelength = 1545.9;
-    lambda = wavelength;
-    outputVoltage1 = 2.846; %V
-    outputPower1 = 0.7646;%mW
-    inputPower1 = 6.984;%mW
-    outputVoltage2 = 2.896; %V
-    outputPower2 = 0.7607;%mW
-    inputPower2 = 6.879;%mW
-    Q_data_filename = 'Z:\Qifan\AlGaAs\20200915-thermal-rawdata\after-1545.9nm.mat';
-    filedirGlob = 'Z:\Qifan\AlGaAs\20200915-thermal-rawdata\No5\1545.9nm-01-mat';
-    kerrOverTotal = 0.0681;
+%     wavelength = 1545.9;
+%     lambda = wavelength;
+%     outputVoltage1 = 2.846; %V
+%     outputPower1 = 0.7646;%mW
+%     inputPower1 = 6.984;%mW
+%     outputVoltage2 = 2.896; %V
+%     outputPower2 = 0.7607;%mW
+%     inputPower2 = 6.879;%mW
+%     Q_data_filename = 'Z:\Qifan\AlGaAs\20200915-thermal-rawdata\after-1545.9nm.mat';
+%     filedirGlob = 'Z:\Qifan\AlGaAs\20200915-thermal-rawdata\No5\1545.9nm-02-mat';
+%     kerrOverTotal = 0.0681;
+
 %     
 %     
 %     
@@ -70,18 +71,18 @@ MZI_FSR = 39.9553; % MHz
 %     filedirGlob = 'Z:\Qifan\AlGaAs\20200915-thermal-rawdata\No5\1554.9nm-01-mat';
 %     kerrOverTotal = 0.0681;
 %     
-%     % % % ------------1560.1 is a good fitting!
-%     wavelength = 1560.1;
-%     lambda = wavelength;
-%     outputVoltage1 = 2.814; %V
-%     outputPower1 = 0.8607;%mW
-%     inputPower1 = 7.872;%mW
-%     outputVoltage2 = 2.552; %V
-%     outputPower2 = 0.7880;%mW
-%     inputPower2 = 7.213;%mW
-%     Q_data_filename = 'Z:\Qifan\AlGaAs\20200915-thermal-rawdata\after-1560.1nm.mat';
-%     filedirGlob = 'Z:\Qifan\AlGaAs\20200915-thermal-rawdata\No5\1560.1nm-01-mat';
-%     kerrOverTotal = 0.0681;
+    % % % ------------1560.1 is a good fitting!
+    wavelength = 1560.1;
+    lambda = wavelength;
+    outputVoltage1 = 2.814; %V
+    outputPower1 = 0.8607;%mW
+    inputPower1 = 7.872;%mW
+    outputVoltage2 = 2.552; %V
+    outputPower2 = 0.7880;%mW
+    inputPower2 = 7.213;%mW
+    Q_data_filename = 'Z:\Qifan\AlGaAs\20200915-thermal-rawdata\after-1560.1nm.mat';
+    filedirGlob = 'Z:\Qifan\AlGaAs\20200915-thermal-rawdata\No5\1560.1nm-01-mat';
+    kerrOverTotal = 0.1146;
 
 % % % % ------------ 20200920 redo AlGaAs -----------
 % %
@@ -95,10 +96,23 @@ MZI_FSR = 39.9553; % MHz
 %     inputPower2 = 6.739;%mW
 %     Q_data_filename = 'Z:\Qifan\AlGaAs\20200920-thermal-rawdata\after-1552nm.mat';
 %     filedirGlob = 'Z:\Qifan\AlGaAs\20200920-thermal-rawdata\No5\1552nm-01-mat';
-%     kerrOverTotal = 0.0681;
+%     kerrOverTotal = 0.1024;
 %     
-% % % % %     Q_data_filename = 'Z:\Qifan\AlGaAs\20200920-thermal-rawdata\No5\test\Q-measure-maxvpp-1554.6nm.mat';
-% % % % %     filedirGlob = 'Z:\Qifan\AlGaAs\20200920-thermal-rawdata\No5\test\1554.6nm-02-mat'
+%     Q_data_filename = 'Z:\Qifan\AlGaAs\20200920-thermal-rawdata\No5\test\Q-measure-maxvpp-1554.6nm.mat';
+%     filedirGlob = 'Z:\Qifan\AlGaAs\20200920-thermal-rawdata\No5\test\1554.6nm-01-mat'
+
+% 
+%     wavelength = 1554.6;
+%     lambda = wavelength;
+%     outputVoltage1 = 2.83; %V
+%     outputPower1 = 0.7633;%mW
+%     inputPower1 = 8.972;%mW
+%     outputVoltage2 = 2.79; %V
+%     outputPower2 = 0.6313;%mW
+%     inputPower2 = 7.801;%mW
+%     Q_data_filename = 'Z:\Qifan\AlGaAs\20200920-thermal-rawdata\after-1554.6nm.mat';
+%     filedirGlob = 'Z:\Qifan\AlGaAs\20200920-thermal-rawdata\No5\1554.6nm-02-mat';
+%     kerrOverTotal = 0.1024;
 %%
 
 % filedirGlob = 'Z:\Qifan\Tantala\20200906-thermal-rawdata\Dev21\1551.4nm-01-mat';

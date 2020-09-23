@@ -29,8 +29,8 @@ if ~isfolder(filedirGlob)
     mkdir(filedirGlob)
 end
 
-Q_measure_volt = 1.95; % FunctionGenerator voltage when measure Q
-Tri_measure_volt = 0.3;%1.0;
+Q_measure_volt = 1.96; % FunctionGenerator voltage when measure Q
+Tri_measure_volt = 1.60;%1.0;
 Q_measure_scale = [-0.1 0.7]; % OSC scale when measure Q
 Tri_measure_scale = [-0.05 3.4];
 
@@ -109,6 +109,9 @@ tridata_filename = strcat(tridata_filename,'.mat');
 load(qdata_filename,'data_matrix');
 Q_obj = Q_trace_fit(data_matrix(:,2),data_matrix(:,3),MZI_FSR,lambda, 0.4,'fanomzi'); % 0.4 is sensitivity
 mode_Q = Q_obj.get_Q;
+Q_obj.plot_Q_max;
+pause(3)
+close all
 mode_Q0 = mode_Q(1)
 mode_Qe = mode_Q(2)
 
