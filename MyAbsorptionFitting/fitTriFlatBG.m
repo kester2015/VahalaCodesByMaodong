@@ -163,7 +163,7 @@ x_freq=(MZI_phase/2/pi*2*pi/mean( diff(MZI_phase) )).';
 %     
 %                            
     % --fit x0,alpha, bg version
-    findmin_fun = @(paras)LCL(modtrans_residual(paras(1),kappa0,kappae,paras(2),paras(3),x_freq.',Trans_raw) ,dip_fit_weight);
+    findmin_fun = @(paras)L3 CL(modtrans_residual(paras(1),kappa0,kappae,paras(2),paras(3),x_freq.',Trans_raw) ,dip_fit_weight);
     findmin_start_point = [bg_base, mid_x(1)-0.5*linewidth_est, 0.8*alpha_est];
     findmin_fit_result = fminsearch(findmin_fun,findmin_start_point);
     triangle_fit_result = modtrans(findmin_fit_result(1),kappa0,kappae,...

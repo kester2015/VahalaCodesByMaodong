@@ -29,8 +29,12 @@ alphaOverGList = 1./kerrOverTotalList -1;
     D1 = 2*pi*17929.82 * 1e6; % in Hz/2/pi (rad).
     
 
-QabsList = (2*pi*c./lambdaList*1e9) * dTdP * nT * neff * (2*pi*r*Aeff) / c / n2 ./ alphaOverGList;
+% QabsList = (2*pi*c./lambdaList*1e9) * dTdP * nT * neff * (2*pi*r*Aeff) / c / n2 ./ alphaOverGList;
 
+
+kabsList = (2*pi*c./lambdaList*1e9) *D1*n2 ./ (2*pi*neff*Aeff*dTdP* nT*(2*pi*c./lambdaList*1e9)/neff ) .*alphaOverGList; 
+
+QabsList = (2*pi*c./lambdaList*1e9)./kabsList;
 
 figure
 scatter(lambdaList ,QabsList/1e6);

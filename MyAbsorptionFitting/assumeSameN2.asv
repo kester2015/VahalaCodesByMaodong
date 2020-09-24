@@ -29,7 +29,7 @@ D1 = 2*pi*192504.13 * 1e6; % in Hz/2/pi (rad).
 
 
 % QabsList = (2*pi*c./lambdaList*1e9) * dTdP * nT * neff * (2*pi*r*Aeff) / c / n2 ./ alphaOverGList;
-kabsList = (2*pi*c./lambdaList*1e9) *D1*n2 ./ (2*pi*neff*Aeff*dTdP* nT*(2*pi*c./lambdaList*1e9)/neff ) .*alphaOverGList; 
+kabsList = (2*pi*c./lambdaList*1e9) *D1*n2 / (2*pi*neff*Aeff*dTdP* nT*(2*pi*c./lambdaList*1e9)/neff ) * 
 
 QabsList = (2*pi*c./lambdaList*1e9)./kabsList;
 

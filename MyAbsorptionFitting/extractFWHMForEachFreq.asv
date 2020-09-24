@@ -69,7 +69,7 @@ MZI_FSR = MZID1;
     % % % ------------1560.1 is a good fitting!
     filedirGolb = 'Z:\Qifan\AlGaAs\AlGaAs final results\broadening measurement\';
     wavelengthList = [1560.1 1554.6];
-    wavelength = wavelengthList(1);
+    wavelength = wavelengthList;
     lambda = wavelengthList;
     outputVoltage1List = [2.814 2.83]; %V
     outputPower1List = [0.8607 0.7633];%mW
@@ -78,7 +78,7 @@ MZI_FSR = MZID1;
     outputPower2List = [0.7880 0.6313];%mW
     inputPower2List = [7.213 7.801];%mW
 
-    kerrOverTotalList = [0.1056 0.0972];
+    kerrOverTotalList = 0.1056;
     realwavelengthList = wavelengthList;
     
     Q_data_filename = 'Z:\Qifan\AlGaAs\AlGaAs final results\broadening measurement\after-1560.1nm.mat';
@@ -88,21 +88,16 @@ MZI_FSR = MZID1;
     mode_Q0 = mode_Q(1)
     mode_Qe = mode_Q(2)
     
-    wavelength = wavelengthList(2)
-    Q_data_filename = 'Z:\Qifan\AlGaAs\AlGaAs final results\broadening measurement\after-1554.6nm.mat';
-    load(Q_data_filename,'data_matrix');
-    Q_obj = Q_trace_fit(data_matrix(:,2),data_matrix(:,3),MZI_FSR,wavelength, 0.4,'fanomzi'); % 0.4 is sensitivity
-    mode_Q = Q_obj.get_Q;
-    mode_Q0 = [mode_Q0 mode_Q(1)]
-    mode_Qe = [mode_Qe mode_Q(2)]
+    
     
     Q0List = mode_Q0*1e6;
     QextList = mode_Qe*1e6;
-    QtotList = 1./(1./Q0List + 1./QextList);
+    QtotList = mode_Q*1e6;
     
     
 
 process_part = 1:length(wavelengthList);
+
 close all
 
 %  % %------20200807 Tantala-----------%
