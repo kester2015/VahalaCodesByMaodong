@@ -45,6 +45,7 @@ resonance_shift = coeff(1);%MHz/C
 
 %%
 n0 = 3.3;
+n0 = input("give neff of this material");
 c = 299792458;
 lambda = 1551.0e-9;
 f = c/lambda;
