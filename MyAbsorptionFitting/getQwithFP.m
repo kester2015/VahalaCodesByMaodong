@@ -3,7 +3,8 @@ function [Q0, Q1, QL,findmin_fit_result] = getQwithFP(filename,lambda,tosave)
     %   Detailed explanation goes here
     if nargin == 1
         temp = strfind(filename,'-');
-        lambda = str2double(filename(temp(end)+1:(end-6)));
+        temp2 = strfind(filename,'nm');
+        lambda = str2double(filename(temp(end)+1:temp2(end)-1));
         tosave = 0;
     elseif nargin == 2
         tosave = 0;
@@ -135,7 +136,7 @@ function [Q0, Q1, QL,findmin_fit_result] = getQwithFP(filename,lambda,tosave)
     weight_width = 5; % times of linewidth
     weight_start = max(round(pos_peak - 1.0*weight_width*linewidth_estimate/2),1);
     weight_end   = min(round(pos_peak + 1.0*weight_width*linewidth_estimate/2),length(Q_trace_tofit));
-    fit_weight_dip(weight_start:weight_end) = 1000000; %10*max(round(length(Q_trace_tofit)/(weight_end-weight_start)),1);
+    fit_weight_dip(weight_start:weight_end) = 10; %10*max(round(length(Q_trace_tofit)/(weight_end-weight_start)),1);
 % % % %     --------Delete these lines later--------
 % % % %     --------for a mode with accompany mode at side------
 % % % %         weight_start = max(round(pos_peak + 0.7*20*linewidth_estimate/2),1);
@@ -150,7 +151,7 @@ function [Q0, Q1, QL,findmin_fit_result] = getQwithFP(filename,lambda,tosave)
     MZI_trace_local_phasor = hilbert(MZI_trace_local-mean(MZI_trace_local));
     MZI_trace_local_phase  = [0;cumsum(mod(diff(angle(MZI_trace_local_phasor))+pi,2*pi)-pi)]+angle(MZI_trace_local_phasor(1));
     MZI_period_local       = round(2*pi/mean( angle(MZI_trace_local_phasor(2:end)./MZI_trace_local_phasor(1:end-1) ) ) );
-    x_freq=(MZI_trace_local_phase/2/pi*2*pi/mean( diff(MZI_trace_local_phase) )).';
+    x_freq = (MZI_trace_local_phase/2/pi*2*pi/mean( diff(MZI_trace_local_phase) )).';
     %% Begin fitting Here
     % first redo the FP (2nd fp)
     fp_fit_2 = fit( x_freq.',Q_trace_tofit,fit_fp,...
@@ -233,6 +234,14 @@ function [Q0, Q1, QL,findmin_fit_result] = getQwithFP(filename,lambda,tosave)
     Q1=299792.458/lambda/((kappa-kappa0)/MZI_fit_T * MZI_FSR);
     QL=299792.458/lambda/( kappa        /MZI_fit_T * MZI_FSR);
     
+    
+    %% SiN: previous codes failed somehow, 
+            Q_obj = Q_trace_fit(Q_trace_tofit./fp_fit_result_2,MZI_trace_tofit,MZI_FSR, lambda, 0.4,'fanomzi'); % 0.4 is sensitivity
+            mode_Q = Q_obj.get_Q;
+            Q0 = mode_Q(1)
+            Q1 = mode_Q(2)
+            QL = 1/(1/Q0+1/Q1);
+    %%
 %             figure
             subplot(132)
             plot(x_freq.',Q_trace_tofit,'Linewidth',2.0)
