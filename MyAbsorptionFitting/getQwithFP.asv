@@ -3,8 +3,8 @@ function [Q0, Q1, QL,findmin_fit_result] = getQwithFP(filename,lambda,tosave)
     %   Detailed explanation goes here
     if nargin == 1
         temp = strfind(filename,'-');
-        temp2 = strfind(filename,'-');
-        lambda = str2double(filename(temp(end)+1:(end-6)));
+        temp2 = strfind(filename,'nm');
+        lambda = str2double(filename(temp(end)+1:temp2(end)-1));
         tosave = 0;
     elseif nargin == 2
         tosave = 0;
@@ -238,8 +238,8 @@ function [Q0, Q1, QL,findmin_fit_result] = getQwithFP(filename,lambda,tosave)
     %% SiN: previous codes failed somehow, 
             Q_obj = Q_trace_fit(Q_trace_tofit./fp_fit_result_2,MZI_trace_tofit,MZI_FSR, lambda, 0.4,'fanomzi'); % 0.4 is sensitivity
             mode_Q = Q_obj.get_Q;
-            Q0 = mode_Q(1);
-            Q1 = mode_Q(2);
+            Q0 = mode_Q(1)
+            Q1 = mode_Q(2)
             QL = 1/(1/Q0+1/Q1);
     %%
 %             figure
@@ -398,8 +398,13 @@ function [Q0, Q1, QL,findmin_fit_result] = getQwithFP(filename,lambda,tosave)
                                                                     findmin_fit_result(4),findmin_fit_result(5),findmin_fit_result(6),...
                                                                     findmin_fit_result(7), x_freq.' ) ,5);
             hold on
+                    scatter(x_freq.', modtrans(findmin_fit_result(1),findmin_fit_result(2),findmin_fit_result(3),...
+                                                                            findmin_fit_result(4),findmin_fit_result(5),findmin_fit_result(6),...
+                                                                            findmin_fit_result(7), x_freq.' ) ,5);
+                    hold on
             plot(x_freq.',fit_weight_dip*max(Q_trace_tofit)/max(fit_weight_dip));
             title(sprintf("Q trace with FP fitting, INCLUDED interference, %g nm\n Q0=%.4gM, Q1=%.4gM, Q=%.4gM, Trans=%.4g",lambda,Q0,Q1,QL,fitted_transmission))
+            legend({"original data","fitted data","exchange Qo and Qe"});
             
             % --------- Plot another one to save ---------
                     figure;
