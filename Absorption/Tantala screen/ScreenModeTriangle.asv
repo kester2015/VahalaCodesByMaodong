@@ -1,5 +1,5 @@
 
-
+MZI_FSR = 39.9553;
 
 %!!!!!!!!!!!! Set lambda !!!!!!!!!!!
 
@@ -13,6 +13,9 @@ instrreset;
 Myfg2 = Keysight33500('USB0::0x0957::0x2607::MY52202388::INSTR'); % upper
 % OSC = Infiniium('USB0::0x2A8D::0x9049::MY55510176::INSTR',2);%1G
 OSC = Infiniium('USB0::0x2A8D::0x904E::MY54200105::INSTR',2);%2.5G
+
+
+
 % if ~Myfg1.isconnected
 %     Myfg1.connect;
 % end
@@ -24,13 +27,13 @@ if ~OSC.isconnected
 end
 %%
 
-filedirGlob = strcat('Z:\Qifan\AlGaAs\',datestr(now,'yyyymmdd'),'-Screen-Modes');
+filedirGlob = strcat('Z:\Qifan\SiN\',datestr(now,'yyyymmdd'),'-Screen-Modes');
 if ~isfolder(filedirGlob)
     mkdir(filedirGlob)
 end
 
-Q_measure_volt = 2.0; % FunctionGenerator voltage when measure Q
-Tri_measure_volt = 0.3;
+Q_measure_volt = 1.96; % FunctionGenerator voltage when measure Q
+Tri_measure_volt = 1.40;%1.0;
 Q_measure_scale = [-0.1 0.7]; % OSC scale when measure Q
 Tri_measure_scale = [-0.05 3.4];
 
@@ -99,7 +102,22 @@ close all
 qdata_filename = strcat(qdata_filename,'.mat');
 tridata_filename = strcat(tridata_filename,'.mat');
 %%
+
 [mode_Q0,mode_Qe,~,~] = getQwithFP(qdata_filename,lambda,1);
+
 trifit_result = fitTriwithFP(tridata_filename, mode_Q0,mode_Qe,lambda,1);
+
+%%
+% 
+% load(qdata_filename,'data_matrix');
+% Q_obj = Q_trace_fit(data_matrix(:,2),data_matrix(:,3),MZI_FSR,lambda, 0.4,'fanomzi'); % 0.4 is sensitivity
+% mode_Q = Q_obj.get_Q;
+% Q_obj.plot_Q_max;
+% pause(3)
+% close all
+% mode_Q0 = mode_Q(1)
+% mode_Qe = mode_Q(2)
+% 
+% trifit_result = fitTriFlatBG(tridata_filename,mode_Q0, mode_Qe,lambda,1);
 
 

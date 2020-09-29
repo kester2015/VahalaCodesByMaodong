@@ -49,8 +49,10 @@ function [Q0, Q1, QL,findmin_fit_result] = getQwithFP(filename,lambda,tosave)
     [amp_fp,pos_fp] = max(Q_trace_freq_temp(1:round(end/2)));
     fit_T_estimate = length(Q_trace_freq)/(pos_fp-1);
     if pos_fp < 3
-        fit_T_estimate = 2*length(Q_trace_freq);
+        fit_T_estimate = 0.5*length(Q_trace_freq);
     end
+            fit_T_estimate = 10*length(Q_trace_freq);
+    
     fit_B_estimate = amp_fp/length(Q_trace_freq);
     fit_A0_estimate = mean(Q_trace);
 
@@ -120,7 +122,7 @@ function [Q0, Q1, QL,findmin_fit_result] = getQwithFP(filename,lambda,tosave)
 %     fit_weight_dip = zeros(length(Q_trace_tofit),1);
     fit_weight_fp = fit_weight_dip;
     
-    weight_width = 20; % times of linewidth
+    weight_width = 5; % times of linewidth
     weight_start = max(round(pos_peak - 1.0*weight_width*linewidth_estimate/2),1);
     weight_end   = min(round(pos_peak + 1.0*weight_width*linewidth_estimate/2),length(Q_trace_tofit));
 %     fit_weight_dip(weight_start:weight_end) = 1; %10*max(round(length(Q_trace_tofit)/(weight_end-weight_start)),1);
@@ -133,7 +135,7 @@ function [Q0, Q1, QL,findmin_fit_result] = getQwithFP(filename,lambda,tosave)
 % % % %         fit_weight_fp(weight_start:weight_end) = 0;
         
     
-    weight_width = 5; % times of linewidth
+    weight_width = 20; % times of linewidth
     weight_start = max(round(pos_peak - 1.0*weight_width*linewidth_estimate/2),1);
     weight_end   = min(round(pos_peak + 1.0*weight_width*linewidth_estimate/2),length(Q_trace_tofit));
     fit_weight_dip(weight_start:weight_end) = 10; %10*max(round(length(Q_trace_tofit)/(weight_end-weight_start)),1);
@@ -152,6 +154,8 @@ function [Q0, Q1, QL,findmin_fit_result] = getQwithFP(filename,lambda,tosave)
     MZI_trace_local_phase  = [0;cumsum(mod(diff(angle(MZI_trace_local_phasor))+pi,2*pi)-pi)]+angle(MZI_trace_local_phasor(1));
     MZI_period_local       = round(2*pi/mean( angle(MZI_trace_local_phasor(2:end)./MZI_trace_local_phasor(1:end-1) ) ) );
     x_freq = (MZI_trace_local_phase/2/pi*2*pi/mean( diff(MZI_trace_local_phase) )).';
+    
+    fit_x0_estimate = x_freq(fit_x0_estimate);
     %% Begin fitting Here
     % first redo the FP (2nd fp)
     fp_fit_2 = fit( x_freq.',Q_trace_tofit,fit_fp,...
@@ -366,7 +370,7 @@ function [Q0, Q1, QL,findmin_fit_result] = getQwithFP(filename,lambda,tosave)
 %             % %----------Give the peak position higher weight---------------
                 fit_weight_dip = 1*ones(length(Q_trace_tofit),1);
                 fit_weight_fp = fit_weight_dip;
-                weight_width = 5; % times of linewidth
+                weight_width = 20; % times of linewidth
                 weight_start = max(round(pos_peak - weight_width*linewidth_estimate/2),1);
                 weight_end   = min(round(pos_peak + weight_width*linewidth_estimate/2),length(Q_trace_tofit));
                 fit_weight_dip(weight_start:weight_end) = 10; %10*max(round(length(Q_trace_tofit)/(weight_end-weight_start)),1);
@@ -378,10 +382,18 @@ function [Q0, Q1, QL,findmin_fit_result] = getQwithFP(filename,lambda,tosave)
         kappa0_findmin_estimate = 299792.458/lambda/( Q0_findmin_estimate /MZI_fit_T * MZI_FSR);
         kappae_findmin_estimate = 299792.458/lambda/( Q1_findmin_estimate /MZI_fit_T * MZI_FSR);
         
-        findmin_fun = @(paras)LCL(modtrans_residual(paras(1),paras(2),paras(3),paras(4),paras(5),paras(6),paras(7),x_freq.',Q_trace_tofit) ,fit_weight_dip);
-        findmin_start_point = [fit_A0_estimate_new, r1r2, fit_x1_estimate, fit_T_estimate, kappa0_findmin_estimate, kappae_findmin_estimate,fit_x0_estimate];
+%         % % % Fit everything version
+%         findmin_fun = @(paras)LCL(modtrans_residual(paras(1),paras(2),paras(3),paras(4),paras(5),paras(6),paras(7),x_freq.',Q_trace_tofit) ,fit_weight_dip);
+%         findmin_start_point = [fit_A0_estimate_new, r1r2, fit_x1_estimate, fit_T_estimate, kappa0_findmin_estimate, kappae_findmin_estimate,fit_x0_estimate];
+% %         options = optimset('MaxFunEvals',5000);
+%         findmin_fit_result = fminsearch(findmin_fun,findmin_start_point);
+        
+        % % % Don't re-fit FP version
+        findmin_fun = @(paras)LCL(modtrans_residual(fit_A0_estimate_new,r1r2,fit_x1_estimate,fit_T_estimate,paras(1),paras(2),paras(3),x_freq.',Q_trace_tofit) ,fit_weight_dip);
+        findmin_start_point = [kappa0_findmin_estimate, kappae_findmin_estimate,fit_x0_estimate];
 %         options = optimset('MaxFunEvals',5000);
         findmin_fit_result = fminsearch(findmin_fun,findmin_start_point);
+        findmin_fit_result = [fit_A0_estimate_new, r1r2, fit_x1_estimate, fit_T_estimate,findmin_fit_result];
         
         Q0=299792.458/lambda/(  findmin_fit_result(5)                           /MZI_fit_T * MZI_FSR);
         Q1=299792.458/lambda/(                           findmin_fit_result(6)  /MZI_fit_T * MZI_FSR);
@@ -404,7 +416,7 @@ function [Q0, Q1, QL,findmin_fit_result] = getQwithFP(filename,lambda,tosave)
 %                     hold on
             plot(x_freq.',fit_weight_dip*max(Q_trace_tofit)/max(fit_weight_dip));
             title(sprintf("Q trace with FP fitting, INCLUDED interference, %g nm\n Q0=%.4gM, Q1=%.4gM, Q=%.4gM, Trans=%.4g",lambda,Q0,Q1,QL,fitted_transmission))
-            legend(["original data","fitted data","exchange Qo and Qe"],'location','best');
+%             legend(["original data","fitted data","exchange Qo and Qe"],'location','best');
             
             % --------- Plot another one to save ---------
                     figure;
@@ -416,14 +428,14 @@ function [Q0, Q1, QL,findmin_fit_result] = getQwithFP(filename,lambda,tosave)
                                                                             findmin_fit_result(4),findmin_fit_result(5),findmin_fit_result(6),...
                                                                             findmin_fit_result(7), x_freq.' ) ,5);
                     hold on
-                                        scatter(x_freq.', modtrans(findmin_fit_result(1),findmin_fit_result(2),findmin_fit_result(3),...
-                                                                            findmin_fit_result(4),findmin_fit_result(6),findmin_fit_result(5),...
-                                                                            findmin_fit_result(7), x_freq.' ) ,5);
-                                        hold on
+%                                         scatter(x_freq.', modtrans(findmin_fit_result(1),findmin_fit_result(2),findmin_fit_result(3),...
+%                                                                             findmin_fit_result(4),findmin_fit_result(6),findmin_fit_result(5),...
+%                                                                             findmin_fit_result(7), x_freq.' ) ,5);
+%                                         hold on
 
                     plot(x_freq.',fit_weight_dip*max(Q_trace_tofit)/max(fit_weight_dip));
                     title(sprintf("Q trace with FP fitting, INCLUDED interference, %g nm\n Q0=%.4gM, Q1=%.4gM, Q=%.4gM, Trans=%.4g",lambda,Q0,Q1,QL,fitted_transmission))
-                        legend(["original data","fitted data","exchange Qo and Qe"],'location','best');
+%                         legend(["original data","fitted data","exchange Qo and Qe"],'location','best');
 
             
             if tosave

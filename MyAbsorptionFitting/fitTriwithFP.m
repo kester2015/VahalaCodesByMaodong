@@ -61,8 +61,10 @@ function [findmin_fit_result] = fitTriwithFP(data_filename, mode_Q0, mode_Qe, la
     [amp_fp,pos_fp] = max(Q_trace_freq_temp);
     fit_T_estimate = length(Q_trace_freq)/(pos_fp-1);
     if pos_fp < 3
-        fit_T_estimate = 0.5*length(Q_trace_freq);
+        fit_T_estimate = 2*length(Q_trace_freq);
     end
+            fit_T_estimate = 10*length(Q_trace_freq);
+
     fit_B_estimate = amp_fp/length(Q_trace_freq);
     fit_A0_estimate = mean(Trans_raw);
 
@@ -71,6 +73,7 @@ function [findmin_fit_result] = fitTriwithFP(data_filename, mode_Q0, mode_Qe, la
                 'Weights',Trans_raw.^2);
     fp_fit_result_1 = fp_fit_1(x_freq.');%fp_fit.A0+fp_fit.B*cos(((1:length(Q_trace)).'-fp_fit.x1)/fp_fit.T*2*pi);
     fit_A0_estimate = fp_fit_1.A0;
+    fit_A0_estimate = mean(Trans_raw);
     fit_B_estimate  = fp_fit_1.B;
     fit_x1_estimate = fp_fit_1.x1;
     fit_T_estimate  = fp_fit_1.T;
@@ -83,13 +86,13 @@ function [findmin_fit_result] = fitTriwithFP(data_filename, mode_Q0, mode_Qe, la
     mid_x_est = [find(half_cut_est(1:dip_x_est)==0, 1,'last' ), find(half_cut_est(dip_x_est:end)==1, 1)+dip_x_est-1];
     linewidth_est = abs(diff(mid_x_est));
 
-    pos_fitrange = 4; % times of linewidth, Q to fit range
-    pos_fitstart = round(max(0.03*length(Trans_raw) , dip_x_est - 0.8*pos_fitrange*linewidth_est)); % fitting range is peak position ± pos_fitrange/2 linewidth
-    pos_fitend   = round(min(0.97*length(Trans_raw) , dip_x_est + 0.2*pos_fitrange*linewidth_est)); % fitting range is peak position ± pos_fitrange/2 linewidth
+    pos_fitrange = 5; % times of linewidth, Q to fit range
+    pos_fitstart = round(max(0.03*length(Trans_raw) , dip_x_est - 0.6*pos_fitrange*linewidth_est)); % fitting range is peak position ± pos_fitrange/2 linewidth
+    pos_fitend   = round(min(0.97*length(Trans_raw) , dip_x_est + 0.4*pos_fitrange*linewidth_est)); % fitting range is peak position ± pos_fitrange/2 linewidth
     fp_fit_weight = ones(size(Trans_raw));
     dip_fit_weight = fp_fit_weight;
     fp_fit_weight(pos_fitstart:pos_fitend) = 0;
-    dip_fit_weight(pos_fitstart:pos_fitend) = 1;
+    dip_fit_weight(pos_fitstart:pos_fitend) = 10;
 
 
     fp_fit = fit( x_freq.',Trans_raw,fit_fp,...
@@ -134,6 +137,7 @@ function [findmin_fit_result] = fitTriwithFP(data_filename, mode_Q0, mode_Qe, la
     dTdP = 613;%1685;%1570;
     alpha_est = nT * dTdP *(2*pi*c/lambda)^2/n0/Qabs_est;   % unit Hz^2/W
     alpha_est = 10*alpha_est;
+    alpha_est = 500;
     % alpha_est = alpha_est / ( sqrt(inputPower2 *outputPower2) * 1e-3 / sqrt(inputVoltage2 * outputVoltage2)); % in unit of power;
     % alpha_est = alpha_est *  (MZI_fit_T / (MZI_FSR*1e6)) ; % unit Num/W
     % 
@@ -168,7 +172,9 @@ function [findmin_fit_result] = fitTriwithFP(data_filename, mode_Q0, mode_Qe, la
 %     findmin_fit_result = fminsearch(findmin_fun,findmin_start_point);
 %     findmin_fit_result = [findmin_fit_result(1:4), kappa0, kappae, findmin_fit_result(5:6)]; 
     findmin_fun = @(paras)LCL(modtrans_residual(fp_fit.A0*(1+r1r2^2),r1r2,fp_fit.x1,fp_fit.T,kappa0,kappae,paras(1),paras(2),x_freq.',Trans_raw) ,dip_fit_weight);
-    findmin_start_point = [mid_x(1), 0.5*alpha_est];
+    findmin_start_point = [mid_x(1)-0.5*linewidth_est, 0.5*alpha_est];
+    findmin_start_point = [x_freq(mid_x(1)), alpha_est];
+
     %         options = optimset('MaxFunEvals',5000);
     findmin_fit_result = fminsearch(findmin_fun,findmin_start_point);
     triangle_fit_result = modtrans(fp_fit.A0*(1+r1r2^2),r1r2,fp_fit.x1,fp_fit.T,kappa0,kappae,...
@@ -198,8 +204,10 @@ function [findmin_fit_result] = fitTriwithFP(data_filename, mode_Q0, mode_Qe, la
             scatter(x_freq.',triangle_fit_result, 5 );
             hold on
             plot(x_freq.',dip_fit_weight*max(Trans_raw)/max(dip_fit_weight))
-            title(sprintf("FP and Triangle fitting result, %g nm",lambda));         
-                
+%             title(sprintf("FP and Triangle fitting result, %g nm",lambda));         
+                title(sprintf("FP and Tri fitting result, %g nm\n x0 = %g, alpha = %g, base = %g\n",...
+                            lambda,findmin_fit_result(end-1),findmin_fit_result(end),findmin_fit_result(1) ));         
+
                 if tosave
                     tt = strfind(data_filename,'\');
                     file_tosave_dir = data_filename(1:tt(end));

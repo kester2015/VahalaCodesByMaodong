@@ -61,7 +61,7 @@ function [findmin_fit_result] = fitTriwithFP(data_filename, mode_Q0, mode_Qe, la
     [amp_fp,pos_fp] = max(Q_trace_freq_temp);
     fit_T_estimate = length(Q_trace_freq)/(pos_fp-1);
     if pos_fp < 3
-        fit_T_estimate = 0.5*length(Q_trace_freq);
+        fit_T_estimate = 2*length(Q_trace_freq);
     end
     fit_B_estimate = amp_fp/length(Q_trace_freq);
     fit_A0_estimate = mean(Trans_raw);
@@ -83,7 +83,7 @@ function [findmin_fit_result] = fitTriwithFP(data_filename, mode_Q0, mode_Qe, la
     mid_x_est = [find(half_cut_est(1:dip_x_est)==0, 1,'last' ), find(half_cut_est(dip_x_est:end)==1, 1)+dip_x_est-1];
     linewidth_est = abs(diff(mid_x_est));
 
-    pos_fitrange = 4; % times of linewidth, Q to fit range
+    pos_fitrange = 20; % times of linewidth, Q to fit range
     pos_fitstart = round(max(0.03*length(Trans_raw) , dip_x_est - 0.8*pos_fitrange*linewidth_est)); % fitting range is peak position ± pos_fitrange/2 linewidth
     pos_fitend   = round(min(0.97*length(Trans_raw) , dip_x_est + 0.2*pos_fitrange*linewidth_est)); % fitting range is peak position ± pos_fitrange/2 linewidth
     fp_fit_weight = ones(size(Trans_raw));
@@ -198,8 +198,10 @@ function [findmin_fit_result] = fitTriwithFP(data_filename, mode_Q0, mode_Qe, la
             scatter(x_freq.',triangle_fit_result, 5 );
             hold on
             plot(x_freq.',dip_fit_weight*max(Trans_raw)/max(dip_fit_weight))
-            title(sprintf("FP and Triangle fitting result, %g nm",lambda));         
-                
+%             title(sprintf("FP and Triangle fitting result, %g nm",lambda));         
+                title(sprintf("FP and Tri fitting result, %g nm\n x0 = %g, alpha = %g, base = %g\n",...
+                            lambda,findmin_fit_result(end-1),findmin_fit_result(end),findmin_fit_result(1) ));         
+
                 if tosave
                     tt = strfind(data_filename,'\');
                     file_tosave_dir = data_filename(1:tt(end));
