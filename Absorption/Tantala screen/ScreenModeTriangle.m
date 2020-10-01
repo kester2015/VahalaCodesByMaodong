@@ -32,9 +32,9 @@ if ~isfolder(filedirGlob)
     mkdir(filedirGlob)
 end
 
-Q_measure_volt = 1.96; % FunctionGenerator voltage when measure Q
-Tri_measure_volt = 1.30;%1.0;
-Q_measure_scale = [-0.1 0.7]; % OSC scale when measure Q
+Q_measure_volt = 2.0;%1.96; % FunctionGenerator voltage when measure Q
+Tri_measure_volt = 0.3;%1.0;
+Q_measure_scale = [-0.1 0.5]; % OSC scale when measure Q
 Tri_measure_scale = [-0.05 3.4];
 
 % Piezo related settings

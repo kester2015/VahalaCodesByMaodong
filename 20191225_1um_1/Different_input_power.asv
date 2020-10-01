@@ -31,7 +31,7 @@ OSC.connect;
 
 
 % filedirToSave = ['\\131.215.238.124\Vahala Group\Qifan\Tantala\' datestr(now,'yyyymmdd') '-thermal-rawdata\1548nm-02'];
-filedirToSave = ['Z:\Qifan\SiN\' datestr(now,'yyyymmdd') '-thermal-rawdata\No14\1541nm-02'];
+filedirToSave = ['Z:\Qifan\SiN\' datestr(now,'yyyymmdd') '-thermal-rawdata\No14\1541nm-01'];
 
 
 % VAOM = 0.01:0.005:1;
@@ -64,8 +64,6 @@ end
 %%
 tic;
 
-OSC.Write([':TIM:POS ' num2str(1/Freq0*0.75)]);
-OSC.Write([':TIM:SCAL ' num2str(1/Freq0/2/10)]);
 for m = 1 : length(VAOM)
     for n = 1 : length(sweepFreq)
 %         if Vpp/2 > Offset
@@ -81,21 +79,19 @@ for m = 1 : length(VAOM)
 %%
 %         Freq0 = sweepFreq(n);
         Myfg1.Freq1 =[Freq0 Vpp Offset];
-        Myfg1.Phase1 = 90;
 %         Myfg1.Phase1 = 90;
 %         Myfg1.TriggerExt1;
         Myfg2.DC2 = VAOM(m);       
         
         
-%         OSC.Write([':TIM:POS ' num2str(1/Freq0*0.75)]);
-%         OSC.Write([':TIM:SCAL ' num2str(1/Freq0/2/10)]);
-
+        OSC.Write([':TIM:POS ' num2str(1/Freq0*0.75)]);
+        OSC.Write([':TIM:SCAL ' num2str(1/Freq0/2/10)]);
 %         OSC.Write([':TIM:POS ' num2str(1/Freq0*1/2)]);
 %         OSC.Write([':TIM:SCAL ' num2str(1/Freq0/10)]);
         OSC.Single;
         pause(0.2); 
         
-%         Myfg1.Phase1 = 90;
+        Myfg1.Phase1 = 90;
         pause(0.2);
         Myfg1.Trigger1;
         
@@ -136,8 +132,6 @@ Myfg2.DC2 = 1.0;
 Myfg1.Freq1 =[Freq0 Vpp Offset];
 OSC.Run;
 
-OSC.Write([':TIM:POS ' num2str(1/Freq0*0.75)]);
-OSC.Write([':TIM:SCAL ' num2str(1/Freq0/2/10)]);
 % sound(sin(2*pi*25*(1:4000)/100));
 tts('Measurement Completed');
 Myfg1.disconnect;

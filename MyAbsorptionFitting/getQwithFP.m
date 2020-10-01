@@ -51,7 +51,7 @@ function [Q0, Q1, QL,findmin_fit_result] = getQwithFP(filename,lambda,tosave)
     if pos_fp < 3
         fit_T_estimate = 0.5*length(Q_trace_freq);
     end
-            fit_T_estimate = 10*length(Q_trace_freq);
+            fit_T_estimate = 0.5*length(Q_trace_freq);
     
     fit_B_estimate = amp_fp/length(Q_trace_freq);
     fit_A0_estimate = mean(Q_trace);
@@ -171,7 +171,7 @@ function [Q0, Q1, QL,findmin_fit_result] = getQwithFP(filename,lambda,tosave)
             scatter(x_freq.',fp_fit_result_2, 5);
             hold on
             plot(x_freq.',fit_weight_fp*max(Q_trace_tofit)/max(fit_weight_fp));
-            title(sprintf("FP 2nd fitting result, %g nm",lambda));
+            title(sprintf("FP 2nd fitting result, %g nm.\n T=%g",lambda,fp_fit_2.T ));
 
     fit_A0_estimate = fp_fit_2.A0;
     fit_B_estimate = fp_fit_2.B;
@@ -240,7 +240,7 @@ function [Q0, Q1, QL,findmin_fit_result] = getQwithFP(filename,lambda,tosave)
     
     
     %% SiN: previous codes failed somehow, 
-            Q_obj = Q_trace_fit(Q_trace_tofit./fp_fit_result_2,MZI_trace_tofit,MZI_FSR, lambda, 0.4,'fanomzi'); % 0.4 is sensitivity
+            Q_obj = Q_trace_fit(Q_trace_tofit./fp_fit_result_2,MZI_trace_tofit,MZI_FSR, lambda, 0.7,'fanomzi'); % 0.4 is sensitivity
             mode_Q = Q_obj.get_Q;
             Q0 = mode_Q(1)
             Q1 = mode_Q(2)

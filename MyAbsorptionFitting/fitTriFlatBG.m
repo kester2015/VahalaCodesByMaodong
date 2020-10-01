@@ -33,11 +33,11 @@ function [findmin_fit_result] = fitTriFlatBG(data_filename, mode_Q0, mode_Qe, la
     %         lambda = 1540.4;
     %         MZI_FSR = 39.9553; % MHz
 
-    if length(timeAxis) > 1e4
-            timeAxis = timeAxis(1:round(length(timeAxis)/1e4):end);
-            Ch3= Ch3(1:round(length(Ch3)/1e4):end);
-            Ch2 = Ch2(1:round(length(Ch2)/1e4):end);
-    end
+%     if length(timeAxis) > 1e4
+%             timeAxis = timeAxis(1:round(length(timeAxis)/1e4):end);
+%             Ch3= Ch3(1:round(length(Ch3)/1e4):end);
+%             Ch2 = Ch2(1:round(length(Ch2)/1e4):end);
+%     end
     %     Ch2 = sgolayfilt(Ch2, 2, round(length(Ch2)/1000)*2 + 1);
     %%
     MZI = Ch3(1:end);
@@ -163,7 +163,7 @@ x_freq=(MZI_phase/2/pi*2*pi/mean( diff(MZI_phase) )).';
 %     
 %                            
     % --fit x0,alpha, bg version
-    findmin_fun = @(paras)L3 CL(modtrans_residual(paras(1),kappa0,kappae,paras(2),paras(3),x_freq.',Trans_raw) ,dip_fit_weight);
+    findmin_fun = @(paras)LCL(modtrans_residual(paras(1),kappa0,kappae,paras(2),paras(3),x_freq.',Trans_raw) ,dip_fit_weight);
     findmin_start_point = [bg_base, mid_x(1)-0.5*linewidth_est, 0.8*alpha_est];
     findmin_fit_result = fminsearch(findmin_fun,findmin_start_point);
     triangle_fit_result = modtrans(findmin_fit_result(1),kappa0,kappae,...
