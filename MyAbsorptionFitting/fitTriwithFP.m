@@ -137,7 +137,7 @@ function [findmin_fit_result] = fitTriwithFP(data_filename, mode_Q0, mode_Qe, la
     dTdP = 613;%1685;%1570;
     alpha_est = nT * dTdP *(2*pi*c/lambda)^2/n0/Qabs_est;   % unit Hz^2/W
     alpha_est = 10*alpha_est;
-    alpha_est = 2000;
+    alpha_est = 5000;
     % alpha_est = alpha_est / ( sqrt(inputPower2 *outputPower2) * 1e-3 / sqrt(inputVoltage2 * outputVoltage2)); % in unit of power;
     % alpha_est = alpha_est *  (MZI_fit_T / (MZI_FSR*1e6)) ; % unit Num/W
     % 
@@ -315,6 +315,6 @@ function phase = MZI2Phase(trace_MZI)
 
     trace_MZI_phase = [0; cumsum(mod(diff(angle(trace_MZI_phasor))+pi, 2*pi) - pi)] + angle(trace_MZI_phasor(1));
     % trace_MZI_phase = sgolayfilt(trace_MZI_phase, 1, 11);
-    phase = sgolayfilt(trace_MZI_phase, 2, round(trace_length/40)*2 + 1);
+    phase = sgolayfilt(trace_MZI_phase, 2, round(trace_length/40/20)*2 + 1);
     % phase = trace_MZI_phase;
 end
