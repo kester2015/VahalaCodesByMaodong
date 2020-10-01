@@ -51,7 +51,7 @@ function [Q0, Q1, QL,findmin_fit_result] = getQwithFP(filename,lambda,tosave)
     if pos_fp < 3
         fit_T_estimate = 0.5*length(Q_trace_freq);
     end
-            fit_T_estimate = 0.5*length(Q_trace_freq);
+            fit_T_estimate = 1*length(Q_trace_freq);
     
     fit_B_estimate = amp_fp/length(Q_trace_freq);
     fit_A0_estimate = mean(Q_trace);

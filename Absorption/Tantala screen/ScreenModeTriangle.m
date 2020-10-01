@@ -33,10 +33,10 @@ if ~isfolder(filedirGlob)
 end
 
 Q_measure_volt = 2.0;%1.96; % FunctionGenerator voltage when measure Q
-Tri_measure_volt = 0.3;%1.0;
+Tri_measure_volt = 1.56;%1.0; % 3~6
 Q_measure_scale = [-0.1 0.5]; % OSC scale when measure Q
 Tri_measure_scale = [-0.05 3.4];
-
+note = '0.5Hz-1.7Vpp-';
 % Piezo related settings
 % sweep_Freq = 20;
 % sweep_Vpp = 3.5;
@@ -60,7 +60,7 @@ Tri_measure_scale = [-0.05 3.4];
 % --2. Measure Tri at high power
 OSC.SetVertScale(Config.trans_ch, Tri_measure_scale);
 Myfg2.DC2 = Tri_measure_volt;
-tridata_filename = strcat(filedirGlob,'\Tri-measure-maxvpp-',num2str(lambda),'nm');
+tridata_filename = strcat(filedirGlob,'\Tri-measure-maxvpp-',note,num2str(lambda),'nm');
                 
                 if isfile(strcat(tridata_filename,'.mat'))
                     backup_filename = strcat(tridata_filename,'_',char(datetime('now','Format','yyMMdd_HHmmss')),'_bak.mat');
@@ -75,10 +75,11 @@ ReadTrace(tridata_filename,OSC,point,Config.trans_ch,Config.mzi_ch,0,pd_offset);
 OSC.Run;
 OSC.HighRes;
 
+OSC.Write(':ACQ:POIN:AUTO');
 
 % -- 1. Measure Q factor at low power
 Myfg2.DC2 = Q_measure_volt;
-qdata_filename = strcat(filedirGlob,'\Q-measure-maxvpp-',num2str(lambda),'nm');
+qdata_filename = strcat(filedirGlob,'\Q-measure-maxvpp-',note,num2str(lambda),'nm');
 
                 if isfile(strcat(qdata_filename,'.mat'))
                     backup_filename = strcat(qdata_filename,'_',char(datetime('now','Format','yyMMdd_HHmmss')),'_bak.mat');

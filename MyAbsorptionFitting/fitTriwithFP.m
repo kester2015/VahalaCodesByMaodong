@@ -21,12 +21,12 @@ function [findmin_fit_result] = fitTriwithFP(data_filename, mode_Q0, mode_Qe, la
     % 
     %         lambda = 1540.4;
     %         MZI_FSR = 39.9553; % MHz
-
-%     if length(timeAxis) > 1e4
-%             timeAxis = timeAxis(1:round(length(timeAxis)/1e4):end);
-%             Ch3= Ch3(1:round(length(Ch3)/1e4):end);
-%             Ch2 = Ch2(1:round(length(Ch2)/1e4):end);
-%     end
+    sapoint = 1e6;
+    if length(timeAxis) > sapoint
+            timeAxis = timeAxis(1:round(length(timeAxis)/sapoint):end);
+            Ch3= Ch3(1:round(length(Ch3)/sapoint):end);
+            Ch2 = Ch2(1:round(length(Ch2)/sapoint):end);
+    end
     %     Ch2 = sgolayfilt(Ch2, 2, round(length(Ch2)/1000)*2 + 1);
     %%
     MZI = Ch3(1:end);
@@ -63,22 +63,25 @@ function [findmin_fit_result] = fitTriwithFP(data_filename, mode_Q0, mode_Qe, la
     if pos_fp < 3
         fit_T_estimate = 2*length(Q_trace_freq);
     end
-            fit_T_estimate = 0.5*length(Q_trace_freq);
+            fit_T_estimate = 1*length(Q_trace_freq);
 
     fit_B_estimate = amp_fp/length(Q_trace_freq);
     fit_A0_estimate = mean(Trans_raw);
 
-    fp_fit_1 = fit( x_freq.',Trans_raw,fit_fp,...
-                'StartPoint',[fit_A0_estimate fit_B_estimate length(Q_trace_freq)/2 fit_T_estimate],...
-                'Weights',Trans_raw.^2);
-    fp_fit_result_1 = fp_fit_1(x_freq.');%fp_fit.A0+fp_fit.B*cos(((1:length(Q_trace)).'-fp_fit.x1)/fp_fit.T*2*pi);
-    fit_A0_estimate = fp_fit_1.A0;
+%     fp_fit_1 = fit( x_freq.',Trans_raw,fit_fp,...
+%                 'StartPoint',[fit_A0_estimate fit_B_estimate length(Q_trace_freq)/2 fit_T_estimate],...
+%                 'Weights',Trans_raw.^2);
+%     fp_fit_result_1 = fp_fit_1(x_freq.');%fp_fit.A0+fp_fit.B*cos(((1:length(Q_trace)).'-fp_fit.x1)/fp_fit.T*2*pi);
+%     fit_A0_estimate = fp_fit_1.A0;
+    
     fit_A0_estimate = mean(Trans_raw);
+    fit_x1_estimate = 0;
 %     fit_B_estimate  = fp_fit_1.B;
-    fit_x1_estimate = fp_fit_1.x1;
+%     fit_x1_estimate = fp_fit_1.x1;
 %     fit_T_estimate  = fp_fit_1.T;
 
-    Trans_normed_1 = Trans_raw./fp_fit_result_1;
+%     Trans_normed_1 = Trans_raw./fp_fit_result_1;
+    Trans_normed_1 = Trans_raw;
     [dip_y_est, dip_x_est] = min(Trans_normed_1);
     Base_est = max(Trans_normed_1);
     mid_y_est = (dip_y_est+Base_est)/2;
@@ -137,7 +140,8 @@ function [findmin_fit_result] = fitTriwithFP(data_filename, mode_Q0, mode_Qe, la
     dTdP = 613;%1685;%1570;
     alpha_est = nT * dTdP *(2*pi*c/lambda)^2/n0/Qabs_est;   % unit Hz^2/W
     alpha_est = 10*alpha_est;
-    alpha_est = 5000;
+
+    alpha_est = 20000;
     % alpha_est = alpha_est / ( sqrt(inputPower2 *outputPower2) * 1e-3 / sqrt(inputVoltage2 * outputVoltage2)); % in unit of power;
     % alpha_est = alpha_est *  (MZI_fit_T / (MZI_FSR*1e6)) ; % unit Num/W
     % 
