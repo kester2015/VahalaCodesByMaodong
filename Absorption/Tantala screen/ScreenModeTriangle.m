@@ -32,8 +32,8 @@ if ~isfolder(filedirGlob)
     mkdir(filedirGlob)
 end
 
-Q_measure_volt = 2.0;%1.96; % FunctionGenerator voltage when measure Q
-Tri_measure_volt = 1.56;%1.0; % 3~6
+Q_measure_volt = 1.8;%1.96; % FunctionGenerator voltage when measure Q
+Tri_measure_volt = 0.2;%1.0; % 3~6
 Q_measure_scale = [-0.1 0.5]; % OSC scale when measure Q
 Tri_measure_scale = [-0.05 3.4];
 note = '0.5Hz-1.7Vpp-';
@@ -75,7 +75,10 @@ ReadTrace(tridata_filename,OSC,point,Config.trans_ch,Config.mzi_ch,0,pd_offset);
 OSC.Run;
 OSC.HighRes;
 
-OSC.Write(':ACQ:POIN:AUTO');
+
+
+OSC.Write(':ACQ:POIN:ANAL AUTO');
+
 
 % -- 1. Measure Q factor at low power
 Myfg2.DC2 = Q_measure_volt;
@@ -94,6 +97,8 @@ input('please adjust attenuator:');
 ReadTrace(qdata_filename,OSC,point,Config.trans_ch,Config.mzi_ch,0,pd_offset);
 OSC.Run;
 OSC.HighRes;
+OSC.Write(':ACQ:POIN:ANAL AUTO');
+
 %% Finally disconnect FG and OSC
 Myfg2.disconnect;
 OSC.disconnect;

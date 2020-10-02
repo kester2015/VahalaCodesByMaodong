@@ -119,4 +119,10 @@ classdef Keysight33500 < handle
         end
         
     end
+    %%
+    methods
+        function Write(Obj,command)
+            fprintf(Obj.visaObj,command);
+        end
+    end
 end
