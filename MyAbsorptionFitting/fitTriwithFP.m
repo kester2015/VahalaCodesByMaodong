@@ -27,10 +27,12 @@ function [findmin_fit_result] = fitTriwithFP(data_filename, mode_Q0, mode_Qe, la
             Ch3= Ch3(1:round(length(Ch3)/sapoint):end);
             Ch2 = Ch2(1:round(length(Ch2)/sapoint):end);
     end
+    
     %     Ch2 = sgolayfilt(Ch2, 2, round(length(Ch2)/1000)*2 + 1);
     %%
     MZI = Ch3(1:end);
     Trans =  Ch2(1:end);
+%     Trans = Trans/2.5494*3.0068;
 
     if min(Trans)<0
             PD_background = min(Trans);
