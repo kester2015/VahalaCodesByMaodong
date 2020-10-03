@@ -3,7 +3,7 @@
 clear
 clc
 
-datadir = "Z:\Qifan\SiN\20201001-thermal-rawdata\No14";
+datadir = "Z:\Qifan\SiN\20201002-thermal-rawdata\No14";
 
 
 allSubfolders = dir(datadir);
@@ -26,7 +26,7 @@ for kk = 1:length(allSubfolders)
             
 %             if ~isfolder(fileToSaveDir)
 %                 mkdir(fileToSaveDir);
-%             end
+%             endgit 
 
             binfiles = dir(strcat(filedir,'\*.bin') );
             %%
