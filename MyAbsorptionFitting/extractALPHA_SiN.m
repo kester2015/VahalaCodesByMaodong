@@ -5,10 +5,11 @@ MZI_FSR = 39.9553; % MHz
 %%
 % % % % ------------ 20200930 SiN-----------
 for scan_round = [1 2]
-for sweep_voltage = [0.25 0.75]
+for sweep_voltage = [0.5]
+for wavelength = [1544.1 1552.2 1556.4 1560.9 1564.8]
 
         % % % ------------1541 
-        wavelength = 1544.1;
+%         wavelength = 1544.1;
         lambda = wavelength;
         outputVoltage1 = 2.6137; %V
         outputPower1 = 0.2154;%mW
@@ -16,10 +17,10 @@ for sweep_voltage = [0.25 0.75]
         outputVoltage2 = 1.9865; %V
         outputPower2 = 0.1530;%mW
         inputPower2 = 1.063;%mW
-        Q_data_filename = 'Z:\Qifan\SiN\20201001-Screen-Modes\Q-measure-maxvpp-0.5Hz-1.7Vpp-1554.1nm.mat';
-        filedirGlob = 'Z:\Qifan\SiN\20201001-thermal-rawdata\No14\1544.1nm-01-mat';
+        Q_data_filename = strcat('Z:\Qifan\SiN\20201002-Screen-Modes\Q-measure-maxvpp-0.5Hz-1.7Vpp-',num2str(wavelength),'nm.mat');
+        filedirGlob = strcat('Z:\Qifan\SiN\20201002-thermal-rawdata\No14\1544.1nm-01-mat');
 
-        filedirGlob = strcat('Z:\Qifan\SiN\20201001-thermal-rawdata\No14\1544.1nm-0',num2str(scan_round),'-mat');
+        filedirGlob = strcat('Z:\Qifan\SiN\20201002-thermal-rawdata\No14\',num2str(wavelength),'nm-0',num2str(scan_round),'-mat');
 
         kerrOverTotal = 1/(1+1);
 
@@ -130,5 +131,6 @@ for sweep_voltage = [0.25 0.75]
                 file_tosave = strcat(filedirGlob(1:tt(end)),num2str(lambda),'nm-',filedirGlob(end-5:end-4),'.mat');
                 save(file_tosave,'results_each_volt');
 
+end
 end
 end
