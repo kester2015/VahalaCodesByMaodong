@@ -31,7 +31,7 @@ OSC.connect;
 
 
 % filedirToSave = ['\\131.215.238.124\Vahala Group\Qifan\Tantala\' datestr(now,'yyyymmdd') '-thermal-rawdata\1548nm-02'];
-filedirToSave = ['Z:\Qifan\SiN\' datestr(now,'yyyymmdd') '-thermal-rawdata\No14\1556.4nm-02'];
+filedirToSave = ['Z:\Qifan\SiN\' datestr(now,'yyyymmdd') '-thermal-rawdata\No14\1555nm-02'];
 
 
 % VAOM = 0.01:0.005:1;
@@ -43,7 +43,7 @@ VAOM = [2.0:-0.1:0];
 sweepFreq = [0.5];
 Freq0=sweepFreq;
 Vpp = 1.7;%3.5;%7.000; %2.000;%1.920;
-Offset = -0.3;%3.5/2;%0.000; %1.523;%2.263;
+Offset = +0.9;%3.5/2;%0.000; %1.523;%2.263;
 
 
 
