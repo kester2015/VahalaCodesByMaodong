@@ -4,9 +4,9 @@ clc
 MZI_FSR = 39.9553; % MHz
 %%
 % % % % ------------ 20200930 SiN-----------
-for scan_round = [2 1]
+for scan_round = [1 2]
 for sweep_voltage = [0.5]
-for wavelength = [1550.2 1555] %[1544.1 1552.2 1556.4 1560.9 1564.8]
+for wavelength = 1555 %[1544.1 1552.2 1556.4 1560.9 1564.8]
 
         % % % ------------1541 
 %         wavelength = 1544.1;
@@ -73,7 +73,7 @@ for wavelength = [1550.2 1555] %[1544.1 1552.2 1556.4 1560.9 1564.8]
         n0 = neff;
 
 
-        nT = 2.6307e-05;
+        nT = 2.1913e-04/10;
         % Aeff and dTdP from simulation
         Aeff = 1.498e-12;
         dTdP = 95.3;%88.354;%1685;%1570;
