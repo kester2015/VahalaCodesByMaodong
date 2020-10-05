@@ -73,7 +73,7 @@ for wavelength = [1544.1 1552.2 1556.4 1560.9 1564.8]
         n0 = neff;
 
 
-        nT = 2.1913e-04/10;
+        nT = 2.6307e-05;
         % Aeff and dTdP from simulation
         Aeff = 1.498e-12;
         dTdP = 95.3;%88.354;%1685;%1570;
