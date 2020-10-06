@@ -2,7 +2,7 @@ close all
 clear
 clc
 %% get resonance shift over temperature
-filedirGlob = 'Z:\Qifan\AlGaAs\20200916\dndTat1551';
+filedirGlob = 'C:\Users\Lab\Documents\Maodong\20201004\dndTat1550.2';
 matfiles = dir(strcat(filedirGlob,'\*.mat') );
 matfilesName = {matfiles.name};
 
@@ -44,12 +44,12 @@ ylabel('Resonance pos/MHz');
 resonance_shift = coeff(1);%MHz/C
 
 %%
-n0 = 3.3;
-n0 = input("give neff of this material");
+n0 = 1.8889;
+% n0 = input("give neff of this material");
 c = 299792458;
-lambda = 1551.0e-9;
+lambda = 1550.2e-9;
 f = c/lambda;
-nT = -n0/f*resonance_shift*1e6;
+nT = -n0/f*resonance_shift*1e6
 %%
 fprintf("resonance shift %f MHz/C \n",coeff(1));
 fprintf("dn/dT is %f \n",nT);

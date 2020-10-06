@@ -3,7 +3,7 @@
 clear
 clc
 
-datadir = "Z:\Qifan\SiN\20201002-thermal-rawdata\No14";
+datadir = "Z:\Qifan\SiN\20201004-thermal-rawdata\No14";
 
 
 allSubfolders = dir(datadir);
