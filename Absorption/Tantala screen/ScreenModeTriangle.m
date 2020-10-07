@@ -31,16 +31,18 @@ end
 % Offset = -0.3;%3.5/2;%0.000; %1.523;%2.263;
 %%
 
-filedirGlob = strcat('Z:\Qifan\SiN\',datestr(now,'yyyymmdd'),'-Screen-Modes');
+filedirGlob = strcat('Z:\Qifan\SiN\',datestr(now,'yyyymmdd'),'-Screen-Modes-resp');
 if ~isfolder(filedirGlob)
     mkdir(filedirGlob)
 end
 
-Q_measure_volt = 1.8;%1.96; % FunctionGenerator voltage when measure Q
+Q_measure_volt = 1.7;%1.96; % FunctionGenerator voltage when measure Q
 Tri_measure_volt = 0.2;%1.0; % 3~6
 Q_measure_scale = [-0.1 0.5]; % OSC scale when measure Q
 Tri_measure_scale = [-0.05 3.4];
-note = '0.5Hz-1.7Vpp-';
+note = '';
+
+
 % Piezo related settings
 % sweep_Freq = 20;
 % sweep_Vpp = 3.5;
@@ -86,7 +88,7 @@ OSC.Write(':ACQ:POIN:ANAL AUTO');
 
 %%
 % -- 1. Measure Q factor at low power
-Myfg2.DC2 = Q_measure_volt;
+% Myfg2.DC2 = Q_measure_volt;
 qdata_filename = strcat(filedirGlob,'\Q-measure-maxvpp-',note,num2str(lambda),'nm');
 
                 if isfile(strcat(qdata_filename,'.mat'))
