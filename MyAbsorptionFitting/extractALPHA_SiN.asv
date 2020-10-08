@@ -4,26 +4,75 @@ clc
 MZI_FSR = 39.9553; % MHz
 %%
 % % % % ------------ 20200930 SiN-----------
-for scan_round = [1 2]
-for sweep_voltage = [0.5]
-for wavelength = 1555 %[1544.1 1552.2 1556.4 1560.9 1564.8]
+% for scan_round = [2 1]
+% for sweep_voltage = [0.5]
+% for wavelength = [1550.2 1555] %[1544.1 1552.2 1556.4 1560.9 1564.8]
 
         % % % ------------1541 
-%         wavelength = 1544.1;
+        wavelength = 1544.1;
         lambda = wavelength;
-        outputVoltage1 = 2.6137; %V
-        outputPower1 = 0.2154;%mW
-        inputPower1 = 1.071;%mW
-        outputVoltage2 = 1.9865; %V
-        outputPower2 = 0.1530;%mW
-        inputPower2 = 1.063;%mW
+        outputVoltage1 = 2.640; %V
+        outputPower1 = 0.2171;%mW
+        inputPower1 = 1.041;%mW
+        outputVoltage2 = 2.032; %V
+        outputPower2 = 0.1712;%mW
+        inputPower2 = 1.062;%mW
+        Q_data_filename = strcat('Z:\Qifan\SiN\20201002-Screen-Modes\Q-measure-maxvpp-0.5Hz-1.7Vpp-',num2str(wavelength),'nm.mat');
+%         filedirGlob = strcat('Z:\Qifan\SiN\20201004-thermal-rawdata\No14\',num2str(wavelength),'nm-0',num2str(scan_round),'-mat');
+        filedirGlob = strcat('Z:\Qifan\SiN\20201002-thermal-rawdata\No14\',num2str(wavelength),'nm-02-mat');
+        kerrOverTotal = 0.303619;
+
+        
+        
+        wavelength = 1560.9;
+        lambda = wavelength;
+        outputVoltage1 = 3.164; %V
+        outputPower1 = 0.2050;%mW
+        inputPower1 = 1.001;%mW
+        outputVoltage2 = 2.975; %V
+        outputPower2 = 0.1977;%mW
+        inputPower2 = 1.011;%mW
+        Q_data_filename = strcat('Z:\Qifan\SiN\20201002-Screen-Modes\Q-measure-maxvpp-0.5Hz-1.7Vpp-',num2str(wavelength),'nm.mat');
+%         filedirGlob = strcat('Z:\Qifan\SiN\20201004-thermal-rawdata\No14\',num2str(wavelength),'nm-0',num2str(scan_round),'-mat');
+        filedirGlob = strcat('Z:\Qifan\SiN\20201002-thermal-rawdata\No14\',num2str(wavelength),'nm-01-mat');
+        kerrOverTotal = 0.424091;
+        
+        
+        
+        wavelength = 1550.2;
+        lambda = wavelength;
+        outputVoltage1 = 2.982; %V
+        outputPower1 = 0.1579;%mW
+        inputPower1 = 1.122;%mW
+        outputVoltage2 = 2.672; %V
+        outputPower2 = 0.1348;%mW
+        inputPower2 = 1.105;%mW
         Q_data_filename = strcat('Z:\Qifan\SiN\20201004-Screen-Modes\Q-measure-maxvpp-0.5Hz-1.7Vpp-',num2str(wavelength),'nm.mat');
-        filedirGlob = strcat('Z:\Qifan\SiN\20201004-thermal-rawdata\No14\1544.1nm-01-mat');
+%         filedirGlob = strcat('Z:\Qifan\SiN\20201004-thermal-rawdata\No14\',num2str(wavelength),'nm-0',num2str(scan_round),'-mat');
+        filedirGlob = strcat('Z:\Qifan\SiN\20201004-thermal-rawdata\No14\',num2str(wavelength),'nm-02-mat');
+        kerrOverTotal = 0.339839;
+        
+        
+        
+        
+        wavelength = 1555;
+        sweep_voltage = 0.5;
+        lambda = wavelength;
+        outputVoltage1 = 3.204; %V
+        outputPower1 = 0.2639;%mW
+        inputPower1 = 1.039;%mW
+        outputVoltage2 = 3.177; %V
+        outputPower2 = 0.2723;%mW
+        inputPower2 = 1.054;%mW
+        Q_data_filename = strcat('Z:\Qifan\SiN\20201004-Screen-Modes\Q-measure-maxvpp-0.5Hz-1.7Vpp-',num2str(wavelength),'nm.mat');
+%         filedirGlob = strcat('Z:\Qifan\SiN\20201004-thermal-rawdata\No14\',num2str(wavelength),'nm-0',num2str(scan_round),'-mat');
+        filedirGlob = strcat('Z:\Qifan\SiN\20201004-thermal-rawdata\No14\',num2str(wavelength),'nm-02-mat');
+        kerrOverTotal = 0.376496;
 
-        filedirGlob = strcat('Z:\Qifan\SiN\20201004-thermal-rawdata\No14\',num2str(wavelength),'nm-0',num2str(scan_round),'-mat');
-
-        kerrOverTotal = 1/(1+1);
-
+        
+        
+        
+        
 
     %%
 
@@ -61,7 +110,13 @@ for wavelength = 1555 %[1544.1 1552.2 1556.4 1560.9 1564.8]
     %%
     % close all
     % filedirGlob = 'C:\Users\leona\iCloudDrive\Work\data\1543.5nm-02-mat';
-    load(strcat(filedirGlob,'\Fitting_results\coefficients_',num2str(sweep_voltage),'V.mat'),'fitting_results');
+    
+    
+    
+%     Qabs_each_volt = zeros(20,2);
+%     for scan_round = [1 2]
+%     filedirGlob = strcat('Z:\Qifan\SiN\20201004-thermal-rawdata\No14\',num2str(wavelength),'nm-0',num2str(scan_round),'-mat');
+    load(strcat(filedirGlob,'\Fitting_results\coefficients_',num2str(0.5),'V.mat'),'fitting_results');
 
     % % ------------- 20200915 redo AlGaAs --------------
     % fitting_results = zeros(size(fitres1))
@@ -73,7 +128,7 @@ for wavelength = 1555 %[1544.1 1552.2 1556.4 1560.9 1564.8]
         n0 = neff;
 
 
-        nT = 2.1913e-04/10;
+        nT = 2.6307e-05;
         % Aeff and dTdP from simulation
         Aeff = 1.498e-12;
         dTdP = 95.3;%88.354;%1685;%1570;
@@ -81,9 +136,9 @@ for wavelength = 1555 %[1544.1 1552.2 1556.4 1560.9 1564.8]
         D1 = 2*pi*40.528*1e9; % in Hz/2/pi (rad).
 
 
-        power_corr_factor = 1;
+%         power_corr_factor = 1;
 
-    %     power_corr_factor = (1 - abs( fitting_results(:,3) ) );    
+        power_corr_factor = (1 - abs( fitting_results(:,3) ) );    
 
 
        if str2double(filedirGlob(end-4)) == 1
@@ -94,10 +149,29 @@ for wavelength = 1555 %[1544.1 1552.2 1556.4 1560.9 1564.8]
 
 
         alpha_each_volt = fitting_results(:,end)/PoverV;
+        
+        
+        
+        n2 = 2.0e-19;
+        
+        g = (2*pi*c/lambda*1e9) * D1 * n2/(2*pi*neff*Aeff);
+        
+        kappaabs_from_kerr = nT * dTdP *(2*pi*c/lambda*1e9)^2/n0/g;
+        
+%         alpha_each_volt = alpha_each_volt-g;
+        
         Qabs_each_volt = nT * dTdP *(2*pi*c/lambda*1e9)^2/n0./alpha_each_volt;
 
         Qabs_each_volt = Qabs_each_volt./power_corr_factor;
 
+        
+%         Qabs_each_volt(:,scan_round) = nT * dTdP *(2*pi*c/lambda*1e9)^2/n0./alpha_each_volt;
+% 
+%         Qabs_each_volt(:,scan_round) = Qabs_each_volt(:,scan_round)./power_corr_factor;
+
+        
+        
+        
         n2_each_volt  = 2*pi*neff*Aeff*(kerrOverTotal*alpha_each_volt)/(2*pi*c/lambda*1e9)/D1;
 
     %     n2_each_volt = kerrOverTotal * n0 * (2*pi*r*Aeff) * (2*pi*c/lambda*1e9)./Qabs_each_volt *dTdP * nT/c;
@@ -115,6 +189,9 @@ for wavelength = 1555 %[1544.1 1552.2 1556.4 1560.9 1564.8]
                 xlabel('OSC voltage / V');
                 ylabel('n2');
                 title('n2 fitting result at different voltage')
+                
+                
+                
     % 
     %             figure
     %             scatter(fitting_results(:,2),fitting_results(:,3));
@@ -125,12 +202,32 @@ for wavelength = 1555 %[1544.1 1552.2 1556.4 1560.9 1564.8]
     %             title('Check Q0 and Qe for different power')
     %             legend({'Q0','Qe'},'location','best')
 
+    
+%                 results_each_volt = [fitting_results(:,2), Qabs_each_volt/1e6, n2_each_volt ];
+%                 tt = strfind(filedirGlob,'\');
+%                 file_tosave = strcat(filedirGlob(1:tt(end)),num2str(lambda),'nm-',filedirGlob(end-5:end-4),'.mat');
+%                 save(file_tosave,'results_each_volt');
+                
+%     end
 
-                results_each_volt = [fitting_results(:,2), Qabs_each_volt/1e6, n2_each_volt ];
-                tt = strfind(filedirGlob,'\');
-                file_tosave = strcat(filedirGlob(1:tt(end)),num2str(lambda),'nm-',filedirGlob(end-5:end-4),'.mat');
-                save(file_tosave,'results_each_volt');
+    
 
-end
-end
-end
+    
+%                 Qabs_each_volt = sqrt( Qabs_each_volt(:,1).*Qabs_each_volt(:,2) );
+%                 
+%                 
+%                 g = (2*pi*c/lambda*1e9) * D1 * n2/(2*pi*neff*Aeff);
+%                 Qabs_from_kerr = nT * dTdP *(2*pi*c/lambda*1e9)^2/n0/g;
+% %                 Qabs_from_kerr = (2*pi*c/lambda*1e9) / kappaabs_from_kerr;
+%                 
+%                 Qabs_each_volt = Qabs_from_kerr.*Qabs_each_volt./(Qabs_from_kerr - Qabs_each_volt);
+%         
+%                 figure
+%                 scatter(fitting_results(:,2),Qabs_each_volt/1e6);
+%                 xlabel('OSC voltage / V');
+%                 ylabel('Q abs / M')
+%                 title('Qabs fitting result at different voltage')
+                
+% end
+% end
+% end

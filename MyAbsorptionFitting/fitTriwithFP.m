@@ -130,20 +130,20 @@ function [findmin_fit_result] = fitTriwithFP(data_filename, mode_Q0, mode_Qe, la
     % %     kappa0 = 299792458/(lambda*1e-9)/( mode_Q0 * 1e6 );
     % %     kappae = 299792458/(lambda*1e-9)/( mode_Qe * 1e6 );
     %% 3. Estimate alpha factor
-    Qabs_est = 3 * 1e6;
-    c = 299792458;
-    % n0 = 2.0573;
-    neff = 1.8373;
-    n0 = neff;
-    r = 109.5e-6;
-    nT = 10.46e-6;
-    % Aeff and dTdP from simulation
-    Aeff = 1.0575e-12;
-    dTdP = 613;%1685;%1570;
-    alpha_est = nT * dTdP *(2*pi*c/lambda)^2/n0/Qabs_est;   % unit Hz^2/W
-    alpha_est = 10*alpha_est;
+%     Qabs_est = 3 * 1e6;
+%     c = 299792458;
+%     % n0 = 2.0573;
+%     neff = 1.8373;
+%     n0 = neff;
+%     r = 109.5e-6;
+%     nT = 10.46e-6;
+%     % Aeff and dTdP from simulation
+%     Aeff = 1.0575e-12;
+%     dTdP = 613;%1685;%1570;
+%     alpha_est = nT * dTdP *(2*pi*c/lambda)^2/n0/Qabs_est;   % unit Hz^2/W
+%     alpha_est = 10*alpha_est;
 
-    alpha_est = 20000;
+    alpha_est = 407246;
     % alpha_est = alpha_est / ( sqrt(inputPower2 *outputPower2) * 1e-3 / sqrt(inputVoltage2 * outputVoltage2)); % in unit of power;
     % alpha_est = alpha_est *  (MZI_fit_T / (MZI_FSR*1e6)) ; % unit Num/W
     % 
