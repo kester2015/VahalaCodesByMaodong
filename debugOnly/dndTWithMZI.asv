@@ -6,10 +6,10 @@ filedirGlob1 = 'Z:\Qifan\Tantala\20200821\Dev21\dndT';
 filedirGlob2 = 'Z:\Qifan\AlGaAs\20200916\dndTat1551';
 filedirGlob3 = 'Z:\Qifan\SiN\20201004\dndTat1550.2';
 
-% filedirGlob = filedirGlob2;
-% material = 'SiN';
-for thisfiledirGlob = {filedirGlob1, filedirGlob2, filedirGlob3}
-filedirGlob = thisfiledirGlob{1};
+filedirGlob = filedirGlob1;
+material = 'Tantala';
+% for thisfiledirGlob = {filedirGlob1, filedirGlob2, filedirGlob3}
+% filedirGlob = thisfiledirGlob{1};
 matfiles = dir(strcat(filedirGlob,'\*.mat') );
 matfilesName = {matfiles.name};
 
@@ -49,11 +49,11 @@ ylabel('Resonance pos/MHz');
 
 resonance_shift = coeff(1);%MHz/C
 
-% save(strcat('Z:\Qifan\absorption Q summary\dndT summary data\',material,'.mat'),'temperatureList','resonanceList','fit_result','coeff');
+save(strcat('Z:\Qifan\absorption Q summary\dndT summary data\',material,'.mat'),'temperatureList','')
 
 
-end
-legend({'Tantala','','AlGaAs','','SiN',''});
+% end
+% legend({'Tantala','','AlGaAs','','SiN',''});
 
 %%
 n0 = 1.8889;
