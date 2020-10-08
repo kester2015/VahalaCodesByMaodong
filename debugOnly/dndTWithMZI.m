@@ -2,7 +2,9 @@ close all
 clear
 clc
 %% get resonance shift over temperature
-filedirGlob = 'C:\Users\Lab\Documents\Maodong\20201004\dndTat1550.2';
+filedirGlob = 'Z:\Qifan\Tantala\20200821\Dev21\dndT';
+filedirGlob = 'Z:\Qifan\AlGaAs\20200916\dndTat1551';
+filedirGlob = 'Z:\Qifan\SiN\20201004\dndTat1550.2';
 matfiles = dir(strcat(filedirGlob,'\*.mat') );
 matfilesName = {matfiles.name};
 
@@ -61,6 +63,8 @@ function Temperature = getTemperature(filename)
     filename = char(filename);
     tt = strsplit(filename,'\');
     tt = tt{end};
+    pp = strsplit(filename,'C');
+    pp = pp{end};
 %     tt = strsplit(tt,'-');
     Temperature = str2double( tt(1:end-5) );
 end
