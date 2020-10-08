@@ -51,7 +51,7 @@ function [Q0, Q1, QL,findmin_fit_result] = getQwithFP(filename,lambda,tosave)
     if pos_fp < 3
         fit_T_estimate = 0.5*length(Q_trace_freq);
     end
-            fit_T_estimate = (1/4)*length(Q_trace_freq);
+            fit_T_estimate = 1*length(Q_trace_freq);
     
     fit_B_estimate = amp_fp/length(Q_trace_freq);
     fit_A0_estimate = mean(Q_trace);
@@ -122,7 +122,7 @@ function [Q0, Q1, QL,findmin_fit_result] = getQwithFP(filename,lambda,tosave)
 %     fit_weight_dip = zeros(length(Q_trace_tofit),1);
     fit_weight_fp = fit_weight_dip;
     
-    weight_width = 2; % times of linewidth
+    weight_width = 5; % times of linewidth
     weight_start = max(round(pos_peak - 1.0*weight_width*linewidth_estimate/2),1);
     weight_end   = min(round(pos_peak + 1.0*weight_width*linewidth_estimate/2),length(Q_trace_tofit));
 %     fit_weight_dip(weight_start:weight_end) = 1; %10*max(round(length(Q_trace_tofit)/(weight_end-weight_start)),1);
@@ -135,7 +135,7 @@ function [Q0, Q1, QL,findmin_fit_result] = getQwithFP(filename,lambda,tosave)
 % % % %         fit_weight_fp(weight_start:weight_end) = 0;
         
     
-    weight_width = 3; % times of linewidth, 20 for SiN
+    weight_width = 20; % times of linewidth
     weight_start = max(round(pos_peak - 1.0*weight_width*linewidth_estimate/2),1);
     weight_end   = min(round(pos_peak + 1.0*weight_width*linewidth_estimate/2),length(Q_trace_tofit));
     fit_weight_dip(weight_start:weight_end) = 10; %10*max(round(length(Q_trace_tofit)/(weight_end-weight_start)),1);
@@ -240,7 +240,7 @@ function [Q0, Q1, QL,findmin_fit_result] = getQwithFP(filename,lambda,tosave)
     
     
     %% SiN: previous codes failed somehow, 
-            Q_obj = Q_trace_fit(Q_trace_tofit./fp_fit_result_2,MZI_trace_tofit,MZI_FSR, lambda, 0.9,'fanomzi'); % 0.4 is sensitivity
+            Q_obj = Q_trace_fit(Q_trace_tofit./fp_fit_result_2,MZI_trace_tofit,MZI_FSR, lambda, 0.7,'fanomzi'); % 0.4 is sensitivity
             mode_Q = Q_obj.get_Q;
             Q0 = mode_Q(1)
             Q1 = mode_Q(2)
