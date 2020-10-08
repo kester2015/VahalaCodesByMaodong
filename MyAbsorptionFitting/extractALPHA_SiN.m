@@ -7,6 +7,15 @@ MZI_FSR = 39.9553; % MHz
 % for scan_round = [2 1]
 % for sweep_voltage = [0.5]
 % for wavelength = [1550.2 1555] %[1544.1 1552.2 1556.4 1560.9 1564.8]
+% for sweep_voltage = [0.5]
+% for wavelength = [1544.1 1552.2 1556.4 1560.9 1564.8]
+% for scan_round = [1 2]
+    
+
+
+% for sweep_voltage = [0.5]
+% for wavelength = [1550.2 1555] %[1544.1 1552.2 1556.4 1560.9 1564.8]
+% for scan_round = [2 1]
 
         % % % ------------1541 
         wavelength = 1544.1;
