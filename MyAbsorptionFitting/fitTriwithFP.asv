@@ -36,7 +36,7 @@ function [findmin_fit_result] = fitTriwithFP(data_filename, mode_Q0, mode_Qe, la
     % 
     %         lambda = 1540.4;
     %         MZI_FSR = 39.9553; % MHz
-    sapoint = 1e6;
+    sapoint = 1e3;
     if length(timeAxis) > sapoint
             timeAxis = timeAxis(1:round(length(timeAxis)/sapoint):end);
             Ch3= Ch3(1:round(length(Ch3)/sapoint):end);
@@ -250,7 +250,7 @@ function [findmin_fit_result] = fitTriwithFP(data_filename, mode_Q0, mode_Qe, la
             hold on
             plot(x_freq.',dip_fit_weight*max(Trans_raw)/max(dip_fit_weight))
 %             title(sprintf("FP and Triangle fitting result, %g nm",lambda));         
-                title(sprintf("FP and Tri fitting result, %g nm\n x0 = %g, alpha = %g, base = %g\n Normalized alpha = %g \n Fitted Q0=%g M, Qe = %g M",...
+                title(sprintf("FP and Tri fitting result, %g nm\n x0 = %g, alpha = %g, base = %g\n Normalized alpha = %g \n Fitted Q0=%g, Qe = %g",...
                             lambda,findmin_fit_result(end-2),findmin_fit_result(end-1),findmin_fit_result(1) , findmin_fit_result(end) ,...
                             fitted_Q0,fitted_Qe) );         
             xlim([x_freq(pos_fitstart)-linewidth_est, x_freq(pos_fitend)+linewidth_est])
