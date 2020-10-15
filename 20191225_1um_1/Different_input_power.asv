@@ -31,14 +31,14 @@ OSC.connect;
 
 
 % filedirToSave = ['\\131.215.238.124\Vahala Group\Qifan\Tantala\' datestr(now,'yyyymmdd') '-thermal-rawdata\1548nm-02'];
-filedirToSave = ['Z:\Qifan\thin SiN\' datestr(now,'yyyymmdd') '-thermal-rawdata\1560.15nm-02'];
+filedirToSave = ['Z:\Qifan\thin SiN\' datestr(now,'yyyymmdd') '-thermal-rawdata-checkspeed\1560.15nm-vpp-1.1-off--0.2'];
 
 
 % VAOM = 0.01:0.005:1;
 % VAOM = [2.3:-0.1:2, 2:-0.01:0.7, 0.7:-0.1:0.3]; % new device: Optical attenuator
 % VAOM = [2.2:-0.1:0];
 
-VAOM = 2.0:-0.2:0;
+VAOM = [1.0 0.5 0];
 % Myfg2.DC1 = 0;
 
 sweepFreq = [0.25]; 

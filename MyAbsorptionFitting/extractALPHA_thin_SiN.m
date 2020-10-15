@@ -7,9 +7,18 @@ MZI_FSR = 39.9553; % MHz
 % for scan_round = [2 1]
 % for sweep_voltage = [0.5]
 % for wavelength = [1550.2 1555] %[1544.1 1552.2 1556.4 1560.9 1564.8]
+% for sweep_voltage = [0.5]
+% for wavelength = [1544.1 1552.2 1556.4 1560.9 1564.8]
+% for scan_round = [1 2]
+    
+
+
+% for sweep_voltage = [0.5]
+% for wavelength = [1550.2 1555] %[1544.1 1552.2 1556.4 1560.9 1564.8]
+% for scan_round = [2 1]
 
         % % % ------------1541 
-        wavelength = 1544.1;
+        wavelength = 1560.15;
         lambda = wavelength;
         outputVoltage1 = 2.640; %V
         outputPower1 = 0.2171;%mW
@@ -17,76 +26,27 @@ MZI_FSR = 39.9553; % MHz
         outputVoltage2 = 2.032; %V
         outputPower2 = 0.1712;%mW
         inputPower2 = 1.062;%mW
-        Q_data_filename = strcat('Z:\Qifan\SiN\20201002-Screen-Modes\Q-measure-maxvpp-0.5Hz-1.7Vpp-',num2str(wavelength),'nm.mat');
-%         filedirGlob = strcat('Z:\Qifan\SiN\20201004-thermal-rawdata\No14\',num2str(wavelength),'nm-0',num2str(scan_round),'-mat');
-        filedirGlob = strcat('Z:\Qifan\SiN\20201002-thermal-rawdata\No14\',num2str(wavelength),'nm-02-mat');
+%         Q_data_filename = strcat('Z:\Qifan\SiN\20201002-Screen-Modes\Q-measure-maxvpp-0.5Hz-1.7Vpp-',num2str(wavelength),'nm.mat');
+% %         filedirGlob = strcat('Z:\Qifan\SiN\20201004-thermal-rawdata\No14\',num2str(wavelength),'nm-0',num2str(scan_round),'-mat');
+%         filedirGlob = strcat('Z:\Qifan\SiN\20201002-thermal-rawdata\No14\',num2str(wavelength),'nm-02-mat');
         kerrOverTotal = 0.303619;
-
-        
-        
-        wavelength = 1560.9;
-        lambda = wavelength;
-        outputVoltage1 = 3.164; %V
-        outputPower1 = 0.2050;%mW
-        inputPower1 = 1.001;%mW
-        outputVoltage2 = 2.975; %V
-        outputPower2 = 0.1977;%mW
-        inputPower2 = 1.011;%mW
-        Q_data_filename = strcat('Z:\Qifan\SiN\20201002-Screen-Modes\Q-measure-maxvpp-0.5Hz-1.7Vpp-',num2str(wavelength),'nm.mat');
-%         filedirGlob = strcat('Z:\Qifan\SiN\20201004-thermal-rawdata\No14\',num2str(wavelength),'nm-0',num2str(scan_round),'-mat');
-        filedirGlob = strcat('Z:\Qifan\SiN\20201002-thermal-rawdata\No14\',num2str(wavelength),'nm-01-mat');
-        kerrOverTotal = 0.424091;
-        
-        
-        
-        wavelength = 1550.2;
-        lambda = wavelength;
-        outputVoltage1 = 2.982; %V
-        outputPower1 = 0.1579;%mW
-        inputPower1 = 1.122;%mW
-        outputVoltage2 = 2.672; %V
-        outputPower2 = 0.1348;%mW
-        inputPower2 = 1.105;%mW
-        Q_data_filename = strcat('Z:\Qifan\SiN\20201004-Screen-Modes\Q-measure-maxvpp-0.5Hz-1.7Vpp-',num2str(wavelength),'nm.mat');
-%         filedirGlob = strcat('Z:\Qifan\SiN\20201004-thermal-rawdata\No14\',num2str(wavelength),'nm-0',num2str(scan_round),'-mat');
-        filedirGlob = strcat('Z:\Qifan\SiN\20201004-thermal-rawdata\No14\',num2str(wavelength),'nm-02-mat');
-        kerrOverTotal = 0.339839;
-        
-        
-        
-        
-        wavelength = 1555;
-        sweep_voltage = 0.5;
-        lambda = wavelength;
-        outputVoltage1 = 3.204; %V
-        outputPower1 = 0.2639;%mW
-        inputPower1 = 1.039;%mW
-        outputVoltage2 = 3.177; %V
-        outputPower2 = 0.2723;%mW
-        inputPower2 = 1.054;%mW
-        Q_data_filename = strcat('Z:\Qifan\SiN\20201004-Screen-Modes\Q-measure-maxvpp-0.5Hz-1.7Vpp-',num2str(wavelength),'nm.mat');
-%         filedirGlob = strcat('Z:\Qifan\SiN\20201004-thermal-rawdata\No14\',num2str(wavelength),'nm-0',num2str(scan_round),'-mat');
-        filedirGlob = strcat('Z:\Qifan\SiN\20201004-thermal-rawdata\No14\',num2str(wavelength),'nm-02-mat');
-        kerrOverTotal = 0.376496;
-
-        
-        
-        
-        
 
     %%
 
     % filedirGlob = 'Z:\Qifan\Tantala\20200906-thermal-rawdata\Dev21\1551.4nm-01-mat';
     % filedirGlob = 'Z:\Qifan\Tantala\20200905-thermal-rawdata\Dev21\1543.5nm-02-mat';
+    filedirGlob = 'Z:\Qifan\thin SiN\20201014-thermal-rawdata-checkspeed\1560.15nm-01-mat';
     powerList = 2.0:-0.1:0.3;
     powerList = 0.1:+0.1:2.0;
-    [mode_Q0, mode_Qe,~,~] = getQwithFP(Q_data_filename);
-
+    powerList = [0 0.5 1 1.5 2];
+%     [mode_Q0, mode_Qe,~,~] = getQwithFP(Q_data_filename);
+    mode_Q0 = 217;
+    mode_Qe = 476;
 
 
     %%
     close all
-    % sweep_voltage = 1;
+    sweep_voltage = 10;
     fitting_results = zeros(length(powerList),10);
     % fitting_results = zeros(1,7);
 
@@ -169,9 +129,6 @@ MZI_FSR = 39.9553; % MHz
 % 
 %         Qabs_each_volt(:,scan_round) = Qabs_each_volt(:,scan_round)./power_corr_factor;
 
-        
-        
-        
         n2_each_volt  = 2*pi*neff*Aeff*(kerrOverTotal*alpha_each_volt)/(2*pi*c/lambda*1e9)/D1;
 
     %     n2_each_volt = kerrOverTotal * n0 * (2*pi*r*Aeff) * (2*pi*c/lambda*1e9)./Qabs_each_volt *dTdP * nT/c;

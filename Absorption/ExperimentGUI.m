@@ -22,7 +22,7 @@ function varargout = ExperimentGUI(varargin)
 
 % Edit the above text to modify the response to help ExperimentGUI
 
-% Last Modified by GUIDE v2.5 23-Jul-2020 17:25:42
+% Last Modified by GUIDE v2.5 12-Oct-2020 14:06:48
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -1092,3 +1092,11 @@ if Device.laser1.PowerON && str2double(handles.Wavelength.String)>1520.24
         Device.fg.CH1(1);
     end
 end
+
+
+% --- Executes on button press in Close_All_Button.
+function Close_All_Button_Callback(hObject, eventdata, handles)
+% hObject    handle to Close_All_Button (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+close all

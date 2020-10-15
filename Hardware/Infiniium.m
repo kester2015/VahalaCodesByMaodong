@@ -105,10 +105,10 @@ classdef Infiniium < handle
             % Reading
             chan=['CHAN',num2str(channel)];
             if ~isempty(point)
-                Obj.InputBufferSize = point*2.1;
+                Obj.InputBufferSize = point*2.1*10;
                 Obj.wait;
             else
-                Obj.InputBufferSize = 4e5*2.1;
+                Obj.InputBufferSize = 4e5*2.1*10;
             end
             
             % Specify data from Channel n

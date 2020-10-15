@@ -1,4 +1,4 @@
-function [findmin_fit_result] = fitTriwithFP(data_filename, mode_Q0, mode_Qe, lambda, tosave)
+function [findmin_fit_result] = fitTriwithFP(data_filename, mode_Q0, mode_Qe, lambda, tosave,varargin)
     % input Q should be in units of Million!
     % Output parameters:
     % [fp_fit.A0*(1+r1r2^2), r1r2, fp_fit.x1, fp_fit.T, kappa0, kappae, dip_x0, alpha, rescaled_alpha]
@@ -7,6 +7,21 @@ function [findmin_fit_result] = fitTriwithFP(data_filename, mode_Q0, mode_Qe, la
     if nargin == 4
         tosave = 0;
     end
+    
+%     ipar = inputParser;
+%     ipar.addParameter('r', 10, @isnumeric); % environmrnt impedance real part
+%     ipar.addParameter('cp', 1e-9, @isnumeric); % junction capcitance
+%     ipar.addParameter('omegad', 300e6, @isnumeric); % smallomegad in paper, Oscillator(junction) freq - Pump freq
+%     
+%     ipar.addParameter('pumpFreq', 5e9, @isnumeric); % denoted as bigOmegad in paper
+%     ipar.addParameter('zaux', 50, @isnumeric); 
+%     ipar.addParameter('lambda', 30e6, @isnumeric); % strength of parameteric pumping
+%     
+%     
+%     ipar.parse(varargin{:});
+%     result = ipar.Results;
+%     
+    
     load(data_filename,'timeAxis','Ch2','Ch3');
     if ~exist('timeAxis','var')
         load(data_filename,'data_matrix');
@@ -65,7 +80,7 @@ function [findmin_fit_result] = fitTriwithFP(data_filename, mode_Q0, mode_Qe, la
     if pos_fp < 3
         fit_T_estimate = 2*length(Q_trace_freq);
     end
-            fit_T_estimate = 1*length(Q_trace_freq);
+        fit_T_estimate = (1/1)*length(Q_trace_freq);
 
     fit_B_estimate = amp_fp/length(Q_trace_freq);
     fit_A0_estimate = mean(Trans_raw);
@@ -143,7 +158,10 @@ function [findmin_fit_result] = fitTriwithFP(data_filename, mode_Q0, mode_Qe, la
 %     alpha_est = nT * dTdP *(2*pi*c/lambda)^2/n0/Qabs_est;   % unit Hz^2/W
 %     alpha_est = 10*alpha_est;
 
-    alpha_est = 407246;
+    alpha_est = 10000; % SiN est.
+    
+%     alpha_est = -20000;
+
     % alpha_est = alpha_est / ( sqrt(inputPower2 *outputPower2) * 1e-3 / sqrt(inputVoltage2 * outputVoltage2)); % in unit of power;
     % alpha_est = alpha_est *  (MZI_fit_T / (MZI_FSR*1e6)) ; % unit Num/W
     % 
@@ -202,6 +220,11 @@ function [findmin_fit_result] = fitTriwithFP(data_filename, mode_Q0, mode_Qe, la
 %                                    mid_x(1), 0.5*alpha_est,(1:length(Trans_raw)).');
 
 
+    %% Normalization to FREQ
+    omegaOverX = 2*pi*(MZI_FSR*1e6)/MZI_fit_T;
+    findmin_fit_result(end+1) = omegaOverX^2 * findmin_fit_result(end);
+    
+    %%
 %             figure
             subplot(122)
             plot(x_freq.',Trans_raw,'Linewidth',2.0)
@@ -212,8 +235,8 @@ function [findmin_fit_result] = fitTriwithFP(data_filename, mode_Q0, mode_Qe, la
             hold on
             plot(x_freq.',dip_fit_weight*max(Trans_raw)/max(dip_fit_weight))
 %             title(sprintf("FP and Triangle fitting result, %g nm",lambda));         
-                title(sprintf("FP and Tri fitting result, %g nm\n x0 = %g, alpha = %g, base = %g\n",...
-                            lambda,findmin_fit_result(end-1),findmin_fit_result(end),findmin_fit_result(1) ));         
+                title(sprintf("FP and Tri fitting result, %g nm\n x0 = %g, alpha = %g, base = %g\n Normalized alpha = %g",...
+                            lambda,findmin_fit_result(end-2),findmin_fit_result(end-1),findmin_fit_result(1) , findmin_fit_result(end) ));         
 
                 if tosave
                     tt = strfind(data_filename,'\');
@@ -235,10 +258,10 @@ function [findmin_fit_result] = fitTriwithFP(data_filename, mode_Q0, mode_Qe, la
                 end
     toc
     
-    %%
-    omegaOverX = 2*pi*(MZI_FSR*1e6)/MZI_fit_T;
-    
-    findmin_fit_result(end+1) = omegaOverX^2 * findmin_fit_result(end);
+%     %% Normalization to FREQ
+%     omegaOverX = 2*pi*(MZI_FSR*1e6)/MZI_fit_T;
+%     
+%     findmin_fit_result(end+1) = omegaOverX^2 * findmin_fit_result(end);
 
 end
 

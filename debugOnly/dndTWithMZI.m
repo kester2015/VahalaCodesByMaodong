@@ -4,12 +4,14 @@ clc
 %% get resonance shift over temperature
 filedirGlob1 = 'Z:\Qifan\Tantala\20200821\Dev21\dndT';
 filedirGlob2 = 'Z:\Qifan\AlGaAs\20200916\dndTat1551';
-filedirGlob3 = 'Z:\Qifan\SiN\20201004\dndTat1550.2';
-
+filedirGlob = 'Z:\Qifan\SiN\20201004\dndTat1550.2';
+% filedirGlob = 'C:\Users\Lab\Documents\Maodong\20201008_LN\No-2\dndTat1556.9';
+% filedirGlob = 'C:\Users\Lab\Documents\Maodong\20201010_LN\No-3\dndTat1556.9';
+% filedirGlob = 'Z:\Qifan\thin SiN\20201014\dndTat1560.15';
 % filedirGlob = filedirGlob2;
 % material = 'SiN';
-for thisfiledirGlob = {filedirGlob1, filedirGlob2, filedirGlob3}
-filedirGlob = thisfiledirGlob{1};
+% for thisfiledirGlob = {filedirGlob1, filedirGlob2, filedirGlob3}
+% filedirGlob = thisfiledirGlob{1};
 matfiles = dir(strcat(filedirGlob,'\*.mat') );
 matfilesName = {matfiles.name};
 
@@ -52,11 +54,12 @@ resonance_shift = coeff(1);%MHz/C
 % save(strcat('Z:\Qifan\absorption Q summary\dndT summary data\',material,'.mat'),'temperatureList','resonanceList','fit_result','coeff');
 
 
-end
-legend({'Tantala','','AlGaAs','','SiN',''});
+% end
+% legend({'Tantala','','AlGaAs','','SiN',''});
 
 %%
-n0 = 1.8889;
+n0 = 1.6;%Thin SIN.
+n0 = 1.8889; % SiN
 % n0 = input("give neff of this material");
 c = 299792458;
 lambda = 1550.2e-9;
