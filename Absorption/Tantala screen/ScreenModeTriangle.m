@@ -11,8 +11,8 @@ global Config Device;
 instrreset;
 % Myfg1 = Keysight33500('USB0::0x0957::0x2C07::MY52814912::INSTR'); % lower
 Myfg2 = Keysight33500('USB0::0x0957::0x2607::MY52202388::INSTR'); % upper
-% OSC = Infiniium('USB0::0x2A8D::0x9049::MY55510176::INSTR',2);%1G
-OSC = Infiniium('USB0::0x2A8D::0x904E::MY54200105::INSTR',2);%2.5G
+OSC = Infiniium('USB0::0x2A8D::0x9049::MY55510176::INSTR',2);%1G
+% OSC = Infiniium('USB0::0x2A8D::0x904E::MY54200105::INSTR',2);%2.5G
 
 
 
@@ -31,12 +31,12 @@ end
 % Offset = -0.3;%3.5/2;%0.000; %1.523;%2.263;
 %%
 
-filedirGlob = strcat('Z:\Qifan\Si\',datestr(now,'yyyymmdd'),'-Screen-Modes','\No.-2');
+filedirGlob = strcat('Z:\Qifan\thin SiN\',datestr(now,'yyyymmdd'),'-Screen-Modes','');
 if ~isfolder(filedirGlob)
     mkdir(filedirGlob)
 end
 
-Q_measure_volt = 2.2;%1.96; % FunctionGenerator voltage when measure Q
+Q_measure_volt =1.8;%1.96; % FunctionGenerator voltage when measure Q
 Tri_measure_volt = 0.2;%1.0; % 3~6
 Q_measure_scale = [-0.1 0.5]; % OSC scale when measure Q
 Tri_measure_scale = [-0.05 3.4];
@@ -63,26 +63,26 @@ note = '';
 %             Device.laser1.Move2Wavelength(lambda);
             
   %%          
-% % --2. Measure Tri at high power
-% OSC.SetVertScale(Config.trans_ch, Tri_measure_scale);
-OSC.SetVertScale(2, Tri_measure_scale);
-Myfg2.DC2 = Tri_measure_volt;
-tridata_filename = strcat(filedirGlob,'\Tri-measure-maxvpp-',note,num2str(lambda),'nm');
-                
-                if isfile(strcat(tridata_filename,'.mat'))
-                    backup_filename = strcat(tridata_filename,'_',char(datetime('now','Format','yyMMdd_HHmmss')),'_bak.mat');
-                    movefile(strcat(tridata_filename,'.mat'),backup_filename);
-                    warning('Old file was renamed!')
-                end
-                
-
-pause(0.1);
-input('please adjust attenuator:');
-% ReadTrace(tridata_filename,OSC,point,Config.trans_ch,Config.mzi_ch,0,pd_offset);
-ReadTrace(tridata_filename,OSC,point,2,3,0,pd_offset);
-
-OSC.Run;
-OSC.HighRes;
+%     % % --2. Measure Tri at high power
+%     % OSC.SetVertScale(Config.trans_ch, Tri_measure_scale);
+%     OSC.SetVertScale(2, Tri_measure_scale);
+%     Myfg2.DC2 = Tri_measure_volt;
+%     tridata_filename = strcat(filedirGlob,'\Tri-measure-maxvpp-',note,num2str(lambda),'nm');
+% 
+%                     if isfile(strcat(tridata_filename,'.mat'))
+%                         backup_filename = strcat(tridata_filename,'_',char(datetime('now','Format','yyMMdd_HHmmss')),'_bak.mat');
+%                         movefile(strcat(tridata_filename,'.mat'),backup_filename);
+%                         warning('Old file was renamed!')
+%                     end
+% 
+% 
+%     pause(0.1);
+%     input('please adjust attenuator:');
+%     % ReadTrace(tridata_filename,OSC,point,Config.trans_ch,Config.mzi_ch,0,pd_offset);
+%     ReadTrace(tridata_filename,OSC,point,2,3,0,pd_offset);
+% 
+%     OSC.Run;
+%     OSC.HighRes;
 
 
 %%

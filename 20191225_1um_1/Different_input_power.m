@@ -9,8 +9,8 @@ Myfg1 = Keysight33500('USB0::0x0957::0x2C07::MY52814912::INSTR'); % lower
 Myfg2 = Keysight33500('USB0::0x0957::0x2607::MY52202388::INSTR'); % upper
 % Ocsillascope
 % OSC = Infiniium('USB0::0x2A8D::0x904E::MY54200105::INSTR');
-% OSC = Infiniium('USB0::0x2A8D::0x9049::MY55510176::INSTR',2);
-OSC = Infiniium('USB0::0x2A8D::0x904E::MY54200105::INSTR',2); 
+OSC = Infiniium('USB0::0x2A8D::0x9049::MY55510176::INSTR',2); %  1G
+% OSC = Infiniium('USB0::0x2A8D::0x904E::MY54200105::INSTR',2); %2.5G
 
 
 % OSC = Infiniium('GPIB1::7::INSTR',1); % = Device.osc;
@@ -31,20 +31,20 @@ OSC.connect;
 
 
 % filedirToSave = ['\\131.215.238.124\Vahala Group\Qifan\Tantala\' datestr(now,'yyyymmdd') '-thermal-rawdata\1548nm-02'];
-filedirToSave = ['Z:\Qifan\thin SiN\' datestr(now,'yyyymmdd') '-thermal-rawdata\1560.15nm-02'];
+filedirToSave = ['Z:\Qifan\thin SiN\' datestr(now,'yyyymmdd') '-thermal-rawdata\1560.17nm-02'];
 
 
 % VAOM = 0.01:0.005:1;
 % VAOM = [2.3:-0.1:2, 2:-0.01:0.7, 0.7:-0.1:0.3]; % new device: Optical attenuator
 % VAOM = [2.2:-0.1:0];
 
-VAOM = 2.0:-0.2:0;
+VAOM = [2.0:-0.2:1.6,1.5:-0.1:0.8,0.7:-0.2:0];
 % Myfg2.DC1 = 0;
 
 sweepFreq = [0.25]; 
 Freq0=sweepFreq;
 Vpp = 1.1;%3.5;%7.000; %2.000;%1.920;
-Offset = -0.2;%3.5/2;%0.000; %1.523;%2.263;
+Offset = +0.2;%3.5/2;%0.000; %1.523;%2.263;
 
 
 
@@ -64,6 +64,11 @@ end
 %         OSC.Write([':TIM:SCAL ' num2str(1/50/20)]);
 %%
 tic;
+OSC.SetVertScale(1,[-4,4]);
+% OSC.SetVertScale(2,[-0.05,3.5]);
+OSC.SetVertScale(3,[-0.2,5]);
+OSC.SetVertScale(4,[-0.2,4]);
+OSC.SetVertScale(2,[-0.2,3.5]);
 
 % OSC.Write([':TIM:POS ' num2str(1/Freq0*0.75)]);
 % OSC.Write([':TIM:SCAL ' num2str(1/Freq0/2/10)]);
@@ -145,10 +150,11 @@ t = toc;
 disp(strcat("Finished in ", num2str(t/60), 'min'));
 
 Myfg2.DC2 = 1.0;
+Freq0 = 20;
 Myfg1.Freq1 =[Freq0 Vpp Offset];
 OSC.Run;
 
-OSC.Write([':TIM:POS ' num2str(1/Freq0*0.75)]);
+OSC.Write([':TIM:POS ' num2str(1/Freq0)]);
 OSC.Write([':TIM:SCAL ' num2str(1/Freq0/2/10)]);
 % sound(sin(2*pi*25*(1:4000)/100));
 tts('Measurement Completed');
