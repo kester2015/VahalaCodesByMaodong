@@ -171,7 +171,7 @@ function [Q0, Q1, QL,findmin_fit_result] = getQwithFP(filename,lambda,tosave)
             scatter(x_freq.',fp_fit_result_2, 5);
             hold on
             plot(x_freq.',fit_weight_fp*max(Q_trace_tofit)/max(fit_weight_fp));
-            title(sprintf("FP 2nd fitting result, %g nm.\n T=%g",lambda,fp_fit_2.T ));
+            title(sprintf("FP 2nd fitting result, %g nm.\n T=%g, r1r2=%.3g, Avg=%.2g, Osc=%.2g",lambda,fp_fit_2.T , ( 1-sqrt(1-fp_fit_2.B^2) )/fp_fit_2.B,fp_fit_2.A0, fp_fit_2.A0 * fp_fit_2.B ));
 
     fit_A0_estimate = fp_fit_2.A0;
     fit_B_estimate = fp_fit_2.B;
