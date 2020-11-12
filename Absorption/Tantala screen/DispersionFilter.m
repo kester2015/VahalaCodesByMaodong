@@ -3,7 +3,7 @@
 clear
 clc
 
-filename = 'C:\Users\Lab\Documents\Maodong\20200820\disper\Dev21\Two-mode-family-together-2-1520-1570nm.mat';
+filename = 'Z:\Qifan\LN\20201024\No.-2\disper\-1520-1570nm.mat';
 load(filename);
 
 data_old = data_matrix(:,2);

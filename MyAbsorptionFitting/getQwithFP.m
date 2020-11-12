@@ -1,14 +1,25 @@
-function [Q0, Q1, QL,findmin_fit_result] = getQwithFP(filename,lambda,tosave)
+function [Q0, Q1, QL,findmin_fit_result] = getQwithFP(filename,lambda,tosave,fpT)
+%     ip = inputParser;
+%     ip.addParameter('fpT', 1/2, @isnumeric); % fp period estimate = fpT*length(data)
+%     ip.parse(varargin{:});
+%     fpT = ip.Results.fpT;
+    
     % GETQWITHFP Summary of this function goes here
     %   Detailed explanation goes here
+    fpT_default = 1/2;
     if nargin == 1
         temp = strfind(filename,'-');
         temp2 = strfind(filename,'nm');
         lambda = str2double(filename(temp(end)+1:temp2(end)-1));
         tosave = 0;
+        fpT = fpT_default;
     elseif nargin == 2
         tosave = 0;
+        fpT = fpT_default;
+    elseif nargin ==3
+        fpT = fpT_default;
     end
+    
     filename = char(filename);
     load(filename,'data_matrix');
     MZI_FSR = 39.9553;
@@ -51,7 +62,7 @@ function [Q0, Q1, QL,findmin_fit_result] = getQwithFP(filename,lambda,tosave)
     if pos_fp < 3
         fit_T_estimate = 0.5*length(Q_trace_freq);
     end
-            fit_T_estimate = (1/3)*length(Q_trace_freq);
+            fit_T_estimate = (fpT)*length(Q_trace_freq);
     
     fit_B_estimate = amp_fp/length(Q_trace_freq);
     fit_A0_estimate = mean(Q_trace);
