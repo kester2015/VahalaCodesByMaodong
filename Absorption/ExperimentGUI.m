@@ -232,7 +232,7 @@ switch hObject.Value
     case 3
         handles.Prefix.String = 'ringdown\';
     case 4
-        handles.Prefix.String = 'etc\';
+        handles.Prefix.String = 'BR\';
 end
 
 function Method_CreateFcn(hObject, eventdata, handles)
@@ -621,6 +621,9 @@ switch handles.Method.Value
         end
     case 4
         %% Reading
+            lambda = str2double(handles.Wavelength.String);
+            filename=[filename_raw,'-',num2str(lambda),'nm'];
+            
         NChan = 4; % Number of channel
         Device.osc.Stop;
         [X,Y] = Device.osc.readmultipletrace(1:NChan,[]);
@@ -631,8 +634,15 @@ switch handles.Method.Value
             legend('-DynamicLegend');
             hold on
         end
-        save([filename_raw '.mat'],'X','Y');
-        filename = filename_raw;
+        if exist([filename,'.mat'],'file')
+            warning('File already exists!')
+%             if ~overwrite
+                movefile([filename,'.mat'],[filename,'_',char(datetime('now','Format','yyMMdd_HHmmss')),'_bak.mat']);
+                warning('Old file was renamed!')
+%             end
+        end
+        save([filename '.mat'],'X','Y');
+%         filename = filename_raw;
         Device.osc.Run;
 end
 Data.Currfilename = filename;

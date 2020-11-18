@@ -1,4 +1,5 @@
 clear all;
+instrreset
 global Config Device;
 load('config.mat')
 % Set configuration for GUI
