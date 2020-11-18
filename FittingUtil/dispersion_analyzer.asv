@@ -746,15 +746,14 @@ if strcmp(handles.data_status.String,'Data loaded')
         match_center_index=MuToIndex(match_center_mu,dispersion_data.MZI_index);
         match_range_index=round((MuToIndex(match_end_mu,dispersion_data.MZI_index)-MuToIndex(match_start_mu,dispersion_data.MZI_index))/2);
 %         mode_matching_trace=dispersion_data.data_matrix(match_center_index-match_range_index:match_center_index+match_range_index,end-1)./max(dispersion_data.data_matrix(:,end-1));
-        mode_matching_trace=dispersion_data.data_matrix(match_center_index-match_range_index:match_center_index+match_range_index,2)./max(dispersion_data.data_matrix(:,2));
+        mode_matching_trace=dispersion_data.data_matrix(match_center_index-match_range_index:match_center_index+match_range_index,end-1)./max(dispersion_data.data_matrix(:,end-1));
     else
         match_center_mu=-mu_center+(FromDigits_offset(handles))/MZI_dispersion(1);
         match_start_mu=-mu_center+(FromDigits_offset(handles)-disk_FSR/2)/MZI_dispersion(1);
         match_end_mu=-mu_center+(FromDigits_offset(handles)+disk_FSR/2)/MZI_dispersion(1);
         match_center_index=MuToIndex(match_center_mu,dispersion_data.MZI_index);
         match_range_index=round((MuToIndex(match_end_mu,dispersion_data.MZI_index)-MuToIndex(match_start_mu,dispersion_data.MZI_index))/2);
-%         mode_matching_trace=dispersion_data.data_matrix(match_center_index+match_range_index:-1:match_center_index-match_range_index,end-1)./max(dispersion_data.data_matrix(:,end-1));
-        mode_matching_trace=dispersion_data.data_matrix(match_center_index+match_range_index:-1:match_center_index-match_range_index,2)./max(dispersion_data.data_matrix(:,2));
+        mode_matching_trace=dispersion_data.data_matrix(match_center_index+match_range_index:-1:match_center_index-match_range_index,end-1)./max(dispersion_data.data_matrix(:,end-1));
     end
     plot(handles.matching_window,mode_matching_trace,...
         linspace(-disk_FSR/2,disk_FSR/2,2*match_range_index+1),'r');
@@ -789,10 +788,8 @@ if strcmp(handles.data_status.String,'Data loaded')
             fitq_end_mu=targeted_mu(ind)+tol/MZI_dispersion(1);
             fitq_center_index=MuToIndex(fitq_center_mu,dispersion_data.MZI_index);
             fitq_range_index=round((MuToIndex(fitq_end_mu,dispersion_data.MZI_index)-MuToIndex(fitq_start_mu,dispersion_data.MZI_index))/2);
-%             fitq_trace_Q=dispersion_data.data_matrix(fitq_center_index-fitq_range_index:fitq_center_index+fitq_range_index,end-1);
-%             fitq_trace_MZI=dispersion_data.data_matrix(fitq_center_index-fitq_range_index:fitq_center_index+fitq_range_index,end);     
-            fitq_trace_Q=dispersion_data.data_matrix(fitq_center_index-fitq_range_index:fitq_center_index+fitq_range_index,2);
-            fitq_trace_MZI=dispersion_data.data_matrix(fitq_center_index-fitq_range_index:fitq_center_index+fitq_range_index,3);
+            fitq_trace_Q=dispersion_data.data_matrix(fitq_center_index-fitq_range_index:fitq_center_index+fitq_range_index,end-1);
+            fitq_trace_MZI=dispersion_data.data_matrix(fitq_center_index-fitq_range_index:fitq_center_index+fitq_range_index,end);
             if f_scan_start<f_scan_end
                 targeted_freq(ind)=f_scan_center+(fitq_center_mu-mu_center)*MZI_dispersion(1)/1000;
             else
