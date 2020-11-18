@@ -21,7 +21,6 @@ function [findmin_fit_result] = fitTriwithFP(data_filename, mode_Q0, mode_Qe, la
 %     ipar.parse(varargin{:});
 %     result = ipar.Results;
 %     
-    
     load(data_filename,'timeAxis','Ch2','Ch3');
     if ~exist('timeAxis','var')
         load(data_filename,'data_matrix');
@@ -29,6 +28,12 @@ function [findmin_fit_result] = fitTriwithFP(data_filename, mode_Q0, mode_Qe, la
         Ch2 = data_matrix(:,2);
         Ch3 = data_matrix(:,3);
     end
+            tt = strsplit(data_filename,'\');
+            if strcmp(tt{3},'LN')
+                timeAxis = timeAxis(1:end/2);
+                Ch2 = Ch2(end/10:end/2);
+                Ch3 = Ch3(end/10:end/2);
+            end
     MZI_FSR = 39.9553; % MHz
 
     % function fitTriwithFP_main(data_filename,lambda,)

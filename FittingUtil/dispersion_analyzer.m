@@ -483,8 +483,10 @@ if strcmp(handles.data_status.String,'Data loaded')
     sens_MS=eval(handles.process_th_peak.String); % relative sensitivity of MS, higher = more sensitive, default to 0
     sens_MZI=eval(handles.process_th_MZI.String); % relative sensitivity of MZI, higher = more sensitive, default to 0
     nominal_width=5*10^(handles.process_Qmode_select.Value-1); % estimated peak width, determined by nominal Q values
-    trace_MS_raw=dispersion_data.data_matrix(:,end-1);
-    trace_MZI_raw=dispersion_data.data_matrix(:,end);
+%     trace_MS_raw=dispersion_data.data_matrix(:,end-1);
+%     trace_MZI_raw=dispersion_data.data_matrix(:,end);
+    trace_MS_raw=dispersion_data.data_matrix(:,2);
+    trace_MZI_raw=dispersion_data.data_matrix(:,3);
     
     % Filtering
     trace_MS_baseline=sgolayfilt(trace_MS_raw,1,1001); % baseline estimate, using slow-varying envelope

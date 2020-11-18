@@ -346,7 +346,7 @@ classdef Q_trace_fit
                 modeFitMZI_A0=[modeFitMZI_A0;MZI_fit_A0];
                 modeFitMZI_A=[modeFitMZI_A;MZI_fit_A];
                 
-                modeFitQobj = [modeFitQobj;{Q_fit}];
+                modeFitQobj = [modeFitQobj;{Q_obj}];
             end
             
             Q_obj.trace_Q=trace_Q;
@@ -470,7 +470,7 @@ classdef Q_trace_fit
             P_matrix=[Q_obj.modePos,Q_obj.modeStart,Q_obj.modeEnd];
         end
         
-        function [trans_raw, trans_fit, mzi_raw] = get_Q_rawdata(Q_obj,n)
+        function [trans_raw, trans_fit, mzi_raw, mzi_fit] = get_Q_rawdata(Q_obj,n)
             if n<=length(Q_obj.modeQ0)
                 peakstart=Q_obj.modeStart(n);
                 peakend=Q_obj.modeEnd(n);
@@ -482,10 +482,10 @@ classdef Q_trace_fit
                 MZI_fit_A0=Q_obj.modeFitMZI_A0(n);
                 MZI_fit_A=Q_obj.modeFitMZI_A(n);
                 
-                Q_fit_obj = Q_obj.modeFitQobj{n};
+                O_fit_obj = Q_obj.modeFitQobj{n};
                 
-                peakstart = max(peakstart - 200*(peakpos-peakstart),1);
-                peakend = min(peakend + 200*(peakend-peakpos),length(Q_obj.trace_Q) );
+                peakstart = peakstart - 2*(peakpos-peakstart);
+                peakend = peakend + 2*(peakend-peakpos);
                 % plot_base=peakstart-peakpos:peakend-peakpos;
                 % % xlim([min(plot_base) max(plot_base)]/MZI_fit_T*Q_obj.MZI_FSR);
                 % scatter(plot_base/MZI_fit_T*Q_obj.MZI_FSR,(Q_obj.trace_MZI(peakstart:peakend)-MZI_fit_A0)/MZI_fit_A*0.2,'ko');
@@ -493,11 +493,10 @@ classdef Q_trace_fit
                 % scatter(plot_base/MZI_fit_T*Q_obj.MZI_FSR,Q_obj.trace_Q(peakstart:peakend)/Q_fit_A,'bo');
                 % plot(plot_base/MZI_fit_T*Q_obj.MZI_FSR,Q_fit/Q_fit_A,'r','LineWidth',2);
                 % legend('MZI interferogram','Sinusoidal fit','Transmission','Lorentzian fit','Location','best');
-                trans_raw = Q_obj.trace_Q(peakstart:peakend) /Q_fit_A;
-                trans_fit = Q_fit_obj(peakstart-peakpos:peakend-peakpos) /Q_fit_A;
-                
+                trans_raw = Q_obj.trace_Q(peakstart:peakend);
+                trans_fit = Q_fit;
                 mzi_raw = (Q_obj.trace_MZI(peakstart:peakend)-MZI_fit_A0);
-%                 mzi_fit = (MZI_fit-MZI_fit_A0);
+                mzi_fit = (MZI_fit-MZI_fit_A0);
                 % Q0=Q_obj.modeQ0(n);
                 % Q1=Q_obj.modeQ1(n);
                 % QL=Q_obj.modeQL(n);
