@@ -69,6 +69,7 @@ global Config;
 load ('config.mat','Config');
 % handles.Directory.String = Config.Directory;
 handles.Directory.String = ['C:\Users\Lab\Documents\Maodong\' datestr(now,'yyyymmdd') '\'];
+handles.Directory.String = ['Z:\Maodong\Projects\Pulse Pumping\AlGaAs\' datestr(now,'yyyymmdd') '\'];
 handles.Condition.String = Config.Condition;
 handles.Wavelength.String = Config.Wavelength;
 handles.MZI_FSR.String = Config.MZI_FSR;
