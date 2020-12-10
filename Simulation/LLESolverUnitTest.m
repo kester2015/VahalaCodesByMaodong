@@ -1,8 +1,9 @@
 
 
 %% test case 1: D2 only
+clear c
 close all
-c = LLESolver('D2',0.02,'D3',0,'pumpPower',50,'detuning',[-10 40],'NStep',50e4,'timeStep',2.5e-4/2);
+c = LLESolver('D2',0.02,'D3',0,'pumpPower',50,'detuning',[-10 40],'NStep',50e4,'timeStep',2.5e-4/2,'initState','random');
 c.solve;
 c.plotAll;
 

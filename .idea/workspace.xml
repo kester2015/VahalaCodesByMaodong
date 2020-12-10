@@ -1,14 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="ca33173f-5080-4c2c-835b-73d90a93851b" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/MyAbsorptionFitting/extractFWHMForEachFreq.asv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MyAbsorptionFitting/convertBinToMat.asv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/MyAbsorptionFitting/convertBinToMat.m" beforeDir="false" afterPath="$PROJECT_DIR$/MyAbsorptionFitting/convertBinToMat.m" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MyAbsorptionFitting/extractFWHMForEachFreq.m" beforeDir="false" afterPath="$PROJECT_DIR$/MyAbsorptionFitting/extractFWHMForEachFreq.m" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MyAbsorptionFitting/plotEachPowerTrace.m" beforeDir="false" afterPath="$PROJECT_DIR$/MyAbsorptionFitting/plotEachPowerTrace.m" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MyAbsorptionFitting/plotOSCTraces.m" beforeDir="false" afterPath="$PROJECT_DIR$/MyAbsorptionFitting/plotOSCTraces.m" afterDir="false" />
-    </list>
+    <list default="true" id="ca33173f-5080-4c2c-835b-73d90a93851b" name="Default Changelist" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -49,7 +42,9 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="COLUMN_ORDER" />
+            </State>
           </value>
         </entry>
       </map>

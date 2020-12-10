@@ -46,6 +46,7 @@ classdef LLESolver < handle
             ip.addParameter('D2',0.02,@isnumeric);
             ip.addParameter('D3',0.0001,@isnumeric);
             ip.addParameter('D4',0,@isnumeric);
+            ip.addParameter('initState','soliton',@ischar);
             % ip.addParameter('DList',[0.02,0.0001,0],@isnumeric);
             % ip.addParameter('initState',1,@isnumeric);
             ip.parse(varargin{:});         
@@ -58,6 +59,7 @@ classdef LLESolver < handle
             obj.D2 = ip.Results.D2;
             obj.D3 = ip.Results.D3;
             obj.D4 = ip.Results.D4;
+            obj.initState = ip.Results.initState;
             
             switch length(ip.Results.detuning)
                 case 1
@@ -120,7 +122,7 @@ classdef LLESolver < handle
                 obj.phiResult(:,kk+1) = exp(k2).* ifft(...
                     exp(k1).* fft(obj.phiResult(:,kk)) ...
                     ) + sqrt(obj.pumpPower(kk)) * obj.timeStep;
-                if mod(kk,500) == 0
+                if mod(kk,50) == 0
                     fprintf("calculating step %d of %d, %.2f%% finished.\n",kk, obj.NStep, 100 * kk/obj.NStep);
                 end
             end
