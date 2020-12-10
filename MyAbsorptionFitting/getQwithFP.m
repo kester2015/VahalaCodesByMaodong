@@ -14,10 +14,26 @@ function [Q0, Q1, QL,findmin_fit_result] = getQwithFP(filename,lambda,tosave,fpT
         tosave = 0;
         fpT = fpT_default;
     elseif nargin == 2
+        if lambda == 0
+            temp = strfind(filename,'-');
+            temp2 = strfind(filename,'nm');
+            lambda = str2double(filename(temp(end)+1:temp2(end)-1));
+        end
         tosave = 0;
         fpT = fpT_default;
     elseif nargin ==3
+        if lambda == 0
+            temp = strfind(filename,'-');
+            temp2 = strfind(filename,'nm');
+            lambda = str2double(filename(temp(end)+1:temp2(end)-1));
+        end
         fpT = fpT_default;
+    else
+        if lambda == 0
+            temp = strfind(filename,'-');
+            temp2 = strfind(filename,'nm');
+            lambda = str2double(filename(temp(end)+1:temp2(end)-1));
+        end
     end
     
     filename = char(filename);

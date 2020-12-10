@@ -279,7 +279,7 @@ function [findmin_fit_result] = fitTriwithFP(data_filename, mode_Q0, mode_Qe, la
                 end
     toc
     
-%     %% Normalization to FREQ
+    %% Normalization to FREQ
 %     omegaOverX = 2*pi*(MZI_FSR*1e6)/MZI_fit_T;
 %     
 %     findmin_fit_result(end+1) = omegaOverX^2 * findmin_fit_result(end);

@@ -48,36 +48,37 @@ MZI_FSR = 39.9553; % MHz
         
         
         
-        wavelength = 1550.2;
-        lambda = wavelength;
-        outputVoltage1 = 2.982; %V
-        outputPower1 = 0.1579;%mW
-        inputPower1 = 1.122;%mW
-        outputVoltage2 = 2.672; %V
-        outputPower2 = 0.1348;%mW
-        inputPower2 = 1.105;%mW
-        Q_data_filename = strcat('Z:\Qifan\SiN\20201004-Screen-Modes\Q-measure-maxvpp-0.5Hz-1.7Vpp-',num2str(wavelength),'nm.mat');
-%         filedirGlob = strcat('Z:\Qifan\SiN\20201004-thermal-rawdata\No14\',num2str(wavelength),'nm-0',num2str(scan_round),'-mat');
-        filedirGlob = strcat('Z:\Qifan\SiN\20201004-thermal-rawdata\No14\',num2str(wavelength),'nm-01-mat');
-        kerrOverTotal = 0.339839;
-        
-        
-        
-        
-        wavelength = 1555;
-        sweep_voltage = 0.5;
-        lambda = wavelength;
-        outputVoltage1 = 3.204; %V
-        outputPower1 = 0.2639;%mW
-        inputPower1 = 1.039;%mW
-        outputVoltage2 = 3.177; %V
-        outputPower2 = 0.2723;%mW
-        inputPower2 = 1.054;%mW
-        Q_data_filename = strcat('Z:\Qifan\SiN\20201004-Screen-Modes\Q-measure-maxvpp-0.5Hz-1.7Vpp-',num2str(wavelength),'nm.mat');
-%         filedirGlob = strcat('Z:\Qifan\SiN\20201004-thermal-rawdata\No14\',num2str(wavelength),'nm-0',num2str(scan_round),'-mat');
-        filedirGlob = strcat('Z:\Qifan\SiN\20201004-thermal-rawdata\No14\',num2str(wavelength),'nm-02-mat');
-        kerrOverTotal = 0.376496;
+%         wavelength = 1550.2;
+%         lambda = wavelength;
+%         outputVoltage1 = 2.982; %V
+%         outputPower1 = 0.1579;%mW
+%         inputPower1 = 1.122;%mW
+%         outputVoltage2 = 2.672; %V
+%         outputPower2 = 0.1348;%mW
+%         inputPower2 = 1.105;%mW
+%         Q_data_filename = strcat('Z:\Qifan\SiN\20201004-Screen-Modes\Q-measure-maxvpp-0.5Hz-1.7Vpp-',num2str(wavelength),'nm.mat');
+% %         filedirGlob = strcat('Z:\Qifan\SiN\20201004-thermal-rawdata\No14\',num2str(wavelength),'nm-0',num2str(scan_round),'-mat');
+%         filedirGlob = strcat('Z:\Qifan\SiN\20201004-thermal-rawdata\No14\',num2str(wavelength),'nm-01-mat');
+%         kerrOverTotal = 0.339839;
+%         
+%         
+%         
+%         
+%         wavelength = 1555;
+%         sweep_voltage = 0.5;
+%         lambda = wavelength;
+%         outputVoltage1 = 3.204; %V
+%         outputPower1 = 0.2639;%mW
+%         inputPower1 = 1.039;%mW
+%         outputVoltage2 = 3.177; %V
+%         outputPower2 = 0.2723;%mW
+%         inputPower2 = 1.054;%mW
+%         Q_data_filename = strcat('Z:\Qifan\SiN\20201004-Screen-Modes\Q-measure-maxvpp-0.5Hz-1.7Vpp-',num2str(wavelength),'nm.mat');
+% %         filedirGlob = strcat('Z:\Qifan\SiN\20201004-thermal-rawdata\No14\',num2str(wavelength),'nm-0',num2str(scan_round),'-mat');
+%         filedirGlob = strcat('Z:\Qifan\SiN\20201004-thermal-rawdata\No14\',num2str(wavelength),'nm-02-mat');
+%         kerrOverTotal = 0.376496;
 
+        
         
         
         
