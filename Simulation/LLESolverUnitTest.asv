@@ -71,15 +71,13 @@ f2 = LLESolver('D2',-0.02,'D3',0,'pumpPower',10,'detuning',0,'NStep',nstep,'time
 f2.solve;
 f2.plotAll;
 %% test case 5: with dispersive wave
-% close all
-% clear
+close all
+clear
 bb=5;%crossing mode number; cite Herr PRL paper.
 aa=1; %deviation from the mode dispersion curve. In units of kappa.
 cross_disp = @(mu) aa/2./(mu-bb-0.5);
 g1 = LLESolver('NStep',60e4,'timeStep',2.5e-4/2,...
     'detuning',[-10 30], 'pumpPower',40, 'D2',0.02,'D3',0,...
-    'initState','random','arbiDisp',cross_disp);
-g1.solve;
-g1.plotAll;
+    'ini)
 
 

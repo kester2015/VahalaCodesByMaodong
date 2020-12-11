@@ -1,9 +1,10 @@
 classdef LLESolver < handle
     % lugiato lefever equation solver
-    % Maodong Gao, Version 1.1, 2020-12-09
+    % Maodong Gao, Version 1.1.02, 2020-12-10
     % \pdv{A}{t} = -(\frac{\kappa}{2} + i \delta \omega) A   % detuning and loss
-    %              + \Sigma_{n=2}^\infty i^{n-1} \frac{D_n}{n!}\pdv[n]{A}{\phi} % Dispersion
+    %              + (\Sigma_{n=2}^\infty i^{n-1} \frac{D_n}{n!}\pdv[n]{A}{\phi}) % Dispersion
     %              + ig\abs{A}^2 A  % nonlinearity
+    %              - ig\tau_R A \pdv{\abs{A}^2}{t} % Raman shock term, See Y.Xu, Opt. Lett. , 41, 3419-3422, (2016)
     %              + \sqrt{\frac{\kappa\eta P_{in}}{\hbar \omega_0}} % pump
     % A in unit of photon density. which is unitless
     % all time and frequency normalized to kappa/2. 
@@ -15,14 +16,17 @@ classdef LLESolver < handle
         
         detuning % detuning in units of kappa
         pumpPower % pump power in units of threshold
-        pulsePump % pump power on fast retarded time, length equal to mode number, pulse shape in time domain, will be normalized to [0 1]
+        pulsePump % length equal to mode number. pulse shape in time(fast retarded time) domain, will be normalized to [0 1]
         
         
         D2 % D2 in units of kappa; positive: anomalous
         D3 % D3 in units of kappa; 
         D4 % D4 in units of kappa;
         D1 % D1 usually not used. useful when pulse pump
+        arbiDisp % arbitary dispersion function handle, added to D_n terms
         % DList % [D2, D3, D4, ...] store dispersion in this array
+        
+        tauR % Ranman shock term, TODO: confirm unit of tauR.
                 
         initState % select initial state
         solver
@@ -35,6 +39,7 @@ classdef LLESolver < handle
    
    properties (Access = public) % should be private later
        reducedPhi % reduced phiResult(down sampling) for data visualization
+       reducedPhi_Freq % reduced phiResult_Freq(down sampling), 0->max->min->0 frequencies.
        reducedPhiIndex
        reduceDim = 1000;
    end
@@ -59,9 +64,10 @@ classdef LLESolver < handle
             ip.addParameter('D1',0,@isnumeric);
             ip.addParameter('initState','soliton',@ischar);
             ip.addParameter('solver','SSFT',@ischar); % SSFT: split step FT; RK: Runge kutta
-            % ip.addParameter('DList',[0.02,0.0001,0],@isnumeric);
-            % ip.addParameter('initState',1,@isnumeric);
-            ip.parse(varargin{:});         
+            
+            ip.addParameter('arbiDisp',@(x)0,@(var)isa(var,'function_handle')); % SSFT: split step FT; RK: Runge kutta
+            
+            ip.parse(varargin{:});
             
             % TODO: check input validility later
             % TODO: check modeNumber be power of 2 in splitstep mode
@@ -72,6 +78,7 @@ classdef LLESolver < handle
             obj.D3 = ip.Results.D3;
             obj.D4 = ip.Results.D4;
             obj.D1 = ip.Results.D1;
+            obj.arbiDisp = ip.Results.arbiDisp;
             obj.initState = ip.Results.initState;
             obj.solver = ip.Results.solver;
             
@@ -102,22 +109,22 @@ classdef LLESolver < handle
             
             switch length(ip.Results.pulsePump)
                 case 1
-                    obj.pulsePump = linspace(1,1,obj.modeNumber);
+                    obj.pulsePump = linspace(1,1,obj.modeNumber)';
                 case obj.modeNumber
                     obj.pulsePump = ip.Results.pulsePump./max(abs(ip.Results.pulsePump));
+                    if size(obj.pulsePump,1)==1
+                        obj.pulsePump = obj.pulsePump';
+                    end
             end
             
-            % TODO: select different init state
-            % obj.initState = 1; % ip.Results.initState;
             
             fprintf("Solver initiated, evolving time %2.2f/kappa.\n", obj.NStep * obj.timeStep * 2);
         end
         
+        % TODO: add set functions for all properties.
 %         function obj = set.modeNumber(obj,value)
 %             obj.modeNumber = value;
 %         end
-
-
 
         function solve(obj)
             modeIndexs = linspace(-floor(obj.modeNumber/2), ceil(obj.modeNumber/2)-1,obj.modeNumber)';
@@ -127,25 +134,28 @@ classdef LLESolver < handle
             obj.initializeState();
             % ----- initialize detuning and power evolution array ----- %
             shiftModeIndexs = fftshift(modeIndexs); % DC->max freq->min Freq->DC
-            shiftModeIndexs_power  = shiftModeIndexs;
-            shiftModeIndexs_power2 = shiftModeIndexs.^2;
-            shiftModeIndexs_power3 = shiftModeIndexs.^3;
-            shiftModeIndexs_power4 = shiftModeIndexs.^4;
             switch obj.solver
                 case 'SSFT'
                     % ----- Split step fourier transform method ------ %
                     fprintf("Using Split step fft method, Sloving...");
+                    dispersion_freq = 1i * 2*(obj.D1 * shiftModeIndexs  + ...
+                                              obj.D2 * shiftModeIndexs.^2 / 2 + ... 
+                                              obj.D3 * shiftModeIndexs.^3 / 6 + ...
+                                              obj.D4 * shiftModeIndexs.^4 / 24 + ...
+                                              arrayfun(obj.arbiDisp,shiftModeIndexs)   );% dispersion terms in LLE
                     for kk = 1:obj.NStep
+                        if ~(obj.tauR == 0)
+                            dphi = [diff(abs(obj.phiResult(:,kk)).^2);abs(obj.phiResult(1,kk)).^2-abs(obj.phiResult(end,kk)).^2]/2/pi;
+                        else
+                            dphi = 0;
+                        end
                         k1 = -( 1 + 1i * obj.detuning(kk) * 2 + ... % kappa/2 + i \delta \omega terms.  
-                            1i * obj.D1 * shiftModeIndexs_power * 2 + ...
-                            1i * obj.D2 * shiftModeIndexs_power2 + ... % dispersion terms
-                            1i * obj.D3 * shiftModeIndexs_power3 / 3 + ...
-                            1i * obj.D4 * shiftModeIndexs_power4 / 12 ) ...
+                            dispersion_freq ) ...
                             * obj.timeStep; 
-                        k2 = ( 1i*abs(obj.phiResult(:,kk)).^2 ) * obj.timeStep;
+                        k2 = ( 1i*abs(obj.phiResult(:,kk)).^2 - 1i*obj.tauR.*dphi ) * obj.timeStep;
                         obj.phiResult(:,kk+1) = exp(k2).* ifft(...
                             exp(k1).* fft(obj.phiResult(:,kk)) ...
-                            ) + sqrt(obj.pumpPower(kk)) * obj.timeStep * obj.pulsePump';
+                            ) + sqrt(obj.pumpPower(kk)) * obj.timeStep * obj.pulsePump;
                         obj.phiResult_Freq(:,kk+1) = fft(obj.phiResult(:,kk+1))/sqrt(length(obj.phiResult(:,kk+1)));
                         if mod(kk,100) == 0
                             fprintf("calculating step %d of %d, %.2f%% finished.\n",kk, obj.NStep, 100 * kk/obj.NStep);
@@ -154,41 +164,44 @@ classdef LLESolver < handle
                 case 'RK'
                     % ----- Runge Kutta method ------ %
                     fprintf("Using Runge Kutta method, Sloving...");
-                    pulsePump_freq = fft(obj.pulsePump)'/sqrt(length(obj.pulsePump));
+                    pulsePump_freq = fft(obj.pulsePump)/sqrt(length(obj.pulsePump));
                     obj.pulsePump_freq_debugonly = pulsePump_freq;
-                    for kk = 1:obj.NStep-1 % Runge Kutta method
+                    dispersion_freq = 1i * 2*(obj.D1 * shiftModeIndexs  + ...
+                                              obj.D2 * shiftModeIndexs.^2 / 2 + ... 
+                                              obj.D3 * shiftModeIndexs.^3 / 6 + ...
+                                              obj.D4 * shiftModeIndexs.^4 / 24 + ...
+                                              arrayfun(obj.arbiDisp,shiftModeIndexs)   );% dispersion terms in LLE
+                    for kk = 1:obj.NStep % Runge Kutta method
+                        if ~(obj.tauR == 0)
+                            error('Runge Kutta not supported for Raman yet, change SSFT solver please.')
+                            % dphi = [diff(abs(obj.phiResult(:,kk)).^2);abs(obj.phiResult(1,kk)).^2-abs(obj.phiResult(end,kk)).^2]/2/pi;
+                        else
+                            dphi = 0;
+                        end
                         %k1
                         aj = ifft(obj.phiResult_Freq(:,kk))*sqrt(length(obj.phiResult_Freq(:,kk)));
                         couple = fft(abs(aj.^2).*aj)/sqrt(length(obj.phiResult_Freq(:,kk)));
                         k1 = -( 1 + 1i * obj.detuning(kk) * 2 + ... % kappa/2 + i \delta \omega terms.   
-                            1i * obj.D1 * shiftModeIndexs_power * 2 + ...
-                            1i * obj.D2 * shiftModeIndexs_power2 + ... % dispersion terms
-                            1i * obj.D3 * shiftModeIndexs_power3 / 3 + ...
-                            1i * obj.D4 * shiftModeIndexs_power4 / 12 ).*obj.phiResult_Freq(:,kk) + pulsePump_freq * sqrt(obj.pumpPower(kk)) + 1i*couple;
+                            dispersion_freq ... % dispersion terms
+                            ).*obj.phiResult_Freq(:,kk) + pulsePump_freq * sqrt(obj.pumpPower(kk)) + 1i*couple;
                         %k2
                         aj = ifft(obj.phiResult_Freq(:,kk) + k1*obj.timeStep/2)*sqrt(length(obj.phiResult_Freq(:,kk)));
                         couple = fft(abs(aj.^2).*aj)/sqrt(length(obj.phiResult_Freq(:,kk)));
-                        k2 = -( 1 + 1i * (obj.detuning(kk) + obj.detuning(kk+1)) + ... % kappa/2 + i \delta \omega terms.  
-                            1i * obj.D1 * shiftModeIndexs_power * 2 + ...
-                            1i * obj.D2 * shiftModeIndexs_power2 + ... % dispersion terms
-                            1i * obj.D3 * shiftModeIndexs_power3 / 3 + ...
-                            1i * obj.D4 * shiftModeIndexs_power4 / 12 ).*(obj.phiResult_Freq(:,kk)+k1*obj.timeStep/2) + pulsePump_freq * sqrt(obj.pumpPower(kk)) + 1i*couple;
+                        k2 = -( 1 + 1i * (obj.detuning(kk) + obj.detuning(min(kk+1,end))) + ... % kappa/2 + i \delta \omega terms.  
+                            dispersion_freq ... % dispersion terms
+                            ).*(obj.phiResult_Freq(:,kk)+k1*obj.timeStep/2) + pulsePump_freq * sqrt(obj.pumpPower(kk)) + 1i*couple;
                         %k3
                         aj = ifft(obj.phiResult_Freq(:,kk) + k2*obj.timeStep/2)*sqrt(length(obj.phiResult_Freq(:,kk)));
                         couple = fft(abs(aj.^2).*aj)/sqrt(length(obj.phiResult_Freq(:,kk)));
-                        k3 = -( 1 + 1i * (obj.detuning(kk) + obj.detuning(kk+1)) + ... % kappa/2 + i \delta \omega terms.   
-                            1i * obj.D1 * shiftModeIndexs_power * 2 + ...
-                            1i * obj.D2 * shiftModeIndexs_power2 + ... % dispersion terms
-                            1i * obj.D3 * shiftModeIndexs_power3 / 3 + ...
-                            1i * obj.D4 * shiftModeIndexs_power4 / 12 ).*(obj.phiResult_Freq(:,kk)+k2*obj.timeStep/2) + pulsePump_freq * sqrt(obj.pumpPower(kk)) + 1i*couple;
+                        k3 = -( 1 + 1i * (obj.detuning(kk) + obj.detuning(min(kk+1,end))) + ... % kappa/2 + i \delta \omega terms.   
+                            dispersion_freq ... % dispersion terms
+                            ).*(obj.phiResult_Freq(:,kk)+k2*obj.timeStep/2) + pulsePump_freq * sqrt(obj.pumpPower(kk)) + 1i*couple;
                         %k4
                         aj = ifft(obj.phiResult_Freq(:,kk) + k3*obj.timeStep)*sqrt(length(obj.phiResult_Freq(:,kk)));
                         couple = fft(abs(aj.^2).*aj)/sqrt(length(obj.phiResult_Freq(:,kk)));
-                        k4 = -( 1 + 1i * obj.detuning(kk+1) * 2 + ... % kappa/2 + i \delta \omega terms.    
-                            1i * obj.D1 * shiftModeIndexs_power * 2 + ...
-                            1i * obj.D2 * shiftModeIndexs_power2 + ... % dispersion terms
-                            1i * obj.D3 * shiftModeIndexs_power3 / 3 + ...
-                            1i * obj.D4 * shiftModeIndexs_power4 / 12 ).*(obj.phiResult_Freq(:,kk)+k3*obj.timeStep) + pulsePump_freq * sqrt(obj.pumpPower(kk)) + 1i*couple;
+                        k4 = -( 1 + 1i * obj.detuning(min(kk+1,end)) * 2 + ... % kappa/2 + i \delta \omega terms.    
+                            dispersion_freq ... % dispersion terms
+                            ).*(obj.phiResult_Freq(:,kk)+k3*obj.timeStep) + pulsePump_freq * sqrt(obj.pumpPower(kk)) + 1i*couple;
                         %finally
                         obj.phiResult_Freq(:,kk+1) = obj.phiResult_Freq(:,kk) + obj.timeStep/6*(k1+2*k2+2*k3+k4);
                         obj.phiResult(:,kk+1) = ifft(obj.phiResult_Freq(:,kk+1))*sqrt(length(obj.phiResult_Freq(:,kk+1)));
@@ -204,16 +217,18 @@ classdef LLESolver < handle
     %% Data visualization model
     methods
         function h = plotPhiAbsAll(obj)
-            % h = figure;
+                % h = figure;
             pcolor(obj.reducedPhiIndex, 1:obj.modeNumber, abs(obj.reducedPhi).^2);
             xlabel('Iteration Time Step ($\frac{2}{\kappa}$ per step)','Interpreter','latex');
             ylabel('circular rotation angle $\phi$','Interpreter','latex');
             title('Intracavity field shape evolution over time','Interpreter','latex');
+            hh = colorbar;
+            ylabel(hh ,'Intracavity Power/$(P_{th}/\frac{\kappa}{2})$ ','Interpreter','latex');
             shading interp
         end
         
         function h = plotIntracavityPower(obj)
-            % h = figure;
+                % h = figure;
             intracavityPower = sum(abs(obj.reducedPhi.^2))/obj.modeNumber;
             plot(obj.reducedPhiIndex, intracavityPower);
             xlabel('Iteration Time Step ($\frac{2}{\kappa}$ per step)','Interpreter','latex');
@@ -222,8 +237,9 @@ classdef LLESolver < handle
         end
         
         function h = plotSpectrumFinal(obj)
-            % h = figure;
-            spectrumFinal = abs(fft(obj.reducedPhi(:,end))/sqrt(obj.modeNumber)).^2;
+                % h = figure;
+            % spectrumFinal = abs(fft(obj.reducedPhi(:,end))/sqrt(obj.modeNumber)).^2;
+            spectrumFinal = abs(obj.reducedPhi_Freq(:,end)).^2;
             spectrumFinal = fftshift(spectrumFinal);
             
             spectrumFinaldbmax = 10*log10(spectrumFinal/max(spectrumFinal)) + 100;
@@ -236,13 +252,14 @@ classdef LLESolver < handle
         end
         
         function h = plotSpectrumAll(obj)
-            % h = figure;
-            ss = size(obj.reducedPhi);
-            spectrumAll = zeros(ss);
-            for ii = 1:ss(2)
-                temp = abs(fft(obj.reducedPhi(:,ii))/sqrt(obj.modeNumber)).^2;
-                spectrumAll(:,ii) = fftshift(temp);
-            end
+                % h = figure;
+            % ss = size(obj.reducedPhi);
+            % spectrumAll = zeros(ss);
+            % for ii = 1:ss(2)
+            %     temp = abs(fft(obj.reducedPhi(:,ii))/sqrt(obj.modeNumber)).^2;
+            %     spectrumAll(:,ii) = fftshift(temp);
+            % end
+            spectrumAll = fftshift(abs(obj.reducedPhi_Freq).^2,1);
             spectrumAlldb = 10*log10(spectrumAll);
             
             mu = linspace(-obj.modeNumber/2,obj.modeNumber/2 - 1,obj.modeNumber).';
@@ -267,7 +284,7 @@ classdef LLESolver < handle
             obj.plotSpectrumFinal;
             subplot(224)
             obj.plotSpectrumAll;
-            fprintf('Calculation finished! Plot showing process...\n');
+            fprintf('Plot Calculation finished! Plot showing process...\n');
         end
     end
     %% protected methods
@@ -283,7 +300,13 @@ classdef LLESolver < handle
                     rand('state',sum(100*clock));
                     obj.phiResult_Freq(:,1) = 1e-5 * randn(obj.modeNumber, 1).*exp(1i * 2 * pi * rand(obj.modeNumber, 1));
                     obj.phiResult(:,1) = ifft(obj.phiResult_Freq(:,1))*sqrt(obj.modeNumber);
-                otherwise
+                case 'soliton'
+                    ita=2 * obj.detuning(1);
+                    f = sqrt(obj.pumpPower(1));
+                    mu = linspace(-obj.modeNumber/2,obj.modeNumber/2 - 1,obj.modeNumber).';
+                    obj.phiResult(:,1) = (4*ita/pi/f+1i*sqrt(2*ita-16*ita^2/pi^2/f^2))*sech(sqrt(ita/obj.D2)*mu/obj.modeNumber*2*pi);
+                    obj.phiResult_Freq(:,1) = fft(obj.phiResult(:,1))/sqrt(obj.modeNumber);
+                otherwise % same as case 'soliton'
                     ita=2 * obj.detuning(1);
                     f = sqrt(obj.pumpPower(1));
                     mu = linspace(-obj.modeNumber/2,obj.modeNumber/2 - 1,obj.modeNumber).';
@@ -297,8 +320,14 @@ classdef LLESolver < handle
                 % check phiResult is already inited
                 error('LLESolver:internalError','cannot create reduced phi before phi is solved.');
             end
-            obj.reducedPhiIndex = floor(obj.NStep/obj.reduceDim) * (1:obj.reduceDim);
+            % obj.phiResult is modeNumber * (NStep+1) matrix.
+            if obj.reduceDim < obj.NStep % take only first NStep results into consideration
+                obj.reducedPhiIndex = floor(obj.NStep/obj.reduceDim) * (1:obj.reduceDim);
+            else
+                obj.reducedPhiIndex = (1:obj.NStep);
+            end
             obj.reducedPhi = obj.phiResult(:,obj.reducedPhiIndex);
+            obj.reducedPhi_Freq = obj.phiResult_Freq(:,obj.reducedPhiIndex);
         end
     end
 end
