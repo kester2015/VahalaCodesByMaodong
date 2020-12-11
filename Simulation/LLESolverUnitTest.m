@@ -24,50 +24,51 @@ plot(abs(c.phiResult_Freq(:,time_unit)));
 close all
 clear d1 d2
 % split step Fourier transform solver
-d1 = LLESolver('D3',0.0001,'NStep',1e5,'solver','SSFT');
-d1.solve;
-d1.plotAll;
+% d1 = LLESolver('detuning',10,'pumpPower',40,'D3',0.0001,'NStep',1e5,'solver','SSFT');
+% d1.solve;
+% d1.plotAll;
 % runge kutta solver
-d2 = LLESolver('D3',0.0001,'NStep',1e4,'solver','RK');
+d2 = LLESolver('detuning',5,'pumpPower',40,'D3',0.000,'NStep',1e5,'solver','RK');
 d2.solve;
 d2.plotAll;
 % check at different evolution time
-time_unit = 1;
-figure
-subplot(211)
-plot(abs(d1.phiResult(:,time_unit)));
-subplot(212)
-plot(abs(d1.phiResult_Freq(:,time_unit)));
-title('split step Fourier transform solver')
-%
-figure
-subplot(211)
-plot(abs(d2.phiResult(:,time_unit)));
-subplot(212)
-plot(abs(d2.phiResult_Freq(:,time_unit)));
-title('runge kutta solver')
+% time_unit = 2;
+% figure
+% subplot(211)
+% plot(abs(d1.phiResult(:,time_unit)));
+% subplot(212)
+% plot(abs(d1.phiResult_Freq(:,time_unit)));
+% title('split step Fourier transform solver')
+% % %
+% figure
+% subplot(211)
+% plot(abs(d2.phiResult(:,time_unit)));
+% subplot(212)
+% plot(abs(d2.phiResult_Freq(:,time_unit)));
+% title('runge kutta solver')
 %% test case 3: pulse pumping
 close all
 clear d1 d2
-nstep = 10e4;
+nstep = 10e4/5;
 
-num_pulse = 1000;
-x0 = 1:nstep/num_pulse:nstep;
+x0 = 512;
 lorentian = @(x,x0,dx)dx^2./((x-x0).^2+dx^2);
-pulse_train = @(x)sum(lorentian(x,x0,nstep/num_pulse/50));
-pumpPower = arrayfun(@(x)50*pulse_train(x), 1:nstep);
+pulse_train = @(x)sum(lorentian(x,x0,50));
+pulsePower = arrayfun(@(x)50*pulse_train(x), 1:1024);
 figure
-plot(pumpPower)
+plot(pulsePower)
+
 % test begins here.
 % This gives a reasonable result
-f1 = LLESolver('D2',+0.02,'D3',0,'pumpPower',pumpPower,'detuning',0,'NStep',nstep,'timeStep',5e-4,...
-    'initState','random','solver','RK');
+f1 = LLESolver('D2',+0.02,'D3',0,'pumpPower',10,'detuning',0,'NStep',nstep,'timeStep',5e-4,'pulsePump',pulsePower,...
+    'initState','random','solver','RK','initState','random');
 f1.solve;
 f1.plotAll;
 % this is somewhat abnormal
-f2 = LLESolver('D2',-0.02,'D3',0,'pumpPower',pumpPower,'detuning',0,'NStep',nstep,'timeStep',5e-4,...
-    'initState','random','solver','RK');
+f2 = LLESolver('D2',-0.02,'D3',0,'pumpPower',10,'detuning',0,'NStep',nstep,'timeStep',5e-4,'pulsePump',pulsePower,...
+    'initState','random','solver','RK','initState','random');
 f2.solve;
 f2.plotAll;
+%%
 
 
