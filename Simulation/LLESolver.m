@@ -295,6 +295,7 @@ classdef LLESolver < handle
             plot(1:obj.modeNumber, abs(obj.phiResult(:,end)),'DisplayName','Final cavity |A|^2')
             hold on
             plot(1:obj.modeNumber, abs(obj.pulsePump)/max(abs(obj.pulsePump))*max(abs(obj.phiResult(:,end))),'DisplayName','Input pulse |f|^2')
+            legend('location','best')
         end
     end
     %% protected methods
