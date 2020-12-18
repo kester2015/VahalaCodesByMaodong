@@ -14,8 +14,8 @@ b3 = LLESolver('D2',0.02,'D3',0,'NStep',10e4,'timeStep',5e-5,'detuning',30,'pump
 b3.solve;
 b3.plotAll;
 %% test case 1: D2 only, soliton formation
-clear c b1 b2 b3
-close all
+% clear c b1 b2 b3
+% close all
 c = LLESolver('D2',0.02,'D3',0,'pumpPower',50,'detuning',[-10 40],'NStep',10e4,'timeStep',2.5e-4,...
     'initState','random','solver','RK');
 c.solve;
@@ -30,8 +30,8 @@ subplot(212)
 plot(abs(c.phiResult_Freq(:,time_unit)));
 %% test case 2: check two solvers
 % test case 2.1: 
-close all
-clear d1 d2
+% close all
+% clear d1 d2
 % split step Fourier transform solver
 d1 = LLESolver('detuning',10,'pumpPower',40,'D3',0.0001,'NStep',1e5,'solver','SSFT');
 d1.solve;
@@ -40,16 +40,22 @@ d1.plotAll;
 d2 = LLESolver('detuning',10,'pumpPower',40,'D3',0.0001,'NStep',1e5,'solver','RK');
 d2.solve;
 d2.plotAll;
+%% multi soliton formation
+f3 = LLESolver('D1',5e-3,'D2',+0.02,'D3',0,'pumpPower',100,'detuning',[-10 50],'NStep',1e5,'timeStep',5e-4/5,...
+    'initState','random','solver','SSFT','modeNumber',2048);
+f3.solve;
+f3.plotAll;
+f3.plotPulseCompare;
 %% test case 3: Breather
 % larger power, smaller detuning, can give breather.
 close all
 clear e1
-e1 = LLESolver('detuning',5,'pumpPower',40,'D3',0.0001,'NStep',1e5,'solver','RK','initState','random');
+e1 = LLESolver('detuning',5,'pumpPower',40,'D3',0.0001,'NStep',1e5,'solver','RK','initState','soliton');
 e1.solve;
 e1.plotAll;
 %% test case 4: pulse pumping
 close all
-clear f1 f2 d1 d2
+clear
 
 nstep = 10e4;
 % detuning = [linspace(-10,50,nstep/2),linspace(50,50,nstep/2)];
@@ -73,7 +79,7 @@ pause(1)
 % f1.solve;
 % f1.plotAll;
 
-f3 = LLESolver('D1',2e-3,'D2',+0.02,'D3',0,'pumpPower',200,'detuning',[-10 50],'NStep',nstep,'timeStep',5e-4/5,'pulsePump',pulsePower,...
+f3 = LLESolver('D1',5e-3,'D2',+0.02,'D3',0,'pumpPower',100,'detuning',[-10 50],'NStep',nstep,'timeStep',5e-4/5,'pulsePump',pulsePower,...
     'initState','random','solver','SSFT','modeNumber',mode_number);
 f3.solve;
 f3.plotAll;
@@ -98,7 +104,7 @@ nstep = 10e4;
 
 mode_number = 1024;
 x0 = mode_number/2;
-dx = 0.05*mode_number;
+dx = 0.03*mode_number;
 lorentian = @(x,x0,dx)dx^2./((x-x0).^2+dx^2);
 gaussian = @(x,x0,dx)exp(-(x-x0)^2/2/dx^2);
 
@@ -109,13 +115,12 @@ plot(pulsePower)
 pause(1)
 
 close all
-f1_1 = LLESolver('D2',+0.02,'D3',0,'pumpPower',50,'detuning',[-10 110],'NStep',5e4,'timeStep',5e-4/5,'pulsePump',pulsePower,...
+f1_1 = LLESolver('D2',+0.02,'D3',0,'pumpPower',100,'detuning',[-10 50],'NStep',nstep,'timeStep',5e-4/5,'pulsePump',pulsePower,...
     'initState','random','solver','SSFT','modeNumber',mode_number);
 f1_1.solve;
 f1_1.plotAll;
 f1_1.plotPulseCompare;
 %% pulse pumping debug with silica code
-D2 = +0.0014;
 clear
 close all
 nstep = 10e4;
@@ -131,8 +136,24 @@ EOComb(1:NComb+1)=sqrt(PComb);
 EOComb(length(w)-NComb+1:length(w))=sqrt(PComb);
 EOPhase=1.9/17*1e3*(-21.6e-27).*w.^2/2;
 Ein_pulse = fftshift(fft(EOComb.*exp(1i*EOPhase)));
-Ein_pulse = ones(size(EOPhase));
-f4 = LLESolver('D2',0.02,'D3',0,'pumpPower',20,'detuning',3,'NStep',nstep,'timeStep',5e-4/5,'pulsePump',Ein_pulse,...
+% Ein_pulse = ones(size(EOPhase));
+
+x0 = nt/2;
+dx = 0.05*nt;
+lorentian = @(x,x0,dx)dx^2./((x-x0).^2+dx^2);
+gaussian = @(x,x0,dx)exp(-(x-x0)^2/2/dx^2);
+pulse_train = @(x)sum(gaussian(x,x0,dx));
+pulsePower = arrayfun(@(x)50*pulse_train(x), 1:nt);
+
+
+
+f3 = LLESolver('D1',0e-3,'D2',+0.02,'D3',0,'pumpPower',100,'detuning',[-10 50],'NStep',nstep,'timeStep',5e-4/5,'pulsePump',Ein_pulse,...
+    'initState','soliton','solver','SSFT','modeNumber',nt);
+f3.solve;
+f3.plotAll;
+f3.plotPulseCompare;
+
+f4 = LLESolver('D1',0e-3,'D2',0.02,'D3',0,'pumpPower',150,'detuning',10,'NStep',nstep,'timeStep',5e-4/5,'pulsePump',pulsePower,...
     'initState','random','solver','SSFT','modeNumber',nt);
 f4.solve;
 f4.plotAll;
