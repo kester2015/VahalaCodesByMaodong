@@ -14,8 +14,8 @@ b3 = LLESolver('D2',0.02,'D3',0,'NStep',10e4,'timeStep',5e-5,'detuning',30,'pump
 b3.solve;
 b3.plotAll;
 %% test case 1: D2 only, soliton formation
-clear c b1 b2 b3
-close all
+% clear c b1 b2 b3
+% close all
 c = LLESolver('D2',0.02,'D3',0,'pumpPower',50,'detuning',[-10 40],'NStep',10e4,'timeStep',2.5e-4,...
     'initState','random','solver','RK');
 c.solve;
@@ -30,8 +30,8 @@ subplot(212)
 plot(abs(c.phiResult_Freq(:,time_unit)));
 %% test case 2: check two solvers
 % test case 2.1: 
-close all
-clear d1 d2
+% close all
+% clear d1 d2
 % split step Fourier transform solver
 d1 = LLESolver('detuning',10,'pumpPower',40,'D3',0.0001,'NStep',1e5,'solver','SSFT');
 d1.solve;
