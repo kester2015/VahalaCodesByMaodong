@@ -49,7 +49,7 @@ e1.solve;
 e1.plotAll;
 %% test case 4: pulse pumping
 close all
-clear f1 f2 d1 d2
+clear
 
 nstep = 10e4;
 % detuning = [linspace(-10,50,nstep/2),linspace(50,50,nstep/2)];
@@ -73,7 +73,7 @@ pause(1)
 % f1.solve;
 % f1.plotAll;
 
-f3 = LLESolver('D1',2e-3,'D2',+0.02,'D3',0,'pumpPower',200,'detuning',[-10 50],'NStep',nstep,'timeStep',5e-4/5,'pulsePump',pulsePower,...
+f3 = LLESolver('D1',5e-3,'D2',+0.02,'D3',0,'pumpPower',100,'detuning',[-10 50],'NStep',nstep,'timeStep',5e-4/5,'pulsePump',pulsePower,...
     'initState','random','solver','SSFT','modeNumber',mode_number);
 f3.solve;
 f3.plotAll;
@@ -109,7 +109,7 @@ plot(pulsePower)
 pause(1)
 
 close all
-f1_1 = LLESolver('D2',+0.02,'D3',0,'pumpPower',200,'detuning',[-10 50],'NStep',nstep,'timeStep',5e-4/5,'pulsePump',pulsePower,...
+f1_1 = LLESolver('D2',+0.02,'D3',0,'pumpPower',100,'detuning',[-10 50],'NStep',nstep,'timeStep',5e-4/5,'pulsePump',pulsePower,...
     'initState','random','solver','SSFT','modeNumber',mode_number);
 f1_1.solve;
 f1_1.plotAll;
@@ -132,11 +132,18 @@ EOComb(length(w)-NComb+1:length(w))=sqrt(PComb);
 EOPhase=1.9/17*1e3*(-21.6e-27).*w.^2/2;
 Ein_pulse = fftshift(fft(EOComb.*exp(1i*EOPhase)));
 Ein_pulse = ones(size(EOPhase));
+
 f4 = LLESolver('D2',0.02,'D3',0,'pumpPower',20,'detuning',3,'NStep',nstep,'timeStep',5e-4/5,'pulsePump',Ein_pulse,...
     'initState','random','solver','SSFT','modeNumber',nt);
 f4.solve;
 f4.plotAll;
 f4.plotPulseCompare;
+
+f3 = LLESolver('D1',5e-3,'D2',+0.02,'D3',0,'pumpPower',100,'detuning',[-10 50],'NStep',nstep,'timeStep',5e-4/5,'pulsePump',Ein_pulse,...
+    'initState','random','solver','SSFT','modeNumber',nt);
+f3.solve;
+f3.plotAll;
+f3.plotPulseCompare;
 
 % e1 = LLESolver('detuning',5,'pumpPower',40,'D3',0.0001,'NStep',1e5,'solver','RK');
 
