@@ -72,8 +72,8 @@ classdef LLESolver < handle
             
             % TODO: check input validility later
             % TODO: check modeNumber be power of 2 in splitstep mode
-            obj.modeNumber = ip.Results.modeNumber;
-            obj.NStep = ip.Results.NStep;
+            obj.modeNumber = 2^ceil( log2(ip.Results.modeNumber) );
+            obj.NStep = ceil(ip.Results.NStep);
             obj.timeStep = ip.Results.timeStep;
             obj.D2 = ip.Results.D2;
             obj.D3 = ip.Results.D3;
@@ -139,7 +139,7 @@ classdef LLESolver < handle
             switch obj.solver
                 case 'SSFT'
                     % ----- Split step fourier transform method ------ %
-                    fprintf("Using Split step fft method, Sloving...");
+                    fprintf("Using Split step fft method, Sloving...\n");
                     dispersion_freq = 1i * 2*(obj.D1 * shiftModeIndexs  + ...
                                               obj.D2 * shiftModeIndexs.^2 / 2 + ... 
                                               obj.D3 * shiftModeIndexs.^3 / 6 + ...
@@ -165,7 +165,7 @@ classdef LLESolver < handle
                     end
                 case 'RK'
                     % ----- Runge Kutta method ------ %
-                    fprintf("Using Runge Kutta method, Sloving...");
+                    fprintf("Using Runge Kutta method, Sloving...\n");
                     pulsePump_freq = fft(obj.pulsePump)/sqrt(length(obj.pulsePump));
                     obj.pulsePump_freq_debugonly = pulsePump_freq;
                     dispersion_freq = 1i * 2*(obj.D1 * shiftModeIndexs  + ...
@@ -243,12 +243,15 @@ classdef LLESolver < handle
             spectrumFinal = fftshift(spectrumFinal);
             
             spectrumFinaldbmax = 10*log10(spectrumFinal/max(spectrumFinal)) + 100;
+%             spectrumFinaldbmax = 10*log10(spectrumFinal);
+
             % arrayfun(@(x) 10*log10(x/max(spectrumFinal)) + 100 ,spectrumFinal);
             mu = linspace(-obj.modeNumber/2,obj.modeNumber/2 - 1,obj.modeNumber).';
             bar(mu,spectrumFinaldbmax);
             xlabel('Iteration Frequency Step ($\frac{\kappa}{2}$ per step)','Interpreter','latex');
             ylabel('Spectrum / (dBmax+100) ','Interpreter','latex');
             title('Final Spectrum','Interpreter','latex');
+%             ylim([0 max(spectrumFinaldbmax)])
         end
         
         function h = plotSpectrumAll(obj)
@@ -286,6 +289,13 @@ classdef LLESolver < handle
             obj.plotSpectrumAll;
             fprintf('Plot Calculation finished! Plot showing process...\n');
         end
+        
+        function plotPulseCompare(obj)
+            figure
+            plot(abs(obj.phiResult(:,end)))
+            hold on
+            plot(abs(obj.pulsePump)/max(abs(obj.pulsePump))*max(abs(obj.phiResult(:,end))))
+        end
     end
     %% protected methods
     methods (Access = protected)
@@ -306,6 +316,14 @@ classdef LLESolver < handle
                     mu = linspace(-obj.modeNumber/2,obj.modeNumber/2 - 1,obj.modeNumber).';
                     obj.phiResult(:,1) = (4*ita/pi/f+1i*sqrt(2*ita-16*ita^2/pi^2/f^2))*sech(sqrt(ita/obj.D2)*mu/obj.modeNumber*2*pi);
                     obj.phiResult_Freq(:,1) = fft(obj.phiResult(:,1))/sqrt(obj.modeNumber);
+                case 'randomPhase'
+                    randn('state',sum(98*clock))
+                    xw=randn(obj.modeNumber, 1);
+                    randn('state',sum(99*clock))
+                    yw=randn(obj.modeNumber, 1);
+                    noise=1e-5.*(xw+1i*yw); % .*sqrt(h*(w+w0)/4/pi/1)
+                    obj.phiResult_Freq(:,1) = noise;
+                    obj.phiResult(:,1) = ifft(noise)*sqrt(obj.modeNumber);%j*sqrt(peak_power)*sech((time-peak_time)/T0).*exp(j*(w_carrier-w0)*time); 
                 otherwise % same as case 'soliton'
                     ita=2 * obj.detuning(1);
                     f = sqrt(obj.pumpPower(1));
