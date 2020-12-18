@@ -25,20 +25,18 @@ pulse_train = @(x)sum(gaussian(x,x0,dx));
 pulsePower = arrayfun(@(x)50*pulse_train(x), 1:nt);
 pulsePower = pulsePower.*exp(1i*EOPhase');
 
-
-% f4 = LLESolver('D1',0e-3,'D2',0.16,'D3',0,'pumpPower',6,'detuning',4,'NStep',nstep,'timeStep',5e-4/5,'pulsePump',pulsePower,...
-%     'initState','random','solver','SSFT','modeNumber',nt);
-% f4.solve;
-% f4.plotAll;
-% f4.plotPulseCompare;
-
-
-% % 4 side peaks on freq domain
-f4 = LLESolver('D1',0e-3,'D2',-0.16,'D3',0,'pumpPower',6,'detuning',4,'NStep',nstep,'timeStep',5e-4/5,'pulsePump',pulsePower,...
+f4 = LLESolver('D1',0e-3,'D2',-0.2,'D3',0,'pumpPower',50,'detuning',[0 50],'NStep',nstep*2,'timeStep',5e-4/2,'pulsePump',Ein_pulse,...
     'initState','random','solver','SSFT','modeNumber',nt);
 f4.solve;
 f4.plotAll;
 f4.plotPulseCompare;
+
+% % 4 side peaks on freq domain
+% f4 = LLESolver('D1',0e-3,'D2',-0.16,'D3',0,'pumpPower',6,'detuning',4,'NStep',nstep,'timeStep',5e-4/5,'pulsePump',pulsePower,...
+%     'initState','random','solver','SSFT','modeNumber',nt);
+% f4.solve;
+% f4.plotAll;
+% f4.plotPulseCompare;
 
 % % dual side on freq domain
 % f4 = LLESolver('D1',0e-3,'D2',-0.1,'D3',0,'pumpPower',6,'detuning',[0 10],'NStep',nstep,'timeStep',5e-4/5,'pulsePump',pulsePower,...

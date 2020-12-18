@@ -292,9 +292,9 @@ classdef LLESolver < handle
         
         function plotPulseCompare(obj)
             figure
-            plot(abs(obj.phiResult(:,end)))
+            plot(1:obj.modeNumber, abs(obj.phiResult(:,end)),'DisplayName','Final cavity |A|^2')
             hold on
-            plot(abs(obj.pulsePump)/max(abs(obj.pulsePump))*max(abs(obj.phiResult(:,end))))
+            plot(1:obj.modeNumber, abs(obj.pulsePump)/max(abs(obj.pulsePump))*max(abs(obj.phiResult(:,end))),'DisplayName','Input pulse |f|^2')
         end
     end
     %% protected methods
