@@ -4,7 +4,7 @@ clc
 
 nstep = 10e4;
 tauR=46e-12; % in s, round-trip time % for the ring is 224 GHz.
-nt=2048;        % set the point number to be 2048
+nt=512;%2048;        % set the point number to be 2048
 dt=tauR/nt;     % set the point number to be 2048
 w=2*pi*[(0:round(nt/2)-1),(-floor(nt/2):-1)]'/(dt*nt);  % frequency window, relative to center angular frequency, with fftshift applied
 
@@ -31,18 +31,12 @@ pulsePower = pulsePower.*exp(1i*EOPhase');
 % f4.plotAll;
 % f4.plotPulseCompare;
 
-% f4 = LLESolver('D1',0e-3,'D2',-0.2,'D3',0,'pumpPower',50,'detuning',[0 50],'NStep',nstep*2,'timeStep',5e-4/2,'pulsePump',Ein_pulse,...
+% % 4 side peaks on freq domain
+% f4 = LLESolver('D1',5e1,'D2',-0.16,'D3',0,'pumpPower',6,'detuning',4,'NStep',nstep,'timeStep',5e-4/5,'pulsePump',pulsePower,...
 %     'initState','random','solver','SSFT','modeNumber',nt);
 % f4.solve;
 % f4.plotAll;
 % f4.plotPulseCompare;
-
-% % 4 side peaks on freq domain
-f4 = LLESolver('D1',5e1,'D2',-0.16,'D3',0,'pumpPower',6,'detuning',4,'NStep',nstep,'timeStep',5e-4/5,'pulsePump',pulsePower,...
-    'initState','random','solver','SSFT','modeNumber',nt);
-f4.solve;
-f4.plotAll;
-f4.plotPulseCompare;
 
 % % dual side on freq domain
 % f4 = LLESolver('D1',0e-3,'D2',-0.1,'D3',0,'pumpPower',6,'detuning',[0 10],'NStep',nstep,'timeStep',5e-4/5,'pulsePump',pulsePower,...
@@ -52,8 +46,9 @@ f4.plotPulseCompare;
 % f4.plotPulseCompare;
 
 % % dual side on time scale peak
-% f4 = LLESolver('D1',0e-3,'D2',0.016,'D3',0,'pumpPower',6,'detuning',4,'NStep',nstep,'timeStep',5e-4/5,'pulsePump',pulsePower,...
-%     'initState','random','solver','SSFT','modeNumber',nt);
-% f4.solve;
-% f4.plotAll;
-% f4.plotPulseCompare;
+f4 = LLESolver('D1',0e-3,'D2',-0.0007,'D3',0.000,'pumpPower',2,'detuning',5,'NStep',nstep,'timeStep',5e-4/5,'pulsePump',pulsePower,...
+    'initState','random','solver','SSFT','modeNumber',nt);
+f4.solve;
+f4.plotAll;
+f4.plotPulseCompare;
+
