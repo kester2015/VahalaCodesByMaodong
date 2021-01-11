@@ -1085,15 +1085,11 @@ function plotThisModeTrace(gcbo,EventData,handles) % Button Down Function of a m
     Qobj=Q_trace_fit(fitq_trace_Q,fitq_trace_MZI,MZI_dispersion(1),...
         299792458/targeted_freq,ExtractQ_sens,handles.ExtractQ_correction.String);
     Qobj.plot_Q_max;
-    
     % Then update side matching window plot
-    disk_FSR=FromDigits_FSR(handles);
     delete(findobj(handles.display_window,'color','k'))
-    hold(handles.display_window,'on');
     plot(handles.display_window,[userdata(1,2) userdata(1,2)],[-1 1]*disk_FSR/2,'k','linewidth',2); % Center bold vertical line
-    hold(handles.display_window,'off');    
-        
-        MS_match=userdata(3:4);
+    
+        MS_match=MS_plot(MS_plot(:,2)==0,3:4);
         line_x=((1-MS_match(:,2))*[0 1 0]).';
         line_x=[0;line_x(:);0];
         line_y=(MS_match(:,1)*[1 1 1]).';
@@ -1104,17 +1100,17 @@ function plotThisModeTrace(gcbo,EventData,handles) % Button Down Function of a m
         plot(handles.matching_window,[-1 2],[-1 -1]*tol,'c');
 
         if f_scan_start<f_scan_end
-            match_center_mu=mu_center+(-FromDigits_offset(handles))/MZI_dispersion(1)+userdata(1,2)*disk_FSR/MZI_dispersion(1);
-            match_start_mu=mu_center+(-FromDigits_offset(handles)-disk_FSR/2)/MZI_dispersion(1)+userdata(1,2)*disk_FSR/MZI_dispersion(1);
-            match_end_mu=mu_center+(-FromDigits_offset(handles)+disk_FSR/2)/MZI_dispersion(1)+userdata(1,2)*disk_FSR/MZI_dispersion(1);
+            match_center_mu=mu_center+(-FromDigits_offset(handles))/MZI_dispersion(1);
+            match_start_mu=mu_center+(-FromDigits_offset(handles)-disk_FSR/2)/MZI_dispersion(1);
+            match_end_mu=mu_center+(-FromDigits_offset(handles)+disk_FSR/2)/MZI_dispersion(1);
             match_center_index=MuToIndex(match_center_mu,dispersion_data.MZI_index);
             match_range_index=round((MuToIndex(match_end_mu,dispersion_data.MZI_index)-MuToIndex(match_start_mu,dispersion_data.MZI_index))/2);
     %         mode_matching_trace=dispersion_data.data_matrix(match_center_index-match_range_index:match_center_index+match_range_index,end-1)./max(dispersion_data.data_matrix(:,end-1));
             mode_matching_trace=dispersion_data.data_matrix(match_center_index-match_range_index:match_center_index+match_range_index,2)./max(dispersion_data.data_matrix(:,2));
         else
-            match_center_mu=-mu_center+(FromDigits_offset(handles))/MZI_dispersion(1)-userdata(1,2)*disk_FSR/MZI_dispersion(1);
-            match_start_mu=-mu_center+(FromDigits_offset(handles)-disk_FSR/2)/MZI_dispersion(1)-userdata(1,2)*disk_FSR/MZI_dispersion(1);
-            match_end_mu=-mu_center+(FromDigits_offset(handles)+disk_FSR/2)/MZI_dispersion(1)-userdata(1,2)*disk_FSR/MZI_dispersion(1);
+            match_center_mu=-mu_center+(FromDigits_offset(handles))/MZI_dispersion(1);
+            match_start_mu=-mu_center+(FromDigits_offset(handles)-disk_FSR/2)/MZI_dispersion(1);
+            match_end_mu=-mu_center+(FromDigits_offset(handles)+disk_FSR/2)/MZI_dispersion(1);
             match_center_index=MuToIndex(match_center_mu,dispersion_data.MZI_index);
             match_range_index=round((MuToIndex(match_end_mu,dispersion_data.MZI_index)-MuToIndex(match_start_mu,dispersion_data.MZI_index))/2);
     %         mode_matching_trace=dispersion_data.data_matrix(match_center_index+match_range_index:-1:match_center_index-match_range_index,end-1)./max(dispersion_data.data_matrix(:,end-1));

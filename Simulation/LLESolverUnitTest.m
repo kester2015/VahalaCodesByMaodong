@@ -33,13 +33,13 @@ plot(abs(c.phiResult_Freq(:,time_unit)));
 % close all
 % clear d1 d2
 % split step Fourier transform solver
-d1 = LLESolver('detuning',10,'pumpPower',40,'D3',0.0001,'NStep',1e5,'solver','SSFT');
+d1 = LLESolver('detuning',10,'pumpPower',40,'D3',0.0015,'NStep',1e5,'solver','SSFT');
 d1.solve;
 d1.plotAll;
 % runge kutta solver
-d2 = LLESolver('detuning',10,'pumpPower',40,'D3',0.0001,'NStep',1e5,'solver','RK');
-d2.solve;
-d2.plotAll;
+% d2 = LLESolver('detuning',10,'pumpPower',40,'D3',0.0001,'NStep',1e5,'solver','RK');
+% d2.solve;
+% d2.plotAll;
 %% multi soliton formation
 f3 = LLESolver('D1',5e-3,'D2',+0.02,'D3',0,'pumpPower',100,'detuning',[-10 50],'NStep',1e5,'timeStep',5e-4/5,...
     'initState','random','solver','SSFT','modeNumber',2048);
