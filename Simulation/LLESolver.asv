@@ -277,9 +277,9 @@ classdef LLESolver < handle
         
         function plotPulseCompare(obj)
             % figure
-            plot(1:obj.modeNumber, abs(obj.phiResult(:,end)),'DisplayName','Cavity |A|^2')
+            plot(1:obj.modeNumber, abs(obj.phiResult(:,end)),'DisplayName','Final cavity |A|^2')
             hold on
-            plot(1:obj.modeNumber, abs(obj.pulsePump)/max(abs(obj.pulsePump))*max(abs(obj.phiResult(:,end))),'DisplayName','Input |f|^2')
+            plot(1:obj.modeNumber, abs(obj.pulsePump)/max(abs(obj.pulsePump))*max(abs(obj.phiResult(:,end))),'DisplayName','Normalized Input |f|^2')
             legend('location','best')
             xlabel('Cavity position','Interpreter','latex');
             ylabel('Field','Interpreter','latex');
@@ -316,7 +316,7 @@ classdef LLESolver < handle
             subplot(2,4,1)
             obj.plotIntracavityPower;
             subplot(2,4,2)
-            obj.plotPulseCompare;
+            obj.plotIntracavityPower;
             subplot(2,4,[3 4])
             obj.plotPhiAbsAll;
             subplot(2,4,[5 6])
@@ -329,6 +329,8 @@ classdef LLESolver < handle
                 saveas(gcf, savedir + obj.getName + ".jpg");
             end
         end
+        
+        
         
         function s = getName(obj)
             s = sprintf("detuning_%.5f"+"_power_%.5f"+"_D1_%.5f"+"_D2_%.5f"+"_D3_%.5f",...
