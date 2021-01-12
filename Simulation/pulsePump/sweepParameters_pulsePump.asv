@@ -4,15 +4,14 @@ clc
 c = 299792458;
 %%
 load('D:\Measurement\pulse pumping\20201123\OSA_Cavity15_PumpPower0.833_Dispersion7.8_RepRate17.91964GHz-1430-1700nm.mat');
-    combPower=sgolayfilt(OSAPower,1,101); % baseline estimate, using slow-varying envelope
-%     trace_length=length(OSAPower);
-%     for index=2:trace_length
-%         combPower(index)=max([combPower(index) combPower(index-1)*(1-10/trace_length)]);
-%     end
-%     for index=trace_length-1:-1:1
-%         combPower(index)=max([combPower(index) combPower(index+1)*(1-10/trace_length)]);
-%     end
-%    combPower = -combPower;
+    trace_MS_baseline=sgolayfilt(trace_MS_raw,1,1001); % baseline estimate, using slow-varying envelope
+    trace_length=length(trace_MS_raw);
+    for index=2:trace_length
+        trace_MS_baseline(index)=max([trace_MS_baseline(index) trace_MS_baseline(index-1)*(1-10/trace_length)]);
+    end
+    for index=trace_length-1:-1:1
+        trace_MS_baseline(index)=max([trace_MS_baseline(index) trace_MS_baseline(index+1)*(1-10/trace_length)]);
+    end
 %%
 Q0 = 1.886; % M
 Qe = 4.085; % M

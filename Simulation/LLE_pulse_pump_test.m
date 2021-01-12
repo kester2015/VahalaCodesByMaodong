@@ -49,6 +49,6 @@ pulsePower = pulsePower.*exp(1i*EOPhase');
 f4 = LLESolver('D1',0e-3,'D2',-0.0007,'D3',0.000,'pumpPower',2,'detuning',5,'NStep',nstep,'timeStep',5e-4/5,'pulsePump',pulsePower,...
     'initState','random','solver','SSFT','modeNumber',nt);
 f4.solve;
-f4.plotAll;
-f4.plotPulseCompare;
-
+% f4.plotAll;
+% f4.plotPulseCompare;
+f4.plotAll_pulsed;

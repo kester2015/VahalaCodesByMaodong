@@ -239,7 +239,7 @@ classdef LLESolver < handle
         function h = plotSpectrumFinal(obj)
                 % h = figure;
             % spectrumFinal = abs(fft(obj.reducedPhi(:,end))/sqrt(obj.modeNumber)).^2;
-            spectrumFinal = abs(obj.reducedPhi_Freq(:,end)).^2;
+            spectrumFinal = abs(obj.phiResult_Freq(:,end)).^2;
             spectrumFinal = fftshift(spectrumFinal);
             
             spectrumFinaldbmax = 10*log10(spectrumFinal/max(spectrumFinal)) + 100;
@@ -330,10 +330,6 @@ classdef LLESolver < handle
             end
         end
         
-        function s = getName(obj)
-            s = sprintf("detuning_%.5f"+"_power_%.5f"+"_D1_%.5f"+"_D2_%.5f"+"_D3_%.5f",...
-                            mean(obj.detuning), mean(obj.pumpPower), obj.D1, obj.D2, obj.D3);
-        end
     end
     %% protected methods
     methods (Access = protected)
@@ -385,5 +381,37 @@ classdef LLESolver < handle
             obj.reducedPhi = obj.phiResult(:,obj.reducedPhiIndex);
             obj.reducedPhi_Freq = obj.phiResult_Freq(:,obj.reducedPhiIndex);
         end
+    end
+    %% get methods
+    methods
+        function s = getName(obj)
+            s = sprintf("detuning_%.5f"+"_power_%.5f"+"_D1_%.5f"+"_D2_%.5f"+"_D3_%.5f",...
+                            mean(obj.detuning), mean(obj.pumpPower), obj.D1, obj.D2, obj.D3);
+        end
+        
+        function spectrumdb = getSpectrumDB(obj,pos) % return db spectrum at time = pos
+            if nargin ==1
+                pos = 1; % automatically return the final spectrum
+            end
+                if ~(pos<0) && ~(pos>1)
+                    pos = round( pos* (length(obj.phiResult_Freq(1,:))-1) ) + 1;
+                end
+                if (pos<0) && ~(pos<-1) % if pos already =0, won't come in here. 
+                    pos = round( (1-pos)*length(obj.phiResult_Freq(1,:))-1 ) + 1;
+                end
+                if pos > length(obj.phiResult_Freq(1,:)) || pos < 0
+                    error("Requested position %.2f exceeds total length %f",pos,length(obj.phiResult_Freq(:,1)) )
+                elseif ~(mod(pos,1)==0)
+                    error("input illegal(non integer) pos %.2f.", pos)
+                end
+            spectrumPos = abs(obj.phiResult_Freq(:,pos)).^2;
+            spectrumPos = fftshift(spectrumPos);
+            spectrumdb = 10*log10(spectrumPos);
+
+            % spectrumdb = 10*log10(spectrumPos/max(spectrumPos)) + 100;
+            % arrayfun(@(x) 10*log10(x/max(spectrumFinal)) + 100 ,spectrumFinal);
+            % mu = linspace(-obj.modeNumber/2,obj.modeNumber/2 - 1,obj.modeNumber).';
+        end
+        
     end
 end

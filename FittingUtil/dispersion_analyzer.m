@@ -813,8 +813,12 @@ if strcmp(handles.data_status.String,'Data loaded')
             plot_interval = str2double(handles.ExtractQ_plot_interval.String);
             % Qobj=Q_trace_fit(fitq_trace_Q,fitq_trace_MZI,MZI_dispersion(1),...
             % 299792458/targeted_freq(ind),1-0.1*10.^(-eval(handles.process_th_peak.String)/10),'fano');
-            Qobj=Q_trace_fit(fitq_trace_Q,fitq_trace_MZI,MZI_dispersion(1),...
-                299792458/targeted_freq(ind),ExtractQ_sens,handles.ExtractQ_correction.String);
+            try
+                Qobj=Q_trace_fit(fitq_trace_Q,fitq_trace_MZI,MZI_dispersion(1),...
+                    299792458/targeted_freq(ind),ExtractQ_sens,handles.ExtractQ_correction.String);
+            catch
+                continue
+            end
             targeted_Q_matrix=Qobj.get_Q;
             try
                 targeted_Q0(ind)=targeted_Q_matrix(1,1);
@@ -1059,6 +1063,25 @@ function plotThisModeTrace(gcbo,EventData,handles) % Button Down Function of a m
         MS_mapping(:,1)=-MS_mapping(:,1);
     end
     mu_center=MS_mapping(1,1)+(f_scan_center-f_scan_start)/(f_scan_end-f_scan_start)*(MS_mapping(end,1)-MS_mapping(1,1));
+    MS_mapping(:,1)=MS_mapping(:,1)-mu_center;
+    MS_plot=zeros(size(MS_mapping(:,1)));
+    MZI_dispersion=eval(handles.plot_MZI_coeff.String);
+    for ind=1:length(MZI_dispersion)
+        MS_plot=MS_plot+MZI_dispersion(ind)*MS_mapping(:,1).^ind/factorial(ind);
+    end
+    if ~isempty(dispersion_data.mode_hopping_spec)
+        mode_hopping_pos=[dispersion_data.mode_hopping_spec(:,1)*FromDigits_FSR(handles),dispersion_data.mode_hopping_spec(:,2)*MZI_dispersion(1)];
+        for mode_hopping_ind=1:length(mode_hopping_pos(:,1))
+            MS_plot=MS_plot-(MS_plot>mode_hopping_pos(mode_hopping_ind,1))*mode_hopping_pos(mode_hopping_ind,2);
+        end
+    end
+    MS_plot(:,1)=MS_plot(:,1)+FromDigits_offset(handles);                      
+    disk_FSR=FromDigits_FSR(handles);
+    MS_plot(:,2)=round(MS_plot(:,1)/disk_FSR);
+    MS_plot(:,3)=MS_plot(:,1)-MS_plot(:,2)*disk_FSR;
+    MS_plot(:,4)=dispersion_data.MS_mapping(:,2);
+    MS_plot(:,5)=dispersion_data.MS_mapping(:,1);
+    dispersion_data.MS_plot=MS_plot;
     
     userdata = get(gcbo,'userdata');
     mode_mu = userdata(1,5);
@@ -1093,7 +1116,7 @@ function plotThisModeTrace(gcbo,EventData,handles) % Button Down Function of a m
     plot(handles.display_window,[userdata(1,2) userdata(1,2)],[-1 1]*disk_FSR/2,'k','linewidth',2); % Center bold vertical line
     hold(handles.display_window,'off');    
         
-        MS_match=userdata(3:4);
+        MS_match=MS_plot(MS_plot(:,2)==userdata(1,2),3:4);
         line_x=((1-MS_match(:,2))*[0 1 0]).';
         line_x=[0;line_x(:);0];
         line_y=(MS_match(:,1)*[1 1 1]).';
