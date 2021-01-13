@@ -34,6 +34,10 @@ classdef LLESolver < handle
         saveStep % save phi result after certain steps of solving only to save memory
     end
     
+    properties
+        dispProgress % whether display sloving progress in command window, default 1
+    end
+    
    properties (Access = public) % should be protected later
        phiResult % store Freq evolution result, mode_num * NStep matrix
        phiResult_Freq % Freq domain, 0->max->min->0 frequencies.
@@ -69,6 +73,8 @@ classdef LLESolver < handle
             ip.addParameter('solver','SSFT',@ischar); % SSFT: split step FT; RK: Runge kutta
             ip.addParameter('saveStep',1,@(x)( isnumeric(x)&&(x>0)&&(mod(x,1)==0) ) ); 
             
+            ip.addParameter('dispProgress',1,@isnumeric);
+            
             ip.addParameter('arbiDisp',@(x)0,@(var)isa(var,'function_handle')); % SSFT: split step FT; RK: Runge kutta
             
             ip.parse(varargin{:});
@@ -87,6 +93,8 @@ classdef LLESolver < handle
             obj.initState = ip.Results.initState;
             obj.solver = ip.Results.solver;
             obj.saveStep = ip.Results.saveStep;
+            
+            obj.dispProgress = ip.Result
             
             switch length(ip.Results.detuning)
                 case 1
@@ -310,7 +318,7 @@ classdef LLESolver < handle
             plot(obj.reducedPhiIndex, intracavityPower);
             xlabel(sprintf('Iteration Time Step ($\\frac{%.f}{\\kappa}$ per step)',2*obj.saveStep),'Interpreter','latex');
             ylabel('Intracavity power','Interpreter','latex');
-            title('Intracavity Power evolution over time','Interpreter','latex');
+            title('Intracavity Power','Interpreter','latex');
         end
         
         function h = plotSpectrumFinal(obj)
@@ -356,11 +364,11 @@ classdef LLESolver < handle
             % figure
             plot(1:obj.modeNumber, abs(obj.phiResult(:,end)),'DisplayName','Cavity |A|^2')
             hold on
-            plot(1:obj.modeNumber, abs(obj.pulsePump)/max(abs(obj.pulsePump))*max(abs(obj.phiResult(:,end))),'DisplayName','Norm.Input |f|^2')
+            plot(1:obj.modeNumber, abs(obj.pulsePump)/max(abs(obj.pulsePump))*max(abs(obj.phiResult(:,end))),'DisplayName','Input |f|^2')
             legend('location','best')
             xlabel('Cavity position','Interpreter','latex');
             ylabel('Field','Interpreter','latex');
-            title('Intracavity field/Pulse input','Interpreter','latex');
+            title('Intracavity field/Normalized Pulse input','Interpreter','latex');
         end
         
         function plotAll(obj,savedir) % savedir should end with "\" !

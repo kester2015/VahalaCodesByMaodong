@@ -1,5 +1,5 @@
-clear
-close all
+% clear
+% close all
 clc
 
 nstep = 10e4;
@@ -47,7 +47,7 @@ pulsePower = pulsePower.*exp(1i*EOPhase');
 
 % % dual side on time scale peak
 f4 = LLESolver('D1',0e-3,'D2',-0.0007,'D3',0.000,'pumpPower',2,'detuning',5,'NStep',nstep,'timeStep',5e-4/5,'pulsePump',pulsePower,...
-    'initState','random','solver','SSFT','modeNumber',nt,'saveStep',500);
+    'initState','random','solver','SSFT','modeNumber',nt,'saveStep',1);
 f4.solve;
 % f4.plotAll;
 % f4.plotPulseCompare;

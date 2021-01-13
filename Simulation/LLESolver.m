@@ -34,6 +34,10 @@ classdef LLESolver < handle
         saveStep % save phi result after certain steps of solving only to save memory
     end
     
+    properties
+        dispProgress % whether display sloving progress in command window, default 1
+    end
+    
    properties (Access = public) % should be protected later
        phiResult % store Freq evolution result, mode_num * NStep matrix
        phiResult_Freq % Freq domain, 0->max->min->0 frequencies.
@@ -69,6 +73,8 @@ classdef LLESolver < handle
             ip.addParameter('solver','SSFT',@ischar); % SSFT: split step FT; RK: Runge kutta
             ip.addParameter('saveStep',1,@(x)( isnumeric(x)&&(x>0)&&(mod(x,1)==0) ) ); 
             
+            ip.addParameter('dispProgress',1,@isnumeric);
+            
             ip.addParameter('arbiDisp',@(x)0,@(var)isa(var,'function_handle')); % SSFT: split step FT; RK: Runge kutta
             
             ip.parse(varargin{:});
@@ -87,6 +93,8 @@ classdef LLESolver < handle
             obj.initState = ip.Results.initState;
             obj.solver = ip.Results.solver;
             obj.saveStep = ip.Results.saveStep;
+            
+            obj.dispProgress = ip.Results.dispProgress;
             
             switch length(ip.Results.detuning)
                 case 1
@@ -172,7 +180,7 @@ classdef LLESolver < handle
                                                             obj.phiResult(:,savepos+1) = thisPhi;
                                                             obj.phiResult_Freq(:,savepos+1) = fft(thisPhi)/sqrt(length(thisPhi));
                                                         end
-                                                        if mod(kk,100) == 0
+                                                        if mod(kk,100) == 0 && obj.dispProgress
                                                             fprintf("calculating step %d of %d, %.2f%% finished.\n",kk, obj.NStep, 100 * kk/obj.NStep);
                                                         end
                                                         lastPhi = thisPhi; % update Recursive
@@ -245,7 +253,7 @@ classdef LLESolver < handle
                                                                 obj.phiResult_Freq(:,savepos+1) = thisPhi_Freq;
                                                                 obj.phiResult(:,savepos+1) = ifft(thisPhi_Freq)*sqrt(length(thisPhi_Freq));
                                                             end
-                                                            if mod(kk,100) == 0
+                                                            if mod(kk,100) == 0 && obj.dispProgress
                                                                 fprintf("calculating step %d of %d, %.2f%% finished.\n",kk, obj.NStep, 100 * kk/obj.NStep);
                                                             end
                                                             lastPhi_Freq = thisPhi_Freq; % update Recursive
@@ -310,7 +318,7 @@ classdef LLESolver < handle
             plot(obj.reducedPhiIndex, intracavityPower);
             xlabel(sprintf('Iteration Time Step ($\\frac{%.f}{\\kappa}$ per step)',2*obj.saveStep),'Interpreter','latex');
             ylabel('Intracavity power','Interpreter','latex');
-            title('Intracavity Power evolution over time','Interpreter','latex');
+            title('Intracavity Power','Interpreter','latex');
         end
         
         function h = plotSpectrumFinal(obj)
@@ -462,7 +470,7 @@ classdef LLESolver < handle
     %% get methods
     methods
         function s = getName(obj)
-            s = sprintf("detuning_%.5f"+"_power_%.5f"+"_D1_%.5f"+"_D2_%.5f"+"_D3_%.5f",...
+            s = sprintf("detuning-%.5f"+"-power-%.5f"+"-D1-%.5f"+"-D2-%.5f"+"-D3-%.5f",...
                             mean(obj.detuning), mean(obj.pumpPower), obj.D1, obj.D2, obj.D3);
         end
         
