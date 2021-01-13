@@ -4,7 +4,7 @@ clc
 
 nstep = 10e4;
 tauR=46e-12; % in s, round-trip time % for the ring is 224 GHz.
-nt=512;%2048;        % set the point number to be 2048
+nt=2048;%2048;        % set the point number to be 2048
 dt=tauR/nt;     % set the point number to be 2048
 w=2*pi*[(0:round(nt/2)-1),(-floor(nt/2):-1)]'/(dt*nt);  % frequency window, relative to center angular frequency, with fftshift applied
 
@@ -47,7 +47,7 @@ pulsePower = pulsePower.*exp(1i*EOPhase');
 
 % % dual side on time scale peak
 f4 = LLESolver('D1',0e-3,'D2',-0.0007,'D3',0.000,'pumpPower',2,'detuning',5,'NStep',nstep,'timeStep',5e-4/5,'pulsePump',pulsePower,...
-    'initState','random','solver','SSFT','modeNumber',nt);
+    'initState','random','solver','SSFT','modeNumber',nt,'saveStep',500);
 f4.solve;
 % f4.plotAll;
 % f4.plotPulseCompare;

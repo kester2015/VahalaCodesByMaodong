@@ -30,25 +30,25 @@ subplot(212)
 plot(abs(c.phiResult_Freq(:,time_unit)));
 %% test case 2: check two solvers
 % test case 2.1: 
-close all
-clear d1 d2
+% close all
+% clear d1 d2
 % split step Fourier transform solver
-d1 = LLESolver('detuning',10,'pumpPower',40,'D3',0.001,'NStep',1e5,'solver','SSFT');
+d1 = LLESolver('detuning',10,'pumpPower',40,'D3',0.0015,'NStep',1e5,'solver','SSFT');
 d1.solve;
 d1.plotAll;
 % runge kutta solver
-d2 = LLESolver('detuning',10,'pumpPower',40,'D3',0.001,'NStep',1e5,'solver','RK');
+d2 = LLESolver('detuning',10,'pumpPower',40,'D3',0.0015,'NStep',1e5,'solver','RK');
 d2.solve;
 d2.plotAll;
 %% test case 2.2: check saveStep with two solvers
 close all
 clear d1 d2
 % split step Fourier transform solver
-d1 = LLESolver('saveStep',100,'detuning',10,'pumpPower',40,'D3',0.001,'NStep',1e5,'solver','SSFT');
+d1 = LLESolver('saveStep',1,'detuning',10,'pumpPower',40,'D3',0.0015,'NStep',1e5,'solver','SSFT');
 d1.solve;
 d1.plotAll;
 % runge kutta solver
-d2 = LLESolver('saveStep',100,'detuning',10,'pumpPower',40,'D3',0.001,'NStep',1e5,'solver','RK');
+d2 = LLESolver('saveStep',1,'detuning',10,'pumpPower',40,'D3',0.0015,'NStep',1e5,'solver','RK');
 d2.solve;
 d2.plotAll;
 %% multi soliton formation
@@ -61,7 +61,7 @@ f3.plotPulseCompare;
 % larger power, smaller detuning, can give breather.
 close all
 clear e1
-e1 = LLESolver('saveStep',100,'detuning',5,'pumpPower',40,'D3',0.0001,'NStep',1e5,'solver','RK','initState','soliton');
+e1 = LLESolver('detuning',5,'pumpPower',40,'D3',0.0001,'NStep',1e5,'solver','RK','initState','soliton');
 e1.solve;
 e1.plotAll;
 %% test case 4: pulse pumping
