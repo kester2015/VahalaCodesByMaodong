@@ -37,41 +37,47 @@ pause(1);
 
 %%
 ii = 0;
-D1_List = (5*1e6/kappa)*[0:0.2:1 -0.1:-0.2:-1];
-D2_List = (disp_D2/kappa)*[1:0.1:2 0.9:-0.1:0.5];
-D3_List = (disp_D3/kappa)*[1:0.1:2 0.9:-0.1:0.5];
-pulse_width_List = [0.03 0.05 0.08];
-pump_power_List = [1:1:10];
-detuning_List = [0:1:5];
-totalNum = length(D1_List)*length(D2_List)*length(D3_List)*length(pulse_width_List)*length(pump_power_List)*length(detuning_List);
+D1_List = (5*1e6/kappa)*[0 1 2 -1 -2];
+D2_List = (disp_D2/kappa)*[0.5 1 2 3];%[1:0.1:2 0.9:-0.1:0.5];
+D3_List = (disp_D3/kappa)*[0.5 1 1.5 2 3];%[1:0.1:2 0.9:-0.1:0.5];
+pulse_width_List = [0.02 0.05 0.08]/2;
+pump_power_List = [1,5,10];
+detuning_List = [-5 0 5];%[0:1:5];
+EO_disp_list = [0 0.2 0.5 1 2 5];
+totalNum = length(D1_List)*length(D2_List)*length(D3_List)*length(pulse_width_List)*length(pump_power_List)*length(detuning_List)*length(EO_disp_list);
+
+for pulse_width = pulse_width_List
 for D1 = D1_List
 for D2 = D2_List
 for D3 = D3_List
-    for pulse_width = pulse_width_List
+    for EO_disp = EO_disp_list
         for pump_power = pump_power_List
         for detuning = detuning_List
             ii = ii + 1 ;
             close all
             tic;
-            sweep_overnight(pulse_width,D1, D2, D3, pump_power, detuning,LOCS,PKS,OSAWavelength,OSAPower);
+            sweep_overnight(pulse_width,D1, D2, D3, pump_power, detuning, EO_disp , LOCS,PKS,OSAWavelength,OSAPower);
             t = toc;
             printPredictTime(t*(totalNum-ii));
             fprintf("--------Finished %.0f of Total %.0f Calculations--------\n",ii,totalNum)
+            fprintf("--------D1=%.f, D2=%.f, D3=%.f, pulseWd=%.2f, pulsePw=%.2f, detun=%.f, EO_disp=%.1f*--------\n",...
+                D1,D2,D3,pulse_width,pump_power,detuning,EO_disp)
         end
         end
     end
 end
 end
 end
+end
 
 
 %%
-function sweep_overnight(pulse_width, D1, D2, D3, pump_power, detuning,LOCS,PKS,OSAWavelength,OSAPower)
+function sweep_overnight(pulse_width, D1, D2, D3, pump_power, detuning,EO_disp,LOCS,PKS,OSAWavelength,OSAPower)
     c = 299792458;
     lambda = 1550.4; % nm
     FSR = 17924.02 * 1e6; % SI unit
     %% Begin simulation
-    filedir = "D:\Measurement\pulse pumping\Simulation_20210112_para_sweep\";
+    filedir = "D:\Measurement\pulse pumping\Simulation_20210114_para_sweep\";
     nstep = 10e4;
     nt = 2048;        % set the point number to be 2048
     tauR = 1/FSR; %46e-12; % in s, round-trip time % for the ring is 224 GHz.
@@ -79,7 +85,7 @@ function sweep_overnight(pulse_width, D1, D2, D3, pump_power, detuning,LOCS,PKS,
     w = 2*pi*[(0:round(nt/2)-1),(-floor(nt/2):-1)]'/(dt*nt);  % frequency window, relative to center angular frequency, with fftshift applied
     %%
     save_flag = datestr(now,'yymmdd-HHMMSS');
-    EOPhase = 1.9/17*1e3*(-21.6e-27).*w.^2/2;
+    EOPhase = 1.9/17*1e3*(-21.6e-27).*w.^2/2 * EO_disp;
 
     x0 = nt/2;
         % pulse_width = 0.05
@@ -101,7 +107,7 @@ function sweep_overnight(pulse_width, D1, D2, D3, pump_power, detuning,LOCS,PKS,
     save(strcat(filedir,save_flag,'-slover.mat'),'f1');
     f1.solve;
     close all
-    f1.plotAll_pulsed(strcat(filedir,save_flag,'-'));
+    f1.plotAll_pulsed(strcat(filedir,save_flag,sprintf('%.2f',EO_disp),'-'));
     pause(1)
 
     w0 = 2*pi*c/(lambda*1e-9);
@@ -130,7 +136,7 @@ function sweep_overnight(pulse_width, D1, D2, D3, pump_power, detuning,LOCS,PKS,
     saveas(gcf,strcat(filedir,save_flag,'-spectrumFit.jpg'))
     
     good_flag = {};
-    if residue/length(PKS) < 4 % if average residue small than 2 db
+    if residue/length(PKS) < 8 % if average residue small than 2 db
         if isfile(strcat(filedir,'good_flag.mat')) 
             load(strcat(filedir,'good_flag.mat'))
         end
