@@ -39,11 +39,11 @@ pause(1);
 ii = 0;
 D1_List = (5*1e6/kappa)*[0 1 2 -1 -2];
 D2_List = (disp_D2/kappa)*[0.5 1 2 3];%[1:0.1:2 0.9:-0.1:0.5];
-D3_List = (disp_D3/kappa)*[0.5 1 1.5 2 3];%[1:0.1:2 0.9:-0.1:0.5];
+D3_List = (disp_D3/kappa)*[0.5 1 2 3];%[1:0.1:2 0.9:-0.1:0.5];
 pulse_width_List = [0.02 0.05 0.08]/2;
 pump_power_List = [1,5,10];
 detuning_List = [-5 0 5];%[0:1:5];
-EO_disp_list = [0 0.2 0.5 1 2 5];
+EO_disp_list = [-1 -0.5 0 0.2 0.8 2];
 totalNum = length(D1_List)*length(D2_List)*length(D3_List)*length(pulse_width_List)*length(pump_power_List)*length(detuning_List)*length(EO_disp_list);
 
 for pulse_width = pulse_width_List
@@ -107,7 +107,7 @@ function sweep_overnight(pulse_width, D1, D2, D3, pump_power, detuning,EO_disp,L
     save(strcat(filedir,save_flag,'-slover.mat'),'f1');
     f1.solve;
     close all
-    f1.plotAll_pulsed(strcat(filedir,save_flag,sprintf('%.2f',EO_disp),'-'));
+    f1.plotAll_pulsed(strcat(filedir,save_flag,sprintf('-EOdisp-%.2f',EO_disp),'-'));
     pause(1)
 
     w0 = 2*pi*c/(lambda*1e-9);
