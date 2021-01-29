@@ -1,11 +1,13 @@
 %%%% The basic Phase-Frame of this code is based on exp(iwt);
 
 clear all
+close all
+
 h=6.626068e-34;                % Planck's constant (m^2*kg/s)
 c=2.998e8;                     % speed of light in vacuum (m/s)
 
 %%%%%%%%%%%
-tauR=46e-12; % in s, round-trip time % for the ring is 224 GHz.
+% tauR=46e-12; % in s, round-trip time % for the ring is 224 GHz.
 scale=1;
 scanning=[
  10e-6, 160, 3.0;
@@ -17,18 +19,19 @@ scanning=[
  ]; % Length, X, Delta
 %%%%%%%%%%%
 
-wavelength=1.5498e-6;             % carrier wavelength
-wavelength_s=1.610e-6;             % carrier wavelength for Stokes soliton
+wavelength=1.550e-6;             % carrier wavelength
+wavelength_s=1.610e-6;           % NOT USED % carrier wavelength for Stokes soliton
 w_carrier=2*pi*c/wavelength;    % carrier angular frequency 
-w_carrier_s=2*pi*c/wavelength_s;    % carrier angular frequency for Stokes soliton
-n2=2.2e-20;  % nonlinear index for silica, unit m^2/W
+w_carrier_s=2*pi*c/wavelength_s;   % NOT USED % carrier angular frequency for Stokes soliton
+n2=1620e-20;  % nonlinear index for algaas, unit m^2/W
 
-R=1.5e-3; % Radius of the resonator, typical for diameter 3 mm microdisk
-FSR=22e9; % FSR of a typical 3 mm microdisk is 22 GHz
+R=720.1e-6; % Radius of the resonator, typical for radius 720um ring
+FSR=17.926e9; % FSR of a typical r=720um ring is 17.9 GHz
+tauR = 1/FSR;
 ng=c/(2*pi*R*FSR); % calculated group velocity index, for this cavity
 
-Qfactor=25e6;  % loaded Q
-Qfactor0=95e6;  % intrinsic Q
+Qfactor=1.117e6;  % loaded Q
+Qfactor0=1.562e6;  % intrinsic Q
 decayrate=w_carrier/Qfactor; % total loss rate
 decayrate0 = w_carrier/Qfactor0; % intrinsic loss rate
 
@@ -39,11 +42,12 @@ kappa=(decayrate-decayrate0)*tauR;   % loss in percent unit per roundtrip for co
 cavity_loss_dB=alpharing/(2*pi*R*1e2)*4.343; % loss in dB;
 finesse=2*pi*FSR/decayrate;
 
-Aeff_p=40e-12; % effective mode area for the primary soliton, unit m^2
-Aeff_s=70e-12; % effective mode area for the Stokes soliton, unit m^2
+Aeff_p=2.63e-13; % effective mode area for the primary soliton, unit m^2
+Aeff_s=70e-12; % NOT USED % effective mode area for the Stokes soliton, unit m^2
 Aeff_ps=120e-12; % effective mode area for crossing term
 
 gamma0_p=2*pi/wavelength*n2/Aeff_p;  % nonlinear coefficient
+
 gamma0_s=2*pi/wavelength*n2/Aeff_s;
 gamma0_ps=2*pi/wavelength*n2/Aeff_ps;
 
@@ -56,9 +60,11 @@ delta0=scanning(1,3)*(alpharing+kappa)/2;%1.0*decayrate*2*pi*tauR; %tauR*(w_m-w_
 %%%%%%%%%%%
 
 % Waveguide parameters
-D2p=2*pi*11e3;                        % Dispersion coefficient in the unit like ps/nm/km
+D3p = 2*pi*-130;
+D2p = 2*pi*-10.1e3*2;                        % Dispersion coefficient in the unit like ps/nm/km
 D1p=2*pi*FSR;
 beta2s=-ng*D2p/D1p^2/c;                 % Dispersion coefficient in the unit like ps^2/km
+beta3s=(ng/c)*((3*D2p^2-D1p*D3p)/D1p^4); 
 
 %D2s=2*pi*22e3;                        % Dispersion coefficient in the unit like ps/nm/km
 %deltaFSR=0;
@@ -75,7 +81,7 @@ alpha0=scale*alpharing; %scale*1*100/4.343;            % loss in 1/m, and alpha_
 xie=1;                         % polarization dependent Kerr, =1; % for TM mode, =1.14; % for TE mode, % refer to Q. Lin, OE, p.16604, 2007
 
 % Simulation parameters
-nt=2048;        % set the point number to be 2048
+nt=2048*2;        % set the point number to be 2048
 dt=tauR/nt;     % set the point number to be 2048
 w=2*pi*[(0:round(nt/2)-1),(-floor(nt/2):-1)]'/(dt*nt);  % frequency window, relative to center angular frequency, with fftshift applied
 lower_freq=c/wavelength+min(w)/2/pi;% the lower limit of frequency 
@@ -99,7 +105,7 @@ randn('state',sum(98*clock))
 xw=randn(size(time));
 randn('state',sum(99*clock))
 yw=randn(size(time));
-noise=sqrt(h*(w+w0)/4/pi/1).*(xw+j*yw);
+noise=sqrt(h*(w+w0)/4/pi/1).*(xw+1i*yw);
 Ain=1e0.*ifft(noise);%j*sqrt(peak_power)*sech((time-peak_time)/T0).*exp(j*(w_carrier-w0)*time);     % in sqrt(W) 
 %%%%%%%%%%%%%%%%%%%%
 %figure; 
@@ -118,20 +124,20 @@ Asave=zeros(sn,nt,floor(Length/save_step));
 
 tic;
 
-Pin=250e-3;  % Input power of 250 mW.
+Pin=20e-3;  % Input power of 250 mW.
 X=Pin*(gamma0_p*2*pi*R*kappa*8/(alpharing+kappa)^3);
 Pin=X/(gamma0_p*2*pi*R*kappa*8/(alpharing+kappa)^3);
 
 gamma=(2*pi*R/tauR)*scale*gamma0_p;   % nonlinear coefficient in 1/W/m
 %%
 %Atmp=Atmp0;
-PComb=25/15*1e-3; % 3 mW per comb line
-NComb=7;   % half number of the comb line
+PComb=0.1*25/15*1e-3; % 3 mW per comb line
+NComb=3;   % half number of the comb line
 EOComb=zeros(length(w),1);
 EOComb(1:NComb+1)=sqrt(PComb);
 EOComb(length(w)-NComb+1:length(w))=sqrt(PComb);
-EOPhase=1.9/17*1e3*(-21.6e-27).*w.^2/2;
-Ein_pulse = fftshift(fft(EOComb.*exp(i*EOPhase) ));
+EOPhase=1.9/17*1e3*(-21.6e-27).*w.^2/2 *0;
+Ein_pulse = fftshift(fft(EOComb.*exp(1i*EOPhase)));
 Sin_pulse=fft(Ein_pulse);
 figure
 plot(time*1e12,abs(Ein_pulse).^2);
@@ -144,7 +150,7 @@ dz=4*tauR;
 save_n=40;
 
 dw=abs(w(2)-w(1));
-disp=(beta2s*w.^2/2);
+disp=(beta2s*w.^2/2 + beta3s*w.^3/6);
 
 omega_center=zeros(20,10000);
 Asave1=zeros(nt,5000);
@@ -164,8 +170,8 @@ FilterFunc=ones(length(w),1);
 FilterFunc(1:NComb+1)=0;
 FilterFunc(length(w)-NComb+1:length(w))=0;
 
-Qfactor=25e6;  % loaded Q
-Qfactor0=100e6;  % intrinsic Q
+Qfactor=1.117e6;  % loaded Q
+Qfactor0=1.562e6;  % intrinsic Q
 decayrate=w_carrier/Qfactor; % total loss rate
 decayrate0 = w_carrier/Qfactor0; % intrinsic loss rate
 alpharing=decayrate0*tauR;  % loss in percent unit per roundtrip for intrinsic
@@ -173,8 +179,8 @@ kappa=(decayrate-decayrate0)*tauR;   % loss in percent unit per roundtrip for co
 
 for KLoop=1:1
     %Qex=5e6+(KLoop-1)*2.5e6;
-    Qex=30e6;
-    Qfactor0=100e6;  % intrinsic Q
+    Qex=3.926e6;
+    Qfactor0=1.562e6;  % intrinsic Q
     %decayrate=w_carrier/Qfactor; % total loss rate
     decayrate0 = w_carrier/Qfactor0; % intrinsic loss rate
     alpharing = decayrate0*tauR;  % loss in percent unit per roundtrip for intrinsic
@@ -226,7 +232,12 @@ As(:,KLoop)=Atmp;
 figure(100)
 hold on
 plot(time*1e12,abs(Atmp).^2);
+plot(time*1e12,abs(Ein_pulse).^2);
 
+figure(200)
+hold on
+plot(time*1e12,abs(Asave1(:,0.5*end)).^2);
+plot(time*1e12,abs(Ein_pulse).^2);
 end
 %figure
 %plot(time*1e12,abs(Atmp).^2);
@@ -236,9 +247,9 @@ wave=2*pi*c./fftshift((w+w0))*1e9;
 figure
 plot(wave,spect);
 
-spect=10*log10(abs(fftshift(fft(Asave1(:,end/2)))).^2);
+spect=10*log10(abs(fftshift(fft(Asave1(:,end*0.2)))).^2);
 wave=2*pi*c./fftshift((w+w0))*1e9;
-figure
+figure('Units','normalized','position',[0.1 0.1 0.8 0.5])
 plot(wave,spect);
 
 figure

@@ -8,12 +8,27 @@ Qe = 4.085; % M
 lambda = 1550.4; % nm
 Qt = Q0*Qe/(Q0+Qe);
 kappa = (2*pi*c/(lambda*1e-9))/(Qt*1e6); % SI unit
+kappae = (2*pi*c/(lambda*1e-9))/(Qe*1e6); % SI unit
 
 FSR = 17924.02 * 1e6; % SI unit
 disp_D2 = -10.1 * 1e3; % SI unit
 disp_D3 = -130; % SI unit
 disp_D4 = -322*1e-3; % SI unit
+%%
+% mu0_1 = -c*(1/(lambda*1e-9)-1/(1447e-9))/FSR;
+mu0_2 = -c*(1/(lambda*1e-9)-1/(1490e-9))/FSR;
+mu0_3 = -c*(1/(lambda*1e-9)-1/(1669e-9))/FSR;
+syms u;
+% d_list = sym2poly(u*(u-mu0_1)*(u-mu0_2)*(u-mu0_3))
+% d_list = -[0 sym2poly((u-mu0_1)*(u-mu0_2)*(u-mu0_3) )]
+% d_list = -[0 sym2poly( u*(u-mu0_2)*(u-mu0_3) )]
+d_list = -[0 0 sym2poly( (u-mu0_2)*(u-mu0_3) )]
 
+plot(-1000:1000,arrayfun(@(x)d_list(end-1)*x+d_list(end-2)*x^2+d_list(end-3)*x^3+d_list(end-4)*x^4,-1000:1000))
+hold on
+line(xlim(), [0 0],'Color', 'r');
+pp = d_list(end-1)*mu0_2+d_list(end-2)*mu0_2^2+d_list(end-3)*mu0_2^3+d_list(end-4)*mu0_2^4;
+line(xlim(), [pp,pp],  'Color', 'k');
 
 %% load experiment results
 load('D:\Measurement\pulse pumping\20201123\OSA_Cavity15_PumpPower0.833_Dispersion7.8_RepRate17.91964GHz-1430-1700nm.mat');
@@ -43,25 +58,39 @@ pause(1);
 
     %% Begin simulation
     filedir = "D:\Measurement\pulse pumping\Simulation_20210114_check_para\";
-    nstep = 10e4;
-    nt = 2048;        % set the point number to be 2048
+    nstep = 10e4/2;
+    nt = 2048*4;        % set the point number to be 2048
     tauR = 1/FSR; %46e-12; % in s, round-trip time % for the ring is 224 GHz.
     dt = tauR/nt;     % set the point number to be 2048
     w = 2*pi*[(0:round(nt/2)-1),(-floor(nt/2):-1)]'/(dt*nt);  % frequency window, relative to center angular frequency, with fftshift applied
     %%
-        D1 = (5*1e6/kappa)*[2]*2.6;
+        D1 = (5*1e6/kappa)*[2]*1.6;
         D2 = (disp_D2/kappa)*[1]*4.8;%[1:0.1:2 0.9:-0.1:0.5];
         D3 = (disp_D3/kappa)*3.1;%[1.8];%[1:0.1:2 0.9:-0.1:0.5];
         D4 = (disp_D4/kappa)*[1];
-        pulse_width = [0.05]/2;
-        pump_power = [1];
-        detuning = -0;%[0:1:5];
         
-        EO_disp = [ 2 ];
+        D1 = (5*1e6/kappa)*[2];
+        D2 = (disp_D2/kappa)*[1]*1;%[1:0.1:2 0.9:-0.1:0.5];
+        D3 = (disp_D3/kappa)*1;%[1.8];%[1:0.1:2 0.9:-0.1:0.5];
+        D4 = (disp_D4/kappa)*[1];
+%         %%
+%         D2 = (disp_D2/kappa)*[1];%[1:0.1:2 0.9:-0.1:0.5];
+%         D1 = d_list(end-1)/d_list(end-2)*(D2/2);
+%         D3 = d_list(end-3)/d_list(end-2)*(D2/2)*6;
+%         D4 = d_list(end-4)/d_list(end-2)*(D2/2)*24;
+
+        
+        pulse_width = [0.01]/2;
+        pump_power = [2];
+        detuning = 10;%[0:1:5];
+        
+        EO_disp = [ 2 ]*0.01;
         
          figure('Units','normalized','position',[0.1 0.1 0.8 0.5])
-         plot(-200:200,arrayfun(@(x)D2*x^2/2+D3*x^3/6+D4*x^4/24,-200:200) )
+         plot(-1000:1000,arrayfun(@(x)D1*x+D2*x^2/2+D3*x^3/6+D4*x^4/24,-1000:1000) )
          hold on
+         line(xlim(), [0,0],  'Color', 'k');
+
          
 %         arbi_D3 = +0.03*D3*kappa;
 %         arbi_D5 = +3*1e-4;
@@ -69,26 +98,31 @@ pause(1);
 %         % figure
 %         plot(-200:200,arrayfun(@(x)D2*x^2/2+D3*x^3/6+D4*x^4/24+arbiDisp(x),-200:200) )
 %         hold off
-%         pause(1)
+        pause(1)
         arbiDisp = @(x)0;
-    %%
+    %
     save_flag = datestr(now,'yymmdd-HHMMSS');
     EOPhase = 1.9/17*1e3*(-21.6e-27).*w.^2/2 * EO_disp;
 
-    x0 = nt/2;
+    x0 = nt/5;
         % pulse_width = 0.05
     dx = pulse_width*nt;
     lorentian = @(x,x0,dx)dx^2./((x-x0).^2+dx^2);
     gaussian = @(x,x0,dx)exp(-(x-x0)^2/2/dx^2);
     pulse_train = @(x)sum(gaussian(x,x0,dx));
     pulsePower = arrayfun(@(x)50*pulse_train(x), 1:nt);
+%     pulsePower = ifft(fft(pulsePower).*exp(1i*(EOPhase')));
+    
+    
     pulsePower = pulsePower.*exp(1i*EOPhase');
 
         
         % load(strcat( "D:\Measurement\pulse pumping\Simulation_20210114_para_sweep\","210117-023720-slover.mat"))
         % f1.dispProgress = 1;
-        
-        
+      figure('Units','normalized','position',[0.1 0.1 0.8 0.5])
+       plot(abs(pulsePower))
+
+    %%
     f2 = LLESolver('D1',D1,'D2',D2,'D3',D3,'pumpPower',pump_power,'detuning',detuning,'NStep',nstep,'timeStep',5e-4/5,'pulsePump',pulsePower,...
         'initState','random','solver','SSFT','modeNumber',nt,'saveStep',500,'dispProgress',1,'arbiDisp',arbiDisp);
     save(strcat(filedir,save_flag,'-slover.mat'),'f2');
@@ -115,7 +149,8 @@ pause(1);
     plot(OSAWavelength*1e9,OSAPower,'displayname','Raw data');
     hold on
     scatter(LOCS,PKS,'displayname','Experiment');
-    scatter(LOCS,spec_simu(LOCS)-offset,'displayname','Simulation')
+    
+    scatter(lambda_sweep,spec_simu(lambda_sweep)-offset,'displayname','Simulation')
     ylim([-90 -10])
     legend('location','best')
     xlabel('Wavelength / nm')
