@@ -477,7 +477,7 @@ end
 % ********************************
 % Modules
 % ********************************
-function MS_process(handles)
+function MS_process(handles) % MS stands for Mode Spectrum
 global dispersion_data;
 if strcmp(handles.data_status.String,'Data loaded')
     sens_MS=eval(handles.process_th_peak.String); % relative sensitivity of MS, higher = more sensitive, default to 0
@@ -657,7 +657,7 @@ if strcmp(handles.data_status.String,'Data loaded')
             MS_plot=MS_plot-(MS_plot>mode_hopping_pos(mode_hopping_ind,1))*mode_hopping_pos(mode_hopping_ind,2);
         end
     end
-    MS_plot(:,1)=MS_plot(:,1)+FromDigits_offset(handles);
+    MS_plot(:,1)=MS_plot(:,1)+FromDigits_offset(handles);                      
     disk_FSR=FromDigits_FSR(handles);
     MS_plot(:,2)=round(MS_plot(:,1)/disk_FSR);
     MS_plot(:,3)=MS_plot(:,1)-MS_plot(:,2)*disk_FSR;
@@ -667,13 +667,18 @@ if strcmp(handles.data_status.String,'Data loaded')
     
     % Five columns 
     % corrected freq, resonator mu, freq offset within FSR, depth and MZI mu
-    plot(handles.display_window,[0 0],[-1 1]*disk_FSR/2,'k','linewidth',2);
-    hold(handles.display_window,'on');
+    plot(handles.display_window,[0 0],[-1 1]*disk_FSR/2,'k','linewidth',2); % Center bold vertical line
+    hold(handles.display_window,'on'); 
     if handles.plot_check_color.Value
-        scatter(handles.display_window,MS_plot(:,2),MS_plot(:,3),4,1-MS_plot(:,4),'linewidth',1);
+        scatter(handles.display_window,MS_plot(:,2),MS_plot(:,3),4,1-MS_plot(:,4),'linewidth',1); % colored plot of modes
         grid(handles.display_window,'off');
     else
-        scatter(handles.display_window,MS_plot(:,2),MS_plot(:,3),'b','linewidth',1);
+        % scatter(handles.display_window,MS_plot(:,2),MS_plot(:,3),'b','linewidth',1); % mode plots
+        for ii = 1:length(MS_plot(:,2)) % This code enables button down function for each mode
+            line(handles.display_window,MS_plot(ii,2),MS_plot(ii,3),...
+                'color','blue','marker','o','linewidth',1,...
+                'userdata',MS_plot(ii,:),'ButtonDownFcn',{@plotThisModeTrace,handles});
+        end
         grid(handles.display_window,'on');
     end
     tol=eval(handles.fit_tol.String);
@@ -681,13 +686,13 @@ if strcmp(handles.data_status.String,'Data loaded')
     ybase=xbase.^2/2*FromDigits_D2(handles)/1e3+xbase.^3/6*eval(handles.fit_D3.String)/1e6+xbase.^4/24*eval(handles.fit_D4.String)/1e9;
     line_group=TorusBreak(xbase,ybase+tol,disk_FSR);
     for ind=1:length(line_group)
-        plot(handles.display_window,line_group{ind}(1,:),line_group{ind}(2,:),'c','linewidth',1);
+        plot(handles.display_window,line_group{ind}(1,:),line_group{ind}(2,:),'c','linewidth',1); % upper tolerance boundary
     end
     line_group=TorusBreak(xbase,ybase-tol,disk_FSR);
     for ind=1:length(line_group)
-        plot(handles.display_window,line_group{ind}(1,:),line_group{ind}(2,:),'c','linewidth',1);
+        plot(handles.display_window,line_group{ind}(1,:),line_group{ind}(2,:),'c','linewidth',1); % lower tolerance boundary
     end
-    if handles.fit_order.Value>1
+    if handles.fit_order.Value>1 % fitting begin here
         MS_merged=TorusMerge(MS_plot(:,2:3),disk_FSR,ybase);
         xfit=MS_merged(:,1);
         yfit=xfit.^2/2*FromDigits_D2(handles)/1e3+xfit.^3/6*eval(handles.fit_D3.String)/1e6+xfit.^4/24*eval(handles.fit_D4.String)/1e9;
@@ -782,6 +787,9 @@ if strcmp(handles.data_status.String,'Data loaded')
         targeted_Q0=targeted_freq;
         targeted_Q1=targeted_freq;
         targeted_QL=targeted_freq;
+        % update dispersion peak search
+        correct_pos = true; % add check box later
+        
         for ind=1:length(targeted_mu)-str2double(handles.ExtractQ_disgard.String)
             disp(['Processing ' num2str(ind) ' of ' num2str(length(targeted_mu))])
             fitq_center_mu=targeted_mu(ind);
@@ -805,13 +813,21 @@ if strcmp(handles.data_status.String,'Data loaded')
             plot_interval = str2double(handles.ExtractQ_plot_interval.String);
             % Qobj=Q_trace_fit(fitq_trace_Q,fitq_trace_MZI,MZI_dispersion(1),...
             % 299792458/targeted_freq(ind),1-0.1*10.^(-eval(handles.process_th_peak.String)/10),'fano');
-            Qobj=Q_trace_fit(fitq_trace_Q,fitq_trace_MZI,MZI_dispersion(1),...
-                299792458/targeted_freq(ind),ExtractQ_sens,handles.ExtractQ_correction.String);
+            try
+                Qobj=Q_trace_fit(fitq_trace_Q,fitq_trace_MZI,MZI_dispersion(1),...
+                    299792458/targeted_freq(ind),ExtractQ_sens,handles.ExtractQ_correction.String);
+            catch
+                continue
+            end
             targeted_Q_matrix=Qobj.get_Q;
             try
                 targeted_Q0(ind)=targeted_Q_matrix(1,1);
                 targeted_Q1(ind)=targeted_Q_matrix(1,2);
                 targeted_QL(ind)=targeted_Q_matrix(1,3);
+                if correct_pos 
+                    dispersion_data.MS_mapping(filter(ind),1) = ... % Update Mu position
+                        IndexToMu(fitq_center_index-fitq_range_index+Qobj.modePos-1,dispersion_data.MZI_index);
+                end
                 if mod(ind-1,plot_interval)==0%mod(ind,60)==1
                     Qobj.plot_Q_max;
                     % Qobj.plot_trace_stat;
@@ -819,6 +835,9 @@ if strcmp(handles.data_status.String,'Data loaded')
             catch
                 continue;
             end
+        end
+        if correct_pos
+            RefreshPlot(handles);
         end
         figure;
         plot(299792458./targeted_freq,([targeted_freq./targeted_Q0,targeted_freq./targeted_Q1,targeted_freq./targeted_QL]/1e3).','.-');
@@ -876,6 +895,7 @@ value=eval(value_char);
 function ToDigits_D2(handles,value)
 if value<0
     handles.D2_sign.String='-';
+    
     value=-value;
 else
     handles.D2_sign.String='+';
@@ -909,6 +929,7 @@ for ind=off_min:off_max
     data_append(:,2)=data_append(:,2)+ind*period;
     data_merged=[data_merged;data_append];
 end
+
 function ind=MuToIndex(mu,MZI_index) % convert mu to raw index
 mu=2*mu;
 if mu==round(mu)
@@ -917,6 +938,26 @@ else
     ind=MZI_index(floor(mu))*(ceil(mu)-mu)+MZI_index(ceil(mu))*(mu-floor(mu));
 end
 ind=round(ind);
+
+function mu = IndexToMu(ind, MZI_index) 
+% This function designed to be used in fitting Q for each mode,
+% convert array index to FITTED mu index (instead of peak search mu index).
+% calculation logic copied from MS_mapping calculation
+% Maodong edit 20210106
+    if ind > max(MZI_index)
+        error('Can not find index given mu, index exceed MZI range')
+    end
+    MS_mu = 2; % Because (1) and (end) of dispersion.MZI_index stores MS start and MS end position.
+    while true
+        if ind > MZI_index(MS_mu)
+            MS_mu = MS_mu+1;
+        else
+            mu = MS_mu-(MZI_index(MS_mu)-ind)/(MZI_index(MS_mu)-MZI_index(MS_mu-1));
+            % linear interpolation to determine mu
+            break;
+        end
+    end
+    mu = mu/2;
 
 
 
@@ -1009,3 +1050,104 @@ function ExtractQ_disgard_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+function plotThisModeTrace(gcbo,EventData,handles) % Button Down Function of a mode
+    global dispersion_data
+    MS_mapping=dispersion_data.MS_mapping;
+    scan=eval(handles.plot_scan_range.String);
+    f_scan_start=299792458/scan(1); % [GHz]
+    f_scan_center=299792458/scan(2); % [GHz]
+    f_scan_end=299792458/scan(3); % [GHz]
+    if f_scan_start>f_scan_end % flip it so MZI mu goes from red to blue
+        MS_mapping(:,1)=-MS_mapping(:,1);
+    end
+    mu_center=MS_mapping(1,1)+(f_scan_center-f_scan_start)/(f_scan_end-f_scan_start)*(MS_mapping(end,1)-MS_mapping(1,1));
+    MS_mapping(:,1)=MS_mapping(:,1)-mu_center;
+    MS_plot=zeros(size(MS_mapping(:,1)));
+    MZI_dispersion=eval(handles.plot_MZI_coeff.String);
+    for ind=1:length(MZI_dispersion)
+        MS_plot=MS_plot+MZI_dispersion(ind)*MS_mapping(:,1).^ind/factorial(ind);
+    end
+    if ~isempty(dispersion_data.mode_hopping_spec)
+        mode_hopping_pos=[dispersion_data.mode_hopping_spec(:,1)*FromDigits_FSR(handles),dispersion_data.mode_hopping_spec(:,2)*MZI_dispersion(1)];
+        for mode_hopping_ind=1:length(mode_hopping_pos(:,1))
+            MS_plot=MS_plot-(MS_plot>mode_hopping_pos(mode_hopping_ind,1))*mode_hopping_pos(mode_hopping_ind,2);
+        end
+    end
+    MS_plot(:,1)=MS_plot(:,1)+FromDigits_offset(handles);                      
+    disk_FSR=FromDigits_FSR(handles);
+    MS_plot(:,2)=round(MS_plot(:,1)/disk_FSR);
+    MS_plot(:,3)=MS_plot(:,1)-MS_plot(:,2)*disk_FSR;
+    MS_plot(:,4)=dispersion_data.MS_mapping(:,2);
+    MS_plot(:,5)=dispersion_data.MS_mapping(:,1);
+    dispersion_data.MS_plot=MS_plot;
+    
+    userdata = get(gcbo,'userdata');
+    mode_mu = userdata(1,5);
+    tol = eval(handles.fit_tol.String);
+    MZI_dispersion=eval(handles.plot_MZI_coeff.String);
+    fitq_center_mu = mode_mu;
+            fitq_start_mu = mode_mu-tol/MZI_dispersion(1);
+            fitq_end_mu = mode_mu+tol/MZI_dispersion(1);
+            fitq_center_index = MuToIndex(fitq_center_mu,dispersion_data.MZI_index);
+            fitq_range_index = round((MuToIndex(fitq_end_mu,dispersion_data.MZI_index)-MuToIndex(fitq_start_mu,dispersion_data.MZI_index))/2);
+%             fitq_trace_Q=dispersion_data.data_matrix(fitq_center_index-fitq_range_index:fitq_center_index+fitq_range_index,end-1);
+%             fitq_trace_MZI=dispersion_data.data_matrix(fitq_center_index-fitq_range_index:fitq_center_index+fitq_range_index,end);     
+            fitq_trace_Q = dispersion_data.data_matrix(fitq_center_index-fitq_range_index:fitq_center_index+fitq_range_index,2);
+            fitq_trace_MZI = dispersion_data.data_matrix(fitq_center_index-fitq_range_index:fitq_center_index+fitq_range_index,3);
+    if f_scan_start<f_scan_end
+        targeted_freq =f_scan_center+(fitq_center_mu-mu_center)*MZI_dispersion(1)/1000;
+    else
+        targeted_freq =f_scan_center+(-fitq_center_mu-mu_center)*MZI_dispersion(1)/1000;
+    end
+    ExtractQ_sens = str2double(handles.ExtractQ_sensitivity.String);
+    if (ExtractQ_sens>1)||(ExtractQ_sens<0)
+        ExtractQ_sens = 1-0.1*10.^(-eval(handles.process_th_peak.String)/10);
+    end
+    Qobj=Q_trace_fit(fitq_trace_Q,fitq_trace_MZI,MZI_dispersion(1),...
+        299792458/targeted_freq,ExtractQ_sens,handles.ExtractQ_correction.String);
+    Qobj.plot_Q_max;
+    
+    % Then update side matching window plot
+    disk_FSR=FromDigits_FSR(handles);
+    delete(findobj(handles.display_window,'color','k'))
+    hold(handles.display_window,'on');
+    plot(handles.display_window,[userdata(1,2) userdata(1,2)],[-1 1]*disk_FSR/2,'k','linewidth',2); % Center bold vertical line
+    hold(handles.display_window,'off');    
+        
+        MS_match=MS_plot(MS_plot(:,2)==userdata(1,2),3:4);
+        line_x=((1-MS_match(:,2))*[0 1 0]).';
+        line_x=[0;line_x(:);0];
+        line_y=(MS_match(:,1)*[1 1 1]).';
+        line_y=[-disk_FSR/2;line_y(:);disk_FSR/2];
+        plot(handles.matching_window,line_x,line_y,'b');
+        hold(handles.matching_window,'on');
+        plot(handles.matching_window,[-1 2],[1 1]*tol,'c');
+        plot(handles.matching_window,[-1 2],[-1 -1]*tol,'c');
+
+        if f_scan_start<f_scan_end
+            match_center_mu=mu_center+(-FromDigits_offset(handles))/MZI_dispersion(1)+userdata(1,2)*disk_FSR/MZI_dispersion(1);
+            match_start_mu=mu_center+(-FromDigits_offset(handles)-disk_FSR/2)/MZI_dispersion(1)+userdata(1,2)*disk_FSR/MZI_dispersion(1);
+            match_end_mu=mu_center+(-FromDigits_offset(handles)+disk_FSR/2)/MZI_dispersion(1)+userdata(1,2)*disk_FSR/MZI_dispersion(1);
+            match_center_index=MuToIndex(match_center_mu,dispersion_data.MZI_index);
+            match_range_index=round((MuToIndex(match_end_mu,dispersion_data.MZI_index)-MuToIndex(match_start_mu,dispersion_data.MZI_index))/2);
+    %         mode_matching_trace=dispersion_data.data_matrix(match_center_index-match_range_index:match_center_index+match_range_index,end-1)./max(dispersion_data.data_matrix(:,end-1));
+            mode_matching_trace=dispersion_data.data_matrix(match_center_index-match_range_index:match_center_index+match_range_index,2)./max(dispersion_data.data_matrix(:,2));
+        else
+            match_center_mu=-mu_center+(FromDigits_offset(handles))/MZI_dispersion(1)-userdata(1,2)*disk_FSR/MZI_dispersion(1);
+            match_start_mu=-mu_center+(FromDigits_offset(handles)-disk_FSR/2)/MZI_dispersion(1)-userdata(1,2)*disk_FSR/MZI_dispersion(1);
+            match_end_mu=-mu_center+(FromDigits_offset(handles)+disk_FSR/2)/MZI_dispersion(1)-userdata(1,2)*disk_FSR/MZI_dispersion(1);
+            match_center_index=MuToIndex(match_center_mu,dispersion_data.MZI_index);
+            match_range_index=round((MuToIndex(match_end_mu,dispersion_data.MZI_index)-MuToIndex(match_start_mu,dispersion_data.MZI_index))/2);
+    %         mode_matching_trace=dispersion_data.data_matrix(match_center_index+match_range_index:-1:match_center_index-match_range_index,end-1)./max(dispersion_data.data_matrix(:,end-1));
+            mode_matching_trace=dispersion_data.data_matrix(match_center_index+match_range_index:-1:match_center_index-match_range_index,2)./max(dispersion_data.data_matrix(:,2));
+        end
+        plot(handles.matching_window,mode_matching_trace,...
+            linspace(-disk_FSR/2,disk_FSR/2,2*match_range_index+1),'r');
+        hold(handles.matching_window,'off');
+        xlim(handles.matching_window,[-0.1,1.1]);
+        ylim(handles.matching_window,[-1 1]*disk_FSR/2);
+        handles.matching_window.XTick=[];
+        handles.matching_window.YTick=[];
+

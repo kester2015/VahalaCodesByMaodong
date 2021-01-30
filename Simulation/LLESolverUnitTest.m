@@ -30,14 +30,25 @@ subplot(212)
 plot(abs(c.phiResult_Freq(:,time_unit)));
 %% test case 2: check two solvers
 % test case 2.1: 
-% close all
-% clear d1 d2
+close all
+clear d1 d2
 % split step Fourier transform solver
-d1 = LLESolver('detuning',10,'pumpPower',40,'D3',0.0001,'NStep',1e5,'solver','SSFT');
+d1 = LLESolver('detuning',10,'pumpPower',40,'D3',0.001,'NStep',1e5,'solver','SSFT');
 d1.solve;
 d1.plotAll;
 % runge kutta solver
-d2 = LLESolver('detuning',10,'pumpPower',40,'D3',0.0001,'NStep',1e5,'solver','RK');
+d2 = LLESolver('detuning',10,'pumpPower',40,'D3',0.001,'NStep',1e5,'solver','RK');
+d2.solve;
+d2.plotAll;
+%% test case 2.2: check saveStep with two solvers
+close all
+clear d1 d2
+% split step Fourier transform solver
+d1 = LLESolver('saveStep',100,'detuning',10,'pumpPower',40,'D3',0.001,'NStep',1e5,'solver','SSFT');
+d1.solve;
+d1.plotAll;
+% runge kutta solver
+d2 = LLESolver('saveStep',100,'detuning',10,'pumpPower',40,'D3',0.001,'NStep',1e5,'solver','RK');
 d2.solve;
 d2.plotAll;
 %% multi soliton formation
@@ -50,7 +61,7 @@ f3.plotPulseCompare;
 % larger power, smaller detuning, can give breather.
 close all
 clear e1
-e1 = LLESolver('detuning',5,'pumpPower',40,'D3',0.0001,'NStep',1e5,'solver','RK','initState','soliton');
+e1 = LLESolver('saveStep',100,'detuning',5,'pumpPower',40,'D3',0.0001,'NStep',1e5,'solver','RK','initState','soliton');
 e1.solve;
 e1.plotAll;
 %% test case 4: pulse pumping
@@ -82,17 +93,17 @@ pause(1)
 f3 = LLESolver('D1',5e-3,'D2',+0.02,'D3',0,'pumpPower',100,'detuning',[-10 50],'NStep',nstep,'timeStep',5e-4/5,'pulsePump',pulsePower,...
     'initState','random','solver','SSFT','modeNumber',mode_number);
 f3.solve;
-f3.plotAll;
+f3.plotAll_pulsed;
 % % normal disp, dark pulse(broader than bright pulse in time domain.)
 % f2 = LLESolver('D2',-0.02,'D3',0,'pumpPower',50,'detuning',[-10 40],'NStep',nstep,'timeStep',5e-4,'pulsePump',pulsePower,...
 %     'initState','random','solver','RK','initState','random');
 % f2.solve;
 % f2.plotAll;
 
-figure
-plot(abs(f3.phiResult(:,end)))
-hold on
-plot(pulsePower/max(pulsePower)*max(abs(f3.phiResult(:,end))))
+% figure
+% plot(abs(f3.phiResult(:,end)))
+% hold on
+% plot(pulsePower/max(pulsePower)*max(abs(f3.phiResult(:,end))))
 
 % set(gca,'yscale','log')
 
@@ -149,8 +160,8 @@ pulsePower = pulsePower.*exp(1i*EOPhase');
 f4 = LLESolver('D1',0e-3,'D2',0.016,'D3',0,'pumpPower',200,'detuning',4,'NStep',nstep,'timeStep',5e-4/5,'pulsePump',pulsePower,...
     'initState','random','solver','SSFT','modeNumber',nt);
 f4.solve;
-f4.plotAll;
-f4.plotPulseCompare;
+f4.plotAll_pulsed;
+% f4.plotPulseCompare;
 
 %% pulse pumping debug with silica code
 clear
@@ -188,8 +199,8 @@ f3.plotPulseCompare;
 f4 = LLESolver('D1',0e-3,'D2',0.016,'D3',0,'pumpPower',200,'detuning',4,'NStep',nstep,'timeStep',5e-4/5,'pulsePump',pulsePower,...
     'initState','random','solver','SSFT','modeNumber',nt);
 f4.solve;
-f4.plotAll;
-f4.plotPulseCompare;
+f4.plotAll_pulsed;
+% f4.plotPulseCompare;
 
 % e1 = LLESolver('detuning',5,'pumpPower',40,'D3',0.0001,'NStep',1e5,'solver','RK');
 

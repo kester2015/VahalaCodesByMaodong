@@ -1,0 +1,11 @@
+
+
+c_const = 299792458;
+NUM = 1000;
+freqlist = c_const./( linspace(1520,1580,NUM)*1e-9);
+nlist = 1.44 + 0.0001*(1:NUM).^2;
+FSR = 10e9; % 10GHz
+radius = c_const/(2*pi*1.44*FSR);
+t1 = nrlistToModeSpec('frequencylist',freqlist','nrlist',nlist'*radius,'FSR',FSR);
+t1.processModeSpectrum;
+t1.plot_MS;
