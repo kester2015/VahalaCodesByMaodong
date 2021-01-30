@@ -32,7 +32,7 @@ pulsePower = pulsePower.*exp(1i*EOPhase');
 % f4.plotPulseCompare;
 
 % % 4 side peaks on freq domain
-f4 = LLESolver('D1',5e1,'D2',-0.16,'D3',0,'pumpPower',6,'detuning',4,'NStep',nstep,'timeStep',5e-4/5,'pulsePump',pulsePower,...
+f4 = LLESolver('D1',0e-3,'D2',-0.0016,'D3',0,'pumpPower',3,'detuning',4,'NStep',nstep,'timeStep',5e-4/5,'pulsePump',pulsePower,...
     'initState','random','solver','SSFT','modeNumber',nt);
 f4.solve;
 f4.plotAll;
