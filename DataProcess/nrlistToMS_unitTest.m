@@ -11,3 +11,15 @@ radius = c_const/(2*pi*n0*FSR);
 t1 = nrlistToModeSpec('frequencylist',freqlist','nrlist',nlist'*radius,'FSR',FSR);
 t1.processModeSpectrum;
 t1.plot_MS;
+%%
+close all
+load('DataProcess\AlGaAs_No15_nr_disp.mat')
+n_eff_r = real(n_eff_r(3:4,:))
+nr_est = 0.0020;
+FSR = 17.1e9;;%299792458/2/pi/nr_est
+% FSR = 15.9e9;
+% FSR = 15.7e9;
+% FSR = 15.5e9;
+t1 = nrlistToModeSpec('frequencylist',freq_list,'nrlist',n_eff_r','FSR',FSR,'modeNum',200);
+t1.processModeSpectrum;
+t1.plot_MS;
