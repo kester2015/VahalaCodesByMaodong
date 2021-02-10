@@ -1,4 +1,5 @@
 classdef nrlistToModeSpec < handle
+    % Maodong, version 0. 012921
     properties
         c_const = 299792458;
         
@@ -6,7 +7,7 @@ classdef nrlistToModeSpec < handle
         nrlist
         
         FSR
-        offset
+        offset % TODO: add offset to each mode family.
     end
     
     properties
@@ -55,8 +56,9 @@ classdef nrlistToModeSpec < handle
             for ii = 1:size(obj.nrlist,2)
                 scatter((-obj.modeNum:obj.modeNum)',obj.modeSpectrum_topolt(:,ii));
             end
-            
-            function testBDF(gcbo,EventData,handles)
+            xlabel('Mode number')
+            ylabel('Frequency / Hz')
+            function testBDF(gcbo,EventData,handles) % TODO: add callback function to figure
                 disp(gcbo.CurrentPoint)
             end
         end
