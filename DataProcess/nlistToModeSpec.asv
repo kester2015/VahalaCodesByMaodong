@@ -1,0 +1,43 @@
+classdef nlistToModeSpec
+    properties
+        frequency
+        nlist
+        
+        FSR
+        offset
+    end
+    
+    properties
+        modeNum
+        centerLambda
+    end
+    
+    properties (Access = public)
+        
+    end
+    
+    methods
+        function obj = nlistToModeSpec(varargin)
+            ip = inputParser(varargin);
+            ip.addParameter('frequency',0,@isnumeric); 
+            ip.addParameter('nlist',0,@isnumeric); 
+            ip.addParameter('FSR',10e9,@isnumeric);
+            ip.addParameter('offset',0,@isnumeric);            
+            ip.addParameter('modeNum',100,@isnumeric);
+            ip.addParameter('centerLambda',1550e-9,@isnumeric);
+            ip.parse(varargin{:});
+            
+            obj.frequency = ip.Results.frequency;
+            obj.nlist = ip.Results.nlist;
+            obj.FSR = ip.Results.FSR;
+            obj.offset = ip.Results.offset;
+            obj.modeNum = ip.Results.modeNum;
+            obj.centerLambda = ip.Results.modeNum;
+        end
+        
+        function processOneModeFamiliy(obj)
+            
+        end
+    end
+    
+end
