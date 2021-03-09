@@ -80,7 +80,7 @@ handles.Disk_FSR.String = Config.Disk_FSR;
 handles.MZI_D1.String = Config.D1;
 handles.MZI_D2.String = Config.D2;
 handles.MZI_D3.String = Config.D3;
-handles.Delay.String = Config.Delay;
+handles.Delay.String = '0.3';%Config.Delay;
 if isfield(Config,'Scan')
     handles.Scan.Value = 1;
     handles.Scan_Range.String = Config.Scan;
@@ -507,6 +507,7 @@ end
 switch handles.Method.Value
     case 1
         %% Q Measurement
+        close all
         lambda = str2double(handles.Wavelength.String);
         FSR_MZI = str2double(handles.MZI_FSR.String);
         if handles.Scan.Value
@@ -515,9 +516,11 @@ switch handles.Method.Value
         end
         for idx = 1:numel(lambda)
             filename = [filename_raw '-',num2str(lambda(idx)),'nm'];
-            if abs(Device.laser1.Wavelength - lambda(idx)) > 0.5
-                Device.laser1.Move2Wavelength(lambda(idx));
-                pause(1);
+            if lambda(idx)>1500 %otherwise, not used for ECDL
+                if abs(Device.laser1.Wavelength - lambda(idx)) > 0.5
+                    Device.laser1.Move2Wavelength(lambda(idx));
+                    pause(1);
+                end
             end
             disp(['wavelength ', num2str(lambda(idx)), ' nm in progress...'])
             ReadTrace(filename,Device.osc,point,Config.trans_ch,Config.mzi_ch,0,str2double(handles.edit34.String) );
