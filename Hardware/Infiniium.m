@@ -105,7 +105,7 @@ classdef Infiniium < handle
             % Reading
             chan=['CHAN',num2str(channel)];
             if ~isempty(point)
-                Obj.InputBufferSize = point*2.1*10;
+                Obj.InputBufferSize = point*2.1*1;
                 Obj.wait;
             else
                 Obj.InputBufferSize = 4e5*2.1*10;
@@ -273,6 +273,19 @@ classdef Infiniium < handle
           %  else
                 Obj.Write([':ACQ:POIN ', Point]);  % # of points
           %  end
+        end
+        
+        function SetTime_StartEnd(Obj,start_pos,end_pos)
+            center_pos = (start_pos + end_pos)/2;
+            span = end_pos - start_pos;
+            Obj.SetTime_CenterSpan(center_pos,span);
+        end
+        
+        function SetTime_CenterSpan(Obj,center_pos,span)
+            tt1 = strcat(":TIM:POS ",num2str(center_pos));
+            tt2 = strcat(":TIM:RANG ",num2str(span));
+            Obj.Write(tt1);
+            Obj.Write(tt2);
         end
         
         function HighRes(Obj)
