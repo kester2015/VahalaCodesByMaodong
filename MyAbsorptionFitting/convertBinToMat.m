@@ -3,7 +3,7 @@
 clear
 clc
 
-datadir = "Z:\Maodong\Projects\1380 absorption\20210222\RUN2\speed";
+datadir = "Z:\Maodong\Projects\1380 absorption\20210306-2\RUN1\sweep";
 
 
 
