@@ -22,7 +22,7 @@ function varargout = ExperimentGUI(varargin)
 
 % Edit the above text to modify the response to help ExperimentGUI
 
-% Last Modified by GUIDE v2.5 12-Oct-2020 14:06:48
+% Last Modified by GUIDE v2.5 11-Mar-2021 17:19:06
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -106,6 +106,7 @@ function B_Connect_Callback(hObject, eventdata, handles)
 global Device Config;
 try
     if strcmp(hObject.String,'Connect')
+        instrreset;
         hObject.String = 'Disconnect';
         load('config.mat','Device');
         if ischar(Device.laser1)
@@ -146,7 +147,7 @@ if Device.laser1.isconnected
         else
             handles.B_LaserOn.String = 'Power on';
         end
-        handles.Wavelength.String = num2str(Device.laser1.Wavelength);
+        % handles.Wavelength.String = num2str(Device.laser1.Wavelength);
         handles.Current.String = num2str(Device.laser1.Current);
     end
 else
