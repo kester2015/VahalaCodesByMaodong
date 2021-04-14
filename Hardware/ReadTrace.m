@@ -1,4 +1,5 @@
 function ReadTrace(filename,myosc,point,trans_ch,mzi_ch,overwrite,offset)
+% This file should be deprecated!
 if nargin < 6
     overwrite = 0;
 end

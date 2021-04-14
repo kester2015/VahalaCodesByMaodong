@@ -223,6 +223,27 @@ classdef Infiniium < handle
             Obj.wait;
         end
         
+        function status = ischannelOn(Obj,channel)
+            tt = strcat(":CHAN", num2str(channel), ":DISP?");
+            status = str2double( Obj.Query( tt ) );
+        end
+        function ChannelOn(Obj,channel)
+            if ~Obj.ischannelOn(channel)
+                tt = strcat(":CHAN", num2str(channel), ":DISP ON");
+                Obj.Write(tt);
+            end
+            fprintf("Infinium oscilloscope Channel %1f display ON\n",channel)
+        end
+        function ChannelOff(Obj,channel)
+            if Obj.ischannelOn(channel)
+                tt = strcat(":CHAN", num2str(channel), ":DISP OFF");
+                Obj.Write(tt);
+            end
+            fprintf("Infinium oscilloscope Channel %1.f display OFF\n",channel)
+        end
+        
+        %%
+        
         function waveform = read(Obj,channel,point)
             % Reading
             chan=['CHAN',num2str(channel)];
@@ -234,6 +255,8 @@ classdef Infiniium < handle
                     Obj.InputBufferSize = 4e5*2.1*10 ; 
                 end
             elseif nargin == 2
+                point = Obj.srate * Obj.tspan * 1.05;
+                waveform = Obj.read(channel,point);
             end
             
             % Specify data from Channel n
@@ -307,14 +330,32 @@ classdef Infiniium < handle
         end
         
         function [XData,YData] = readtrace(Obj,channel,point)
-            Obj.read(channel,point);
-            
-            
-            XData = Obj.Waveform.XData;
-            YData = Obj.Waveform.YData;
+            % return X and Y data instead of Waveform struct
+            if nargin == 3
+                waveform = Obj.read(channel,point);
+            elseif nargin == 2
+                % point automatically calculated in read function.
+                waveform = Obj.read(channel); 
+            else
+                error("Not enough input arguments. readtrace method Need at least specify channel to read.\n %s"...
+                    , "Use readall instead to read all traces out.")
+            end
+            XData = waveform.XData;
+            YData = waveform.YData;
+        end
+        
+        function oscTraces = readall(Obj,point)
+            if nargin == 1
+                point = Obj.srate * Obj.tspan * 1.05;
+            end
+            oscTraces.Ch1 = Obj.read(1,point);
+            oscTraces.Ch2 = Obj.read(2,point);
+            oscTraces.Ch3 = Obj.read(3,point);
+            oscTraces.Ch4 = Obj.read(4,point);
         end
         
         function [XData,YreturnData] = readmultipletrace(Obj,channel,point)
+            % deprecated method. Avoid using this.
             n=length(channel);
             for i=n:-1:1
                 Obj.read(channel(i),point);
