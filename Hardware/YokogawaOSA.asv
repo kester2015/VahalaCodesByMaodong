@@ -291,24 +291,24 @@ classdef YokogawaOSA < handle
             n = str2double(query(obj.visaObj,[':TRACe:DATA:SNUMber? TR' strTraceName]));
         end
         
-%         function wait(obj)
-%             flag = ~ str2double( obj.Query(":STAT:OPER:EVEN?") ) ;
-%             count = 0;
-%             while flag
-%                 flag = ~str2double( obj.Query(":STAT:OPER:EVEN?") );
-%                 if count > 0
-%                     fprintf("Waiting for OSA finish sweeping. %1.f seconds waited\n",count);
-%                 end
-%                 count = count + 1;
-%                 pause(1)
-%             end
-%         end
-        
+        function wait(obj)
+            flag = 1;
+            count = 0;
+            while flag
+                flag = ~str2double( osa.Query(":STAT:OPER:EVEN?") );
+                pause(1)
+                if count > 0
+                fprintf()
+                end
+                count = count + 1;
+            end
+        end
         %%
         function [X,Y] = ReadTrace(obj,strTraceName,bSingle)
             if nargin == 3 && bSingle
                 obj.Initiate;
             end
+%             if obj.
             x=query(obj.visaObj,[':TRACe:X? TR' strTraceName]);
             x=strsplit(x,',');
             X=str2double(x)*1e9; % wavelength in unit of NM.
