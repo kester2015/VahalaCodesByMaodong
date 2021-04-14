@@ -1,5 +1,5 @@
 
-classdef YokogawaOSA < handle
+classdef YokogawaOSA_deprecated < handle
     properties
         visaResourceString;
         visaObj;

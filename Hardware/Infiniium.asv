@@ -121,7 +121,6 @@ classdef Infiniium < handle
             end
         end
         
-        % --- Horizontal control ---
         function set.tcenter(Obj, center_pos) % center_pos in units of s
             tt1 = strcat(":TIM:POS ",num2str(center_pos));
             Obj.Write(tt1);
@@ -149,10 +148,10 @@ classdef Infiniium < handle
         end
         
         function set.tstart(Obj, tstart)
-            % oldtstart = Obj.tcenter - Obj.tspan/2;
-            oldtend = Obj.tcenter + Obj.tspan/2;
+            % oldtstart = Obj.tcenter - 5*Obj.tspan;
+            oldtend = Obj.tcenter + (Obj.NUM_DIV_HOR/2) *Obj.tspan;
             newstart = tstart;
-            if ~(newstart < oldtend)
+            if newstart > oldend
                 newend = newstart + 10e-3; % if move too far, 10ms span default
             else
                 newend = oldtend;
@@ -163,17 +162,17 @@ classdef Infiniium < handle
             Obj.tspan = newspan;
         end
         function tt = get.tstart(Obj)
-            tt = Obj.tcenter - Obj.tspan/2;
+            tt = Obj.tcenter - (Obj.NUM_DIV_HOR/2) *Obj.tspan;
         end
         
         function set.tend(Obj, tend)
-            oldtstart = Obj.tcenter - Obj.tspan/2;
-            % oldtend = Obj.tcenter + Obj.tspan/2;
+            oldtstart = Obj.tcenter - (Obj.NUM_DIV_HOR/2) *Obj.tspan;
+            % oldtend = Obj.tcenter + (Obj.NUM_DIV_HOR/2) *Obj.tspan;
             newend = tend;
-            if ~(newend > oldtstart)
-                newstart = newend - 10e-3; % if move too far, 10ms span default
+            if newend < oldtstart
+                newend = newstart + 10e-3; % if move too far, 10ms span default
             else
-                newstart = oldtstart;
+                newend = oldtend;
             end
             newspan = (newend - newstart); 
             newcenter = (newend + newstart)/2;

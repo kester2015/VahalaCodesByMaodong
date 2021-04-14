@@ -9,11 +9,13 @@ classdef YokogawaOSA < handle
     methods
         function obj=YokogawaOSA(visaResourceString)
             if nargin>0
-                obj.visaResourceString=visaResourceString;
-                obj.visaObj=visa('ni',visaResourceString);
-                obj.visaObj.Timeout=30;
-                obj.visaObj.InputBufferSize=obj.InputBufferSize;
+                obj.visaResourceString = visaResourceString;
+            else
+                obj.visaResourceString = "GPIB1::1::INSTR";
             end
+            obj.visaObj=visa('ni',obj.visaResourceString);
+            obj.visaObj.Timeout=30;
+            obj.visaObj.InputBufferSize=obj.InputBufferSize;
         end
         
         function connect(Obj)
@@ -24,9 +26,9 @@ classdef YokogawaOSA < handle
             disp('Yokogawa OSA connected');
         end
         
-        function delete(Obj)
-            Obj.disconnect();
-        end
+        % function delete(Obj)
+        %     Obj.disconnect();
+        % end
         
         function b = isconnected(Obj)
             b = strcmp(Obj.visaObj.Status,'open');
