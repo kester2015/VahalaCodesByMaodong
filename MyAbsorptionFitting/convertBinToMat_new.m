@@ -5,7 +5,7 @@ clc
 
 datadir = "Z:\Maodong\Projects\1380 absorption\20210306-2\RUN1\sweep";
 
-datadir = "Z:\Maodong\Projects\1380 absorption\20210306-2\RUN3-1370\sweep";
+datadir = "Z:\Maodong\Projects\1380 absorption\20210315-annealed\RUN2-1380\speed";
 sapoint = 1e5;
 
 % allSubfolders = dir(datadir);
