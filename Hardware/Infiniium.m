@@ -11,10 +11,23 @@ classdef Infiniium < handle
     
     properties (Dependent = true)
         InputBufferSize
+        
+        % --- osc settings related --- %
+        srate % sampling rate, is a number or "AUTO"
+        memoDepth % Memory Depth, is a number or "AUTO"
+        
+        tcenter % time center
+        tspan % time axis total span. tspan/10 = horizontal scale
+        % time center and span are core. Other are derived.
+        tscale % = tspan/10;
+        tstart
+        tend
     end
     
     properties (Access = private)
         setting
+        NUM_DIV_HOR = 10; % number of horiztiontal division, =10
+        NUM_DIV_VER = 8; % number of vertical division, =8
     end
     
     methods
@@ -61,15 +74,123 @@ classdef Infiniium < handle
         function data = Query(Obj,command)
             data = query(Obj.visaObj,command);
         end
-        
+        %%
         function set.InputBufferSize(Obj,size)
             fclose(Obj.visaObj);
             Obj.visaObj.InputBufferSize = size;
             fopen(Obj.visaObj);
         end
         
-        function wait(Obj)
+        function set.srate(Obj, srate)
+            if strcmpi(srate, 'AUTO')
+                Obj.Write(":ACQ:SRAT:ANAL AUTO");
+                return
+            elseif isnumeric(srate)
+                tt1 = strcat(":ACQ:SRAT:ANAL ",num2str(srate/1e6),'E+6');
+                Obj.Write(tt1);
+            else
+                error("Un-reconigized sample rate command. srate should be 'AUTO' or (a number)")
+            end
+        end
+        
+        function ss = get.srate(Obj)
+            if str2double( Obj.Query(":ACQ:SRAT:AUTO?") )
+                ss = "AUTO";
+            else
+                ss = str2double( Obj.Query(":ACQ:SRAT?") );
+            end
+        end
+        
+        function set.memoDepth(Obj, memodept)
+            if strcmpi(memodept, 'AUTO')
+                Obj.AutoMemoryDepth;
+                return
+            elseif isnumeric(memodept)
+                tt1 = strcat(":ACQ:POIN:ANAL ",num2str(memodept/1e6),'E+6');
+                Obj.Write(tt1);
+            else
+                error("Un-reconigized memory depth command. memoDepth should be 'AUTO' or (a number)")
+            end
+        end
+        
+        function tt = get.memoDepth(Obj)
+            if str2double( Obj.Query(":ACQ:POIN:AUTO?") )
+                tt = "AUTO";
+            else
+                tt = str2double( Obj.Query(":ACQ:POIN:ANAL?") );
+            end
+        end
+        
+        % --- Horizontal control ---
+        function set.tcenter(Obj, center_pos) % center_pos in units of s
+            tt1 = strcat(":TIM:POS ",num2str(center_pos));
+            Obj.Write(tt1);
+        end
+        
+        function tt = get.tcenter(Obj)
+            tt = str2double( Obj.Query(":TIM:POS?") );
+        end
+        
+        function set.tspan(Obj, span) % span in unit of s
+            tt2 = strcat(":TIM:RANG ",num2str(span));
+            Obj.Write(tt2);
+        end
+        
+        function tt = get.tspan(Obj)
+            tt = str2double( Obj.Query(":TIM:RANG?") );
+        end
+        
+        function set.tscale(Obj, scale)
+            Obj.tspan = Obj.NUM_DIV_HOR * scale;
+        end
+        
+        function tt = get.tscale(Obj)
+            tt = Obj.tspan / Obj.NUM_DIV_HOR;
+        end
+        
+        function set.tstart(Obj, tstart)
+            % oldtstart = Obj.tcenter - Obj.tspan/2;
+            oldtend = Obj.tcenter + Obj.tspan/2;
+            newstart = tstart;
+            if ~(newstart < oldtend)
+                newend = newstart + 10e-3; % if move too far, 10ms span default
+            else
+                newend = oldtend;
+            end
+            newspan = (newend - newstart); 
+            newcenter = (newend + newstart)/2;
+            Obj.tcenter = newcenter;
+            Obj.tspan = newspan;
+        end
+        function tt = get.tstart(Obj)
+            tt = Obj.tcenter - Obj.tspan/2;
+        end
+        
+        function set.tend(Obj, tend)
+            oldtstart = Obj.tcenter - Obj.tspan/2;
+            % oldtend = Obj.tcenter + Obj.tspan/2;
+            newend = tend;
+            if ~(newend > oldtstart)
+                newstart = newend - 10e-3; % if move too far, 10ms span default
+            else
+                newstart = oldtstart;
+            end
+            newspan = (newend - newstart); 
+            newcenter = (newend + newstart)/2;
+            Obj.tcenter = newcenter;
+            Obj.tspan = newspan;
+        end
+        function tt = get.tend(Obj)
+            tt = Obj.tcenter + (Obj.NUM_DIV_HOR/2) *Obj.tspan;
+        end
+        %%
+       function wait(Obj)
             operationComplete = str2double(Obj.Query('*OPC?'));
+            while isnan(operationComplete) % this may happen when last save action are still not finished
+                warning("Infinium OSC wait operation failed, retry in 5 seconds.");
+                pause(5)
+                operationComplete = str2double(Obj.Query('*OPC?'));
+            end
             while ~operationComplete
                 operationComplete = str2double(Obj.Query('*OPC?'));
             end
@@ -83,6 +204,7 @@ classdef Infiniium < handle
             end
         end
         
+        %%
         function Stop(Obj)
             Obj.Write(':STOP');
             Obj.wait;
@@ -101,14 +223,40 @@ classdef Infiniium < handle
             Obj.wait;
         end
         
-        function read(Obj,channel,point)
+        function status = ischannelOn(Obj,channel)
+            tt = strcat(":CHAN", num2str(channel), ":DISP?");
+            status = str2double( Obj.Query( tt ) );
+        end
+        function ChannelOn(Obj,channel)
+            if ~Obj.ischannelOn(channel)
+                tt = strcat(":CHAN", num2str(channel), ":DISP ON");
+                Obj.Write(tt);
+            end
+            fprintf("Infinium oscilloscope Channel %1f display ON\n",channel)
+        end
+        function ChannelOff(Obj,channel)
+            if Obj.ischannelOn(channel)
+                tt = strcat(":CHAN", num2str(channel), ":DISP OFF");
+                Obj.Write(tt);
+            end
+            fprintf("Infinium oscilloscope Channel %1.f display OFF\n",channel)
+        end
+        
+        %%
+        
+        function waveform = read(Obj,channel,point)
             % Reading
             chan=['CHAN',num2str(channel)];
-            if ~isempty(point)
-                Obj.InputBufferSize = point*2.1*1;
-                Obj.wait;
-            else
-                Obj.InputBufferSize = 4e5*2.1*10;
+            if nargin == 3
+                if ~isempty(point)
+                    Obj.InputBufferSize = point*2.1*1 ;
+                    Obj.wait;
+                else
+                    Obj.InputBufferSize = 4e5*2.1*10 ; 
+                end
+            elseif nargin == 2
+                point = Obj.srate * Obj.tspan * 1.05;
+                waveform = Obj.read(channel,point);
             end
             
             % Specify data from Channel n
@@ -182,14 +330,32 @@ classdef Infiniium < handle
         end
         
         function [XData,YData] = readtrace(Obj,channel,point)
-            Obj.read(channel,point);
-            
-            
-            XData = Obj.Waveform.XData;
-            YData = Obj.Waveform.YData;
+            % return X and Y data instead of Waveform struct
+            if nargin == 3
+                waveform = Obj.read(channel,point);
+            elseif nargin == 2
+                % point automatically calculated in read function.
+                waveform = Obj.read(channel); 
+            else
+                error("Not enough input arguments. readtrace method Need at least specify channel to read.\n %s"...
+                    , "Use readall instead to read all traces out.")
+            end
+            XData = waveform.XData;
+            YData = waveform.YData;
+        end
+        
+        function oscTraces = readall(Obj,point)
+            if nargin == 1
+                point = Obj.srate * Obj.tspan * 1.05;
+            end
+            oscTraces.Ch1 = Obj.read(1,point);
+            oscTraces.Ch2 = Obj.read(2,point);
+            oscTraces.Ch3 = Obj.read(3,point);
+            oscTraces.Ch4 = Obj.read(4,point);
         end
         
         function [XData,YreturnData] = readmultipletrace(Obj,channel,point)
+            % deprecated method. Avoid using this.
             n=length(channel);
             for i=n:-1:1
                 Obj.read(channel(i),point);
@@ -208,6 +374,7 @@ classdef Infiniium < handle
             Obj.Write(strcat(':DISK:SAVE:WAVeform ALL,"',filename,'",BIN'));
         end
         
+        %%
         function Qsetting(Obj)
             if (Obj.setting == 1)
                 return
@@ -264,6 +431,8 @@ classdef Infiniium < handle
             Obj.setting = 3;
         end
         
+        
+        %%
         function SetScale(Obj, Scale, Point, Srate)
             Obj.Write([':TIM:SCAL ', Scale]); % time_Scale
             Obj.Write([':ACQ:SRAT ', Srate]); % Sampling rate
@@ -292,9 +461,6 @@ classdef Infiniium < handle
             Obj.Write(':ACQ:MODE HRES');
         end
         
-        function AutoMemoryDepth(Obj)
-            Obj.Write(':ACQ:POIN:ANAL AUTO');
-        end
         
         function makeDirOnOSC(Obj,fullpath)
             tt = strcat(":DISK:MDIR ","""", fullpath, """");
@@ -317,6 +483,14 @@ classdef Infiniium < handle
         end
     end
     
+    methods (Access = private)
+         function AutoMemoryDepth(Obj)
+            % Deprecated from public to private
+            % use obj.memoDepth = 'auto' instead.
+            Obj.Write(':ACQ:POIN:ANAL AUTO');
+        end
+    end
+    %% static methods
     methods (Static = true)
         function [X,Y] = ReadFromBinary(filename,ToSave)
             if nargin < 2
