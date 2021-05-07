@@ -7,6 +7,6 @@ function phase = MZI2Phase(trace_MZI)
 
     trace_MZI_phase = [0; cumsum(mod(diff(angle(trace_MZI_phasor))+pi, 2*pi) - pi)] + angle(trace_MZI_phasor(1));
     % trace_MZI_phase = sgolayfilt(trace_MZI_phase, 1, 11);
-    phase = sgolayfilt(trace_MZI_phase, 2, round(trace_length/40)*2 + 1);
+    phase = sgolayfilt(trace_MZI_phase, 2, round(trace_length/100)*2 + 1);
     % phase = trace_MZI_phase;
 end

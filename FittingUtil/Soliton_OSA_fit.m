@@ -25,6 +25,7 @@ classdef Soliton_OSA_fit < handle
         pump_wavelength     % [nm]
         
         sech2_fit           % Fitting results
+        sech2_fit_wl_db
         pulse_width         % taos [ps]
         Ramanshift          % Omega/2pi [THz]
         centerpeakpower     % [dBm]
@@ -83,6 +84,8 @@ classdef Soliton_OSA_fit < handle
             obj.Ramanshift = obj.sech2_fit.x0/2/pi - 299792.458/Pump;
             obj.pulse_width = obj.sech2_fit.ts;
             obj.centerpeakpower = obj.sech2_fit.A;
+            
+            obj.sech2_fit_wl_db = @(x)obj.sech2_fit(2*pi*299792.458./x);
         end
         
         function figure_handle = plot(obj,XUnit)
