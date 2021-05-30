@@ -1,0 +1,108 @@
+close all
+clear
+clc
+
+h=6.626068e-34;                % Planck's constant (m^2*kg/s)
+c=299792458;                     % speed of light in vacuum (m/s)
+%% Resonator parameters
+wavelength = 1549.8e-9; % carrier wavelength
+w_carrier=2*pi*c/wavelength;    % carrier angular frequency 
+
+n2 = 1616e-20;  % nonlinear index for AlGaAs, unit m^2/W
+FSR = 17.48e9; % FSR, GHz.
+ng = 3.3; % group velocity index %c/(2*pi*R*FSR)
+tauR = 1/FSR; % round trip time in s
+R = c/FSR/2/pi/ng; %Ring radius. 1438e-6/2;
+
+%------ Q factors ------%
+Qfactor = 0.7413e6; % loaded Q
+Qfactor0 = 1.129e6; % intrinsic Q
+Qfactore = 1/(1/Qfactor-1/Qfactor0); % external Q
+decayrate = w_carrier/Qfactor; % total loss rate kappa in Hz
+decayrate0 = w_carrier/Qfactor0; % intrinsic loss rate
+
+%------ mode parameters ------%
+Aeff_p = 2.63e-13;
+gamma0_p = 2*pi/wavelength*n2/Aeff_p;  % nonlinear coefficient
+D1p = 2*pi*FSR;
+D2p = 2*pi*54.4e3; % Dispersion coefficient
+beta2p = -ng*D2p/D1p^2/c;
+
+%% Simulation parameters
+%------ frequency domain / fast time domain------%
+nt = 4096;
+dt = tauR/nt;
+w = 2*pi*[(0:round(nt/2)-1),(-floor(nt/2):-1)]'/(dt*nt);  % frequency window, relative to center angular frequency, with fftshift applied
+lower_freq  = c/wavelength + min(w)/2/pi; % the lower limit of frequency 
+upper_freq = c/wavelength + max(w)/2/pi; % the upper limit of frequency 
+f0 = (lower_freq+upper_freq)/2; % center frequence in the frequency window 
+w0 = 2*pi*f0;
+lambda0 = c/f0; % center wavelength in m
+
+time_start = 0;                  % the beginning of time
+time_end = round(tauR/dt)*dt;    % the end of time
+time = (time_start:dt:(time_end-dt))';   % time window
+
+%------ time domain / slow time domain ------%
+dz = 1*tauR;
+nz = 2e4; % number of steps
+
+%% Input parameters
+randn('state',sum(98*clock))
+xw=randn(size(time));
+randn('state',sum(99*clock))
+yw=randn(size(time));
+noise=sqrt(h*(w+w0)/4/pi).*(xw+1i*yw);
+Ain=1e0.*ifft(noise)*length(noise); % in unit sqrt(W)
+Atemp = Ain;
+
+%%
+PComb=0.13*1e-3; % 3 mW per comb line
+NComb=12;   % half number of the comb line
+EOComb=zeros(length(w),1);
+EOComb(1:NComb+1)=sqrt(PComb);
+EOComb(length(w)-NComb+1:length(w))=sqrt(PComb);
+EOPhase=1/17*1e3*(-21.6e-27).*w.^2/2;
+Ein_pulse = fftshift( fft( EOComb.*exp(1i*EOPhase) )/length(EOComb) );
+% Ein_pulse = ifft( EOComb.*exp(1i*EOPhase) );
+Sin_pulse=fft(Ein_pulse);
+figure
+plot(time*1e12,abs(Ein_pulse).^2);
+
+%%
+gamma=(2*pi*R/tauR)*gamma0_p;   % nonlinear coefficient in 1/W/m
+alpharing = decayrate0*tauR; % loss in percent unit per roundtrip for intrinsic
+kappa = (decayrate-decayrate0)*tauR; % loss in percent unit per roundtrip for coupling
+kappaall = alpharing + kappa;
+
+beta1 = 0*w;
+disp2 = beta2p*w.^2/2 ;
+
+for kz = 1:nz*5
+    delta0 = (10*kz/nz)*(kappaall/2);
+    
+    Dis = (-kappaall/2 + 1i*delta0 + 1i*beta1*2*pi*R - 1i*disp2*2*pi*R); % Linear loss is treated as part of dispersion.
+    
+    Atemp = ifft(exp(Dis*dz/tauR).*fft(Atemp)) ; % Not related to energy. No need to normalize.
+    
+    A2 = abs(Atemp).*abs(Atemp);
+    
+    Atemp_lp = Atemp + sqrt(kappa)*Ein_pulse*(dz/tauR);
+    
+    Atemp = Atemp_lp.*exp(-1i*dz*gamma*A2)
+    
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
