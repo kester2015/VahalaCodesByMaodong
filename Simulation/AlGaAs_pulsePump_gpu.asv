@@ -34,6 +34,7 @@ beta2p = -ng*D2p/D1p^2/c;
 nt = 4096;
 dt = tauR/nt;
 w = 2*pi*[(0:round(nt/2)-1),(-floor(nt/2):-1)]'/(dt*nt);  % frequency window, relative to center angular frequency, with fftshift applied
+w = gpuArray(w);
 lower_freq  = c/wavelength + min(w)/2/pi; % the lower limit of frequency 
 upper_freq = c/wavelength + max(w)/2/pi; % the upper limit of frequency 
 f0 = (lower_freq+upper_freq)/2; % center frequence in the frequency window 
@@ -43,7 +44,7 @@ lambda0 = c/f0; % center wavelength in m
 time_start = 0;                  % the beginning of time
 time_end = round(tauR/dt)*dt;    % the end of time
 time = (time_start:dt:(time_end-dt))';   % time window
-
+time = gpuArray(time)
 %------ time domain / slow time domain ------%
 dz = 1*tauR;
 nz = 2e4; % number of steps
@@ -112,7 +113,6 @@ dz = scan_time/nz;  %100*tauR;
 start_detuning = -25 /2;
 stop_detuning = 25 /2;
 
-tic
 for kz = 1:nz
     delta0 = ( start_detuning+(stop_detuning-start_detuning)*kz/nz )*(kappaall);
     
@@ -131,7 +131,7 @@ for kz = 1:nz
         fprintf("%.0f of %.0f\n",kz, nz)
     end
 end
-toc
+
 % ---------------- %
 
 

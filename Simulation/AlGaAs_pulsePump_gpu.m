@@ -34,6 +34,7 @@ beta2p = -ng*D2p/D1p^2/c;
 nt = 4096;
 dt = tauR/nt;
 w = 2*pi*[(0:round(nt/2)-1),(-floor(nt/2):-1)]'/(dt*nt);  % frequency window, relative to center angular frequency, with fftshift applied
+w = gpuArray(w);
 lower_freq  = c/wavelength + min(w)/2/pi; % the lower limit of frequency 
 upper_freq = c/wavelength + max(w)/2/pi; % the upper limit of frequency 
 f0 = (lower_freq+upper_freq)/2; % center frequence in the frequency window 
@@ -43,7 +44,7 @@ lambda0 = c/f0; % center wavelength in m
 time_start = 0;                  % the beginning of time
 time_end = round(tauR/dt)*dt;    % the end of time
 time = (time_start:dt:(time_end-dt))';   % time window
-
+time = gpuArray(time);
 %------ time domain / slow time domain ------%
 dz = 1*tauR;
 nz = 2e4; % number of steps
@@ -51,8 +52,10 @@ nz = 2e4; % number of steps
 %% Input parameters
 randn('state',sum(98*clock))
 xw=randn(size(time));
+xw = gpuArray(xw);
 randn('state',sum(99*clock))
 yw=randn(size(time));
+yw = gpuArray(yw);
 noise=sqrt(h*(w+w0)/4/pi).*(xw+1i*yw);
 Ain=1e0.*ifft(noise)*length(noise); % in unit sqrt(W)
 Atemp = Ain;
@@ -62,6 +65,7 @@ PComb=0.13*4096*1e-3; % 3 mW per comb line
 PComb=100*1e-3;
 NComb=16;   % half number of the comb line
 EOComb=zeros(length(w),1);
+EOComb = gpuArray(EOComb);
 EOComb(1:NComb+1)=sqrt(PComb);
 EOComb(length(w)-NComb+1:length(w))=sqrt(PComb);
 EOPhase=1/17*1e3*(-21.6e-27).*w.^2/2;
@@ -85,6 +89,9 @@ disp2 = beta2p*w.^2/2 ;
 
 save_n = 100;
 Asave1 = zeros( nt,ceil(nz*5/save_n) );
+Asave1 = gpuArray(Asave1);
+
+% ------------------ %
 
 % for kz = 1:nz*5
 %     delta0 = (10*kz/nz)*(kappaall/2);
@@ -134,6 +141,9 @@ end
 toc
 % ---------------- %
 
+time = gather(time);
+Asave1 = gather(Asave1);
+Ein_pulse = gather(Ein_pulse);
 
 %%
 ploty_pos = 0.62

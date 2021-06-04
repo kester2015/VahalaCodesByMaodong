@@ -664,7 +664,7 @@ if strcmp(handles.data_status.String,'Data loaded')
     MS_plot(:,4)=dispersion_data.MS_mapping(:,2);
     MS_plot(:,5)=dispersion_data.MS_mapping(:,1);
     dispersion_data.MS_plot=MS_plot;
-    
+    dispersion_data.disk_FSR = disk_FSR;
     % Five columns 
     % corrected freq, resonator mu, freq offset within FSR, depth and MZI mu
     plot(handles.display_window,[0 0],[-1 1]*disk_FSR/2,'k','linewidth',2); % Center bold vertical line
