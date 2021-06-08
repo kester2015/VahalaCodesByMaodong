@@ -1,0 +1,538 @@
+;----------------------------------------------------------------
+;
+;	FILE: EDGEPORT.INF for Windows XP, Vista, Server 2003 & Server 2008
+;
+;	Edgeport Installation Script
+;
+;	Copyright 1997-2010 Digi International
+;
+;----------------------------------------------------------------
+[Version]
+Signature   = "$CHICAGO$"
+Class       = IonMultiPortSerial
+ClassGuid   = {1A48FDD5-9D23-4889-93AA-78967DB78D30}
+Provider    = %MfgName%
+CatalogFile = edgeport.cat
+DriverVer=05/05/2010, 5.30.02.0
+
+
+;----------------------------------------------------------------
+; This section lists the diskette names. Format is:
+;	diskid = %strkey% | ["]disk-description["][[,tagfile][,unused,path]]
+;----------------------------------------------------------------
+[SourceDisksNames]
+1 = %EpDiskName%,edgeport.cab,,
+
+
+;----------------------------------------------------------------
+; This section gives location of each source file. Format is:
+;	filename = diskid[,[ subdir][, size]]
+;----------------------------------------------------------------
+[SourceDisksFiles]
+edgeser.sys = 1,,
+edgeser64.sys = 1,,
+ionenum.sys = 1,,
+ionenum64.sys = 1,,
+EdgeCoIn.dll = 1,,
+EdgeCoIn64.dll = 1,,
+ImpsCoin.dll = 1,,
+ImpsCoin64.dll = 1,,
+edgeport.exe = 1,,
+edgeport64.exe = 1,,
+Edgeport.lnk = 1,,
+Edgeport64.lnk = 1,,
+Ionflash.exe = 1,,
+Ionflash.lnk = 1,,
+
+
+;----------------------------------------------------------------
+; This section gives location of where to put each destination file.
+; Format is:
+;	DefaultDestDir = dirid[,subdir]] 
+;	file-list-section = dirid[,subdir]]... 
+;----------------------------------------------------------------
+[DestinationDirs]
+Edgeport.NTx86.Files.Sys = 12			; System32\Drivers
+Edgeport.NTAMD64.Files.Sys = 12			; System32\Drivers
+
+Edgeport.NTx86.Files.Exe = 11 			; System32
+Edgeport.NTAMD64.Files.Exe = 11 		; System32
+
+Rapidport.NTx86.Files.Exe = 11 			; System32
+Rapidport.NTAMD64.Files.Exe = 11 		; System32
+
+CoInstaller_CopyFiles.NTx86 = 11 		; System32
+CoInstaller_CopyFiles.NTAMD64 = 11 		; System32
+
+Edgeport.NTx86.Files.Menu = 16407,\Digi USB
+Edgeport.NTAMD64.Files.Menu = 16407,\Digi USB
+
+Rapidport.NTx86.Files.Menu = 16407,\Digi USB
+Rapidport.NTAMD64.Files.Menu = 16407,\Digi USB
+
+
+;----------------------------------------------------------------
+; This section gives flags for this INF file. Format is:
+;	ExcludeFromSelect[.nt[xxx]] = [*] | [hw-id[,hw-id]...]
+;	CopyFilesOnly = hw-id[,hw-id]...
+;----------------------------------------------------------------
+[ControlFlags]
+ExcludeFromSelect = *		; Hide all devices here from manual install
+
+
+;----------------------------------------------------------------
+; This section lists the manufacturer of devices installable with
+; this INF file, and gives the name of the [Models] section for each
+; manufacturer. The format is:
+;	manufacturer-name...	|
+;	%strkey% = models-section-name...
+;----------------------------------------------------------------
+[Manufacturer]
+%Digi.Mfg% = Digi, NTx86, NTAMD64
+%NCR.Mfg% = NCR, NTx86, NTAMD64
+
+
+;----------------------------------------------------------------
+; This section lists the various devices that may be installed for
+; each manufacturer. Format is:
+;
+;	device-description = install-section-name,hw-id[,compatible-id...] ...
+;----------------------------------------------------------------
+[Digi.NTx86]
+; 1st Generation (930) VID/PIDs
+%Ep4DeviceName%    = Edgeport.Install,  USB\VID_1608&PID_0001
+%Ep8DeviceName%    = Edgeport.Install,  USB\VID_1608&PID_0002
+%Rp4DeviceName%    = Rapidport.Install, USB\VID_1608&PID_0003
+%Ep4tDeviceName%   = Edgeport.Install,  USB\VID_1608&PID_0004
+%Ep2DeviceName%    = Edgeport.Install,  USB\VID_1608&PID_0005
+%Ep4iDeviceName%   = Edgeport.Install,  USB\VID_1608&PID_0006
+%Ep2iDeviceName%   = Edgeport.Install,  USB\VID_1608&PID_0007
+%Ep8DeviceName%    = Edgeport.Install,  USB\VID_1608&PID_0008
+%Ep421DeviceName%  = Edgeport.Install,  USB\VID_1608&PID_000C
+%Ep21DeviceName%   = Edgeport.Install,  USB\VID_1608&PID_000D
+%Ep4DeviceName%    = Edgeport.Install,  USB\VID_1608&PID_000E
+%Ep8DeviceName%    = Edgeport.Install,  USB\VID_1608&PID_000F
+%Ep2D8DeviceName%  = Edgeport.Install,  USB\VID_1608&PID_0010
+%Ep4D8DeviceName%  = Edgeport.Install,  USB\VID_1608&PID_0011
+%Ep416DeviceName%  = Edgeport.Install,  USB\VID_1608&PID_0012
+%Ep8iDeviceName%   = Edgeport.Install,  USB\VID_1608&PID_0014
+%Ep412DeviceName%  = Edgeport.Install,  USB\VID_1608&PID_0018
+%Ep412DeviceName%  = Edgeport.Install,  USB\VID_1608&PID_0019
+%Ep22iDeviceName%  = Edgeport.Install,  USB\VID_1608&PID_001A
+
+; Watchport/Wireless
+%MoteDiagName%     = Edgeport.Install,  USB\VID_1608&PID_0048
+%MoteBootName%     = Edgeport.Install,  USB\VID_1608&PID_0049
+%MoteDeviceName%   = Edgeport.Install,  USB\VID_1608&PID_004A
+%PanDeviceName%    = Edgeport.Install,  USB\VID_1608&PID_024B
+
+; 2nd Generation (80251/Netchip) VID/PIDs
+%Ep4DeviceName%    = Edgeport.Install,  USB\VID_1608&PID_0101
+%Ep2DeviceName%    = Edgeport.Install,  USB\VID_1608&PID_0105
+%Ep4iDeviceName%   = Edgeport.Install,  USB\VID_1608&PID_0106
+%Ep2iDeviceName%   = Edgeport.Install,  USB\VID_1608&PID_0107
+%Ep421DeviceName%  = Edgeport.Install,  USB\VID_1608&PID_010C
+%Ep21DeviceName%   = Edgeport.Install,  USB\VID_1608&PID_010D
+%Ep2D8DeviceName%  = Edgeport.Install,  USB\VID_1608&PID_0110
+%Ep4D8DeviceName%  = Edgeport.Install,  USB\VID_1608&PID_0111
+%Ep416DeviceName%  = Edgeport.Install,  USB\VID_1608&PID_0112
+%Ep8iDeviceName%   = Edgeport.Install,  USB\VID_1608&PID_0114
+
+; 3rd Generation (Ti 5152 UMP) VID/PIDs
+%Ep4DeviceName%    = Edgeport.Install,  USB\VID_1608&PID_0201
+%Ep4rDeviceName%   = Edgeport.Install,  USB\VID_1608&PID_0202
+%Rp4DeviceName%    = Rapidport.Install, USB\VID_1608&PID_0203
+%Ep4tDeviceName%   = Edgeport.Install,  USB\VID_1608&PID_0204
+%Ep2DeviceName%    = Edgeport.Install,  USB\VID_1608&PID_0205
+%Ep4iDeviceName%   = Edgeport.Install,  USB\VID_1608&PID_0206
+%Ep2iDeviceName%   = Edgeport.Install,  USB\VID_1608&PID_0207
+%Ep421DeviceName%  = Edgeport.Install,  USB\VID_1608&PID_020C
+%Ep21DeviceName%   = Edgeport.Install,  USB\VID_1608&PID_020D
+%Ep4DeviceName%    = Edgeport.Install,  USB\VID_1608&PID_020E
+%Ep8DeviceName%    = Edgeport.Install,  USB\VID_1608&PID_020F
+%Ep2D8DeviceName%  = Edgeport.Install,  USB\VID_1608&PID_0210
+%Ep4D8DeviceName%  = Edgeport.Install,  USB\VID_1608&PID_0211
+%Ep416DeviceName%  = Edgeport.Install,  USB\VID_1608&PID_0212
+%Ep8iDeviceName%   = Edgeport.Install,  USB\VID_1608&PID_0214
+%Ep1DeviceName%    = Edgeport.Install,  USB\VID_1608&PID_0215
+%Ep44DeviceName%   = Edgeport.Install,  USB\VID_1608&PID_0216
+%Ep42DeviceName%   = Edgeport.Install,  USB\VID_1608&PID_0217
+%Ep22iDeviceName%  = Edgeport.Install,  USB\VID_1608&PID_021A
+%Ep2cDeviceName%   = Edgeport.Install,  USB\VID_1608&PID_021B
+%Ep221cDeviceName% = Edgeport.Install,  USB\VID_1608&PID_021C
+%Ep22cDeviceName%  = Edgeport.Install,  USB\VID_1608&PID_021D
+%Ep21cDeviceName%  = Edgeport.Install,  USB\VID_1608&PID_021E
+%Ep62DeviceName%   = Edgeport.Install,  USB\VID_1608&PID_021F
+%Ep4sDeviceName%   = Edgeport.Install,  USB\VID_1608&PID_0242
+%Ep8sDeviceName%   = Edgeport.Install,  USB\VID_1608&PID_0243
+%Ep8DeviceName%    = Edgeport.Install,  USB\VID_1608&PID_0244
+%Ep22cDeviceName%  = Edgeport.Install,  USB\VID_1608&PID_0245
+%Ep416sDeviceName% = Edgeport.Install,  USB\VID_1608&PID_0246
+%Ep416DeviceName%  = Edgeport.Install,  USB\VID_1608&PID_0247
+%Ep2sDeviceName%   = Edgeport.Install,  USB\VID_1608&PID_024C
+
+; 4th Generation (Ti 3410 UMP) VID/PIDs
+%Ep1DeviceName%    = Edgeport.Install,  USB\VID_1608&PID_0240
+%Ep1iDeviceName%   = Edgeport.Install,  USB\VID_1608&PID_0241
+
+; Watchport Family (Ti 3410 UMP) VID/PIDs
+%WpPDeviceName%    = Edgeport.Install,  USB\VID_1608&PID_0301
+%WpMDeviceName%    = Edgeport.Install,  USB\VID_1608&PID_0302
+%WpWDeviceName%    = Edgeport.Install,  USB\VID_1608&PID_0303
+%WpTDeviceName%    = Edgeport.Install,  USB\VID_1608&PID_0304
+%WpHDeviceName%    = Edgeport.Install,  USB\VID_1608&PID_0305
+%WpEDeviceName%    = Edgeport.Install,  USB\VID_1608&PID_0306
+%WpLDeviceName%    = Edgeport.Install,  USB\VID_1608&PID_0307
+%WpRDeviceName%    = Edgeport.Install,  USB\VID_1608&PID_0308
+%WpADeviceName%    = Edgeport.Install,  USB\VID_1608&PID_0309
+%WpDDeviceName%    = Edgeport.Install,  USB\VID_1608&PID_030B
+%WpGDeviceName%    = Edgeport.Install,  USB\VID_1608&PID_030F
+%WpTcDeviceName%   = Edgeport.Install,  USB\VID_1608&PID_0310
+%WpHcDeviceName%   = Edgeport.Install,  USB\VID_1608&PID_0311
+
+; Power Management Watchports (Ti 5052 UMP) VID/PIDs
+%WpPPDeviceName%   = Edgeport.Install,  USB\VID_1608&PID_030C
+%WpPPDeviceName%   = Edgeport.Install,  USB\VID_1608&PID_030E
+%WpPPDeviceName%   = Edgeport.Install,  USB\VID_1608&PID_0312
+%WpPPDeviceName%   = Edgeport.Install,  USB\VID_1608&PID_0313
+
+; NCR EPiC VID/PIDs
+[NCR.NTx86]
+%NCR0202% 	   = Edgeport.Install,  USB\VID_0404&PID_0202
+%NCR0203% 	   = Edgeport.Install,  USB\VID_0404&PID_0203
+%NCR0310% 	   = Edgeport.Install,  USB\VID_0404&PID_0310
+%NCR0311% 	   = Edgeport.Install,  USB\VID_0404&PID_0311
+%NCR0312% 	   = Edgeport.Install,  USB\VID_0404&PID_0312
+
+;----------------------------------------------------------------
+[Digi.NTAMD64]
+; 1st Generation (930) VID/PIDs
+%Ep4DeviceName%    = Edgeport.Install,  USB\VID_1608&PID_0001
+%Ep8DeviceName%    = Edgeport.Install,  USB\VID_1608&PID_0002
+%Rp4DeviceName%    = Rapidport.Install, USB\VID_1608&PID_0003
+%Ep4tDeviceName%   = Edgeport.Install,  USB\VID_1608&PID_0004
+%Ep2DeviceName%    = Edgeport.Install,  USB\VID_1608&PID_0005
+%Ep4iDeviceName%   = Edgeport.Install,  USB\VID_1608&PID_0006
+%Ep2iDeviceName%   = Edgeport.Install,  USB\VID_1608&PID_0007
+%Ep8DeviceName%    = Edgeport.Install,  USB\VID_1608&PID_0008
+%Ep421DeviceName%  = Edgeport.Install,  USB\VID_1608&PID_000C
+%Ep21DeviceName%   = Edgeport.Install,  USB\VID_1608&PID_000D
+%Ep4DeviceName%    = Edgeport.Install,  USB\VID_1608&PID_000E
+%Ep8DeviceName%    = Edgeport.Install,  USB\VID_1608&PID_000F
+%Ep2D8DeviceName%  = Edgeport.Install,  USB\VID_1608&PID_0010
+%Ep4D8DeviceName%  = Edgeport.Install,  USB\VID_1608&PID_0011
+%Ep416DeviceName%  = Edgeport.Install,  USB\VID_1608&PID_0012
+%Ep8iDeviceName%   = Edgeport.Install,  USB\VID_1608&PID_0014
+%Ep412DeviceName%  = Edgeport.Install,  USB\VID_1608&PID_0018
+%Ep412DeviceName%  = Edgeport.Install,  USB\VID_1608&PID_0019
+%Ep22iDeviceName%  = Edgeport.Install,  USB\VID_1608&PID_001A
+
+; Watchport/Wireless
+%MoteDiagName%     = Edgeport.Install,  USB\VID_1608&PID_0048
+%MoteBootName%     = Edgeport.Install,  USB\VID_1608&PID_0049
+%MoteDeviceName%   = Edgeport.Install,  USB\VID_1608&PID_004A
+%PanDeviceName%    = Edgeport.Install,  USB\VID_1608&PID_024B
+
+; 2nd Generation (80251/Netchip) VID/PIDs
+%Ep4DeviceName%    = Edgeport.Install,  USB\VID_1608&PID_0101
+%Ep2DeviceName%    = Edgeport.Install,  USB\VID_1608&PID_0105
+%Ep4iDeviceName%   = Edgeport.Install,  USB\VID_1608&PID_0106
+%Ep2iDeviceName%   = Edgeport.Install,  USB\VID_1608&PID_0107
+%Ep421DeviceName%  = Edgeport.Install,  USB\VID_1608&PID_010C
+%Ep21DeviceName%   = Edgeport.Install,  USB\VID_1608&PID_010D
+%Ep2D8DeviceName%  = Edgeport.Install,  USB\VID_1608&PID_0110
+%Ep4D8DeviceName%  = Edgeport.Install,  USB\VID_1608&PID_0111
+%Ep416DeviceName%  = Edgeport.Install,  USB\VID_1608&PID_0112
+%Ep8iDeviceName%   = Edgeport.Install,  USB\VID_1608&PID_0114
+
+; 3rd Generation (Ti 5152 UMP) VID/PIDs
+%Ep4DeviceName%    = Edgeport.Install,  USB\VID_1608&PID_0201
+%Ep4rDeviceName%   = Edgeport.Install,  USB\VID_1608&PID_0202
+%Rp4DeviceName%    = Rapidport.Install, USB\VID_1608&PID_0203
+%Ep4tDeviceName%   = Edgeport.Install,  USB\VID_1608&PID_0204
+%Ep2DeviceName%    = Edgeport.Install,  USB\VID_1608&PID_0205
+%Ep4iDeviceName%   = Edgeport.Install,  USB\VID_1608&PID_0206
+%Ep2iDeviceName%   = Edgeport.Install,  USB\VID_1608&PID_0207
+%Ep421DeviceName%  = Edgeport.Install,  USB\VID_1608&PID_020C
+%Ep21DeviceName%   = Edgeport.Install,  USB\VID_1608&PID_020D
+%Ep4DeviceName%    = Edgeport.Install,  USB\VID_1608&PID_020E
+%Ep8DeviceName%    = Edgeport.Install,  USB\VID_1608&PID_020F
+%Ep2D8DeviceName%  = Edgeport.Install,  USB\VID_1608&PID_0210
+%Ep4D8DeviceName%  = Edgeport.Install,  USB\VID_1608&PID_0211
+%Ep416DeviceName%  = Edgeport.Install,  USB\VID_1608&PID_0212
+%Ep8iDeviceName%   = Edgeport.Install,  USB\VID_1608&PID_0214
+%Ep1DeviceName%    = Edgeport.Install,  USB\VID_1608&PID_0215
+%Ep44DeviceName%   = Edgeport.Install,  USB\VID_1608&PID_0216
+%Ep42DeviceName%   = Edgeport.Install,  USB\VID_1608&PID_0217
+%Ep22iDeviceName%  = Edgeport.Install,  USB\VID_1608&PID_021A
+%Ep2cDeviceName%   = Edgeport.Install,  USB\VID_1608&PID_021B
+%Ep221cDeviceName% = Edgeport.Install,  USB\VID_1608&PID_021C
+%Ep22cDeviceName%  = Edgeport.Install,  USB\VID_1608&PID_021D
+%Ep21cDeviceName%  = Edgeport.Install,  USB\VID_1608&PID_021E
+%Ep62DeviceName%   = Edgeport.Install,  USB\VID_1608&PID_021F
+%Ep4sDeviceName%   = Edgeport.Install,  USB\VID_1608&PID_0242
+%Ep8sDeviceName%   = Edgeport.Install,  USB\VID_1608&PID_0243
+%Ep8DeviceName%    = Edgeport.Install,  USB\VID_1608&PID_0244
+%Ep22cDeviceName%  = Edgeport.Install,  USB\VID_1608&PID_0245
+%Ep416sDeviceName% = Edgeport.Install,  USB\VID_1608&PID_0246
+%Ep416DeviceName%  = Edgeport.Install,  USB\VID_1608&PID_0247
+%Ep2sDeviceName%   = Edgeport.Install,  USB\VID_1608&PID_024C
+
+; 4th Generation (Ti 3410 UMP) VID/PIDs
+%Ep1DeviceName%    = Edgeport.Install,  USB\VID_1608&PID_0240
+%Ep1iDeviceName%   = Edgeport.Install,  USB\VID_1608&PID_0241
+
+; Watchport Family (Ti 3410 UMP) VID/PIDs
+%WpPDeviceName%    = Edgeport.Install,  USB\VID_1608&PID_0301
+%WpMDeviceName%    = Edgeport.Install,  USB\VID_1608&PID_0302
+%WpWDeviceName%    = Edgeport.Install,  USB\VID_1608&PID_0303
+%WpTDeviceName%    = Edgeport.Install,  USB\VID_1608&PID_0304
+%WpHDeviceName%    = Edgeport.Install,  USB\VID_1608&PID_0305
+%WpEDeviceName%    = Edgeport.Install,  USB\VID_1608&PID_0306
+%WpLDeviceName%    = Edgeport.Install,  USB\VID_1608&PID_0307
+%WpRDeviceName%    = Edgeport.Install,  USB\VID_1608&PID_0308
+%WpADeviceName%    = Edgeport.Install,  USB\VID_1608&PID_0309
+%WpDDeviceName%    = Edgeport.Install,  USB\VID_1608&PID_030B
+%WpGDeviceName%    = Edgeport.Install,  USB\VID_1608&PID_030F
+%WpTcDeviceName%   = Edgeport.Install,  USB\VID_1608&PID_0310
+%WpHcDeviceName%   = Edgeport.Install,  USB\VID_1608&PID_0311
+
+; Power Management Watchports (Ti 5052 UMP) VID/PIDs
+%WpPPDeviceName%   = Edgeport.Install,  USB\VID_1608&PID_030C
+%WpPPDeviceName%   = Edgeport.Install,  USB\VID_1608&PID_030E
+%WpPPDeviceName%   = Edgeport.Install,  USB\VID_1608&PID_0312
+%WpPPDeviceName%   = Edgeport.Install,  USB\VID_1608&PID_0313
+
+; NCR EPiC VID/PIDs
+[NCR.NTAMD64]
+%NCR0202% 	   = Edgeport.Install,  USB\VID_0404&PID_0202
+%NCR0203% 	   = Edgeport.Install,  USB\VID_0404&PID_0203
+%NCR0310% 	   = Edgeport.Install,  USB\VID_0404&PID_0310
+%NCR0311% 	   = Edgeport.Install,  USB\VID_0404&PID_0311
+%NCR0312% 	   = Edgeport.Install,  USB\VID_0404&PID_0312
+
+
+;----------------------------------------------------------------
+; NT 5.0 Edgeport
+;----------------------------------------------------------------
+[ClassInstall32.NTx86]
+CopyFiles   =	ClassInstaller_CopyFiles.NTx86
+AddReg      =   IonMultiPortSerialClass.NTx86.AddReg
+ 
+[ClassInstall32.NTAMD64]
+CopyFiles   =	ClassInstaller_CopyFiles.NTAMD64
+AddReg      =   IonMultiPortSerialClass.NTAMD64.AddReg
+ 
+;----------------------------------------------------------------
+[Edgeport.Install.NTx86]
+CopyFiles = Edgeport.NTx86.Files.Sys, Edgeport.NTx86.Files.Exe, Edgeport.NTx86.Files.Menu
+
+[Edgeport.Install.NTAMD64]
+CopyFiles = Edgeport.NTAMD64.Files.Sys, Edgeport.NTAMD64.Files.Exe, Edgeport.NTAMD64.Files.Menu
+
+;----------------------------------------------------------------
+[RapidPort.Install.NTx86]
+CopyFiles = Edgeport.NTx86.Files.Sys, Edgeport.NTx86.Files.Exe, Rapidport.NTx86.Files.Exe, Rapidport.NTx86.Files.Menu
+
+[RapidPort.Install.NTAMD64]
+CopyFiles = Edgeport.NTAMD64.Files.Sys, Edgeport.NTAMD64.Files.Exe, Rapidport.NTAMD64.Files.Exe, Rapidport.NTAMD64.Files.Menu
+
+;----------------------------------------------------------------
+[Edgeport.NTx86.Files.Sys]
+edgeser.sys
+ionenum.sys
+
+[Edgeport.NTAMD64.Files.Sys]
+edgeser64.sys
+ionenum64.sys
+
+;----------------------------------------------------------------
+[ClassInstaller_CopyFiles.NTx86]
+ImpsCoin.dll
+
+[ClassInstaller_CopyFiles.NTAMD64]
+ImpsCoin64.dll
+
+;----------------------------------------------------------------
+[CoInstaller_CopyFiles.NTx86]
+EdgeCoIn.dll
+
+[CoInstaller_CopyFiles.NTAMD64]
+EdgeCoIn64.dll
+
+;----------------------------------------------------------------
+[Edgeport.NTx86.Files.Exe]
+edgeport.exe
+
+[Edgeport.NTAMD64.Files.Exe]
+edgeport64.exe
+
+;----------------------------------------------------------------
+[Rapidport.NTx86.Files.Exe]
+Ionflash.exe
+
+[Rapidport.NTAMD64.Files.Exe]
+Ionflash.exe
+
+;----------------------------------------------------------------
+[Edgeport.NTx86.Files.Menu]
+"Edgeport Configuration Utility.lnk",Edgeport.lnk,,
+
+[Edgeport.NTAMD64.Files.Menu]
+"Edgeport Configuration Utility.lnk",Edgeport64.lnk,,
+
+;----------------------------------------------------------------
+[Rapidport.NTx86.Files.Menu]
+"Edgeport Configuration Utility.lnk",Edgeport.lnk,,
+"Rapidport Firmware Update Utility.lnk",Ionflash.lnk,,
+
+[Rapidport.NTAMD64.Files.Menu]
+"Edgeport Configuration Utility.lnk",Edgeport64.lnk,,
+"Rapidport Firmware Update Utility.lnk",Ionflash.lnk,,
+
+;----------------------------------------------------------------
+[Edgeport.Install.NTx86.Services]
+AddService = EdgeSer, 0x00000002, Edgeport.NTx86.AddService, Edgeport_EventLog_Inst.NTx86
+
+[Edgeport.Install.NTAMD64.Services]
+AddService = EdgeSer, 0x00000002, Edgeport.NTAMD64.AddService, Edgeport_EventLog_Inst.NTAMD64
+
+;----------------------------------------------------------------
+[RapidPort.Install.NTx86.Services]
+AddService = EdgeSer, 0x00000002, Edgeport.NTx86.AddService, Edgeport_EventLog_Inst.NTx86
+
+[RapidPort.Install.NTAMD64.Services]
+AddService = EdgeSer, 0x00000002, Edgeport.NTAMD64.AddService, Edgeport_EventLog_Inst.NTAMD64
+
+;----------------------------------------------------------------
+[Edgeport.NTx86.AddService]
+DisplayName    = %EpDriverName%
+ServiceType    = 1                  ; SERVICE_KERNEL_DRIVER
+StartType      = 3                  ; SERVICE_DEMAND_START
+ErrorControl   = 1                  ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\edgeser.sys   ; 12 => nt/system32/drivers
+
+[Edgeport.NTAMD64.AddService]
+DisplayName    = %EpDriverName%
+ServiceType    = 1                  ; SERVICE_KERNEL_DRIVER
+StartType      = 3                  ; SERVICE_DEMAND_START
+ErrorControl   = 1                  ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\edgeser64.sys ; 12 => nt/system32/drivers
+
+;----------------------------------------------------------------
+[Edgeport.Install.NTx86.CoInstallers]
+CopyFiles = CoInstaller_CopyFiles.NTx86
+AddReg=Edgeport.NTx86.CoInstallers_AddReg
+
+[Edgeport.Install.NTAMD64.CoInstallers]
+CopyFiles = CoInstaller_CopyFiles.NTAMD64
+AddReg=Edgeport.NTAMD64.CoInstallers_AddReg
+
+;----------------------------------------------------------------
+[Edgeport.NTx86.CoInstallers_AddReg]
+HKR,,CoInstallers32,0x00010000,"EdgeCoIn.dll,EdgeCoInstaller"
+HKLM,System\CurrentControlSet\Services\EdgeSer,Family,0x00000000,%EpFamilyName%
+
+[Edgeport.NTAMD64.CoInstallers_AddReg]
+HKR,,CoInstallers32,0x00010000, "EdgeCoIn64.dll,EdgeCoInstaller"
+HKLM,System\CurrentControlSet\Services\EdgeSer,Family,0x00000000,%EpFamilyName%
+
+;----------------------------------------------------------------
+[IonMultiPortSerialClass.NTx86.AddReg]
+HKR,,Installer32,,"ImpsCoin.dll,IonMpsClassInstaller"
+HKR,,Icon,,"0"
+
+[IonMultiPortSerialClass.NTAMD64.AddReg]
+HKR,,Installer32,,"ImpsCoin64.dll,IonMpsClassInstaller"
+HKR,,Icon,,"0"
+
+;----------------------------------------------------------------
+[Edgeport_EventLog_Inst.NTx86]
+AddReg = Edgeport_EventLog_AddReg.NTx86
+
+[Edgeport_EventLog_Inst.NTAMD64]
+AddReg = Edgeport_EventLog_AddReg.NTAMD64
+
+;----------------------------------------------------------------
+[Edgeport_EventLog_AddReg.NTx86]
+HKR,,EventMessageFile,0x00020000,"%%SystemRoot%%\System32\IoLogMsg.dll;%%SystemRoot%%\System32\drivers\edgeser.sys"
+HKR,,TypesSupported,0x00010001,7
+
+[Edgeport_EventLog_AddReg.NTAMD64]
+HKR,,EventMessageFile,0x00020000,"%%SystemRoot%%\System32\IoLogMsg.dll;%%SystemRoot%%\System32\drivers\edgeser64.sys"
+HKR,,TypesSupported,0x00010001,7
+
+
+;----------------------------------------------------------------
+; This section lists the replacable string macros used above.
+; This supports internationalization. Format is:
+;
+;	<StringName> = "<StringValue>"
+;----------------------------------------------------------------
+[Strings]
+MfgName          = "Digi International"
+Digi.Mfg	 = "Digi International"
+NCR.Mfg	 	 = "NCR Corp"
+
+EpDriverName     = "Edgeport Driver for Windows 2000, XP, Vista & Server 2003"
+EpDiskName       = "Edgeport Driver Disk for Windows 2000, XP, Vista & Server 2003"
+EpFamilyName	 = "Edgeport"
+
+Ep1DeviceName    = "Edgeport/1"
+Ep1iDeviceName   = "Edgeport/1i"
+Ep2DeviceName	 = "Edgeport/2"
+Ep2D8DeviceName	 = "Edgeport/2"
+Ep2cDeviceName	 = "Edgeport/2c"
+Ep2iDeviceName	 = "Edgeport/2i"
+Ep2sDeviceName	 = "Edgeport/2s"
+Ep22iDeviceName	 = "Edgeport/2+2i"
+Ep22cDeviceName	 = "Edgeport/22c"
+Ep221cDeviceName = "Edgeport/221c"
+Ep21DeviceName	 = "Edgeport/21"
+Ep21cDeviceName	 = "Edgeport/21c"
+Ep42DeviceName	 = "Edgeport/42"
+Ep421DeviceName	 = "Edgeport/421"
+Ep4DeviceName	 = "Edgeport/4"
+Ep4D8DeviceName	 = "Edgeport/4"
+Ep4tDeviceName	 = "Edgeport/4"
+Ep4iDeviceName	 = "Edgeport/4i"
+Ep4rDeviceName	 = "Edgeport/4r"
+Ep4sDeviceName	 = "Edgeport/4s"
+Ep62DeviceName	 = "Edgeport/62"
+Ep8DeviceName	 = "Edgeport/8"
+Ep8iDeviceName	 = "Edgeport/8i"
+Ep8sDeviceName	 = "Edgeport/8s"
+Ep412DeviceName  = "Edgeport/412"
+Ep416DeviceName  = "Edgeport/416"
+Ep416sDeviceName = "Edgeport/416s"
+
+Ep44DeviceName   = "EPOS/44"
+
+Rp4DeviceName	 = "Rapidport/4"
+
+WpPDeviceName	 = "Watchport/P"
+WpMDeviceName    = "Watchport/M"
+WpWDeviceName    = "Watchport/W"
+WpTDeviceName    = "Watchport/T"
+WpHDeviceName    = "Watchport/H"
+WpEDeviceName    = "Watchport/E"
+WpLDeviceName    = "Watchport/L"
+WpRDeviceName    = "Watchport/R"
+WpADeviceName    = "Watchport/A"
+WpDDeviceName    = "Watchport/D"
+WpGDeviceName    = "Watchport/G"
+WpTcDeviceName   = "Watchport/Tc"
+WpHcDeviceName   = "Watchport/Hc"
+
+WpPPDeviceName   = "Power Management Port"
+
+MoteDiagName     = "Watchport/Wireless Diagnostics Mode"
+MoteBootName     = "Watchport/Wireless Boot Mode"
+MoteDeviceName   = "Watchport/Wireless"
+PanDeviceName	 = "Watchport/Wireless Coordinator"
+
+NCR0202		 = "NCR 78XX Scanner"
+NCR0203		 = "NCR 78XX Scanner - Embedded System"
+NCR0310		 = "NCR K590 Self-Service Printer"
+NCR0311		 = "NCR 7167 Receipt/Slip Printer"
+NCR0312		 = "NCR 7197 Receipt Printer"

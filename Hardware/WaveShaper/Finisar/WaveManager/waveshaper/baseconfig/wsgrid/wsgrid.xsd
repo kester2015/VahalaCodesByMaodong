@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:element name="gridFilter" type="gridFilter"/>
+
+  <xs:complexType name="gridFilter">
+    <xs:complexContent>
+      <xs:extension base="abstractFilter">
+        <xs:sequence>
+          <xs:element name="Version" type="xs:string" minOccurs="0"/>
+          <xs:element name="fGridConfig" type="gridConfig" minOccurs="0"/>
+          <xs:element name="fDivPerTHz" type="xs:int"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="abstractFilter" abstract="true">
+    <xs:sequence>
+      <xs:element name="deviceStopFrequency" type="xs:float"/>
+      <xs:element name="deviceStartFrequency" type="xs:float"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="gridConfig">
+    <xs:sequence>
+      <xs:element name="StartFrequency" type="xs:float"/>
+      <xs:element name="GridEntry" type="gridEntry" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="gridEntry">
+    <xs:sequence>
+      <xs:element name="id" type="xs:string" minOccurs="0"/>
+      <xs:element name="port" type="xs:int"/>
+      <xs:element name="attenuation" type="xs:float"/>
+      <xs:element name="sliceCount" type="xs:int"/>
+      <xs:element name="startSlice" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
+

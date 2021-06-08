@@ -1,0 +1,134 @@
+; tpdibus.inf
+; Copyright (c) 2011 Total Phase Inc.
+
+[Version]
+Signature="$Windows NT$"
+DriverPackageType=PlugAndPlay
+DriverPackageDisplayName=%Desc%
+Class=USB
+ClassGUID={36fc9e60-c465-11cf-8056-444553540000}
+Provider=%TotalPhase%
+CatalogFile=tpdibus.cat
+DriverVer=03/18/2011,2.08.14
+
+
+;--------------------------------------------------------------------------
+; Files
+;--------------------------------------------------------------------------
+
+[SourceDisksNames]
+1=%DriversDisk%,,,
+
+[SourceDisksFiles]
+tpdibus.sys = 1,i386
+tpd2xx.dll  = 1,i386
+
+[SourceDisksFiles.amd64]
+tpdibus.sys  = 1,amd64
+tpd2xx64.dll = 1,amd64
+tpd2xx.dll   = 1,i386
+
+[DestinationDirs]
+TpdiBus.NT.Copy = 10,system32\drivers
+TpdiBus.NT.Copy2 = 10,system32
+TpdiBus.NTamd64.Copy = 10,system32\drivers
+TpdiBus.NTamd64.Copy2 = 10,system32
+TpdiBus.NTamd64.Copy3 = 10,syswow64
+
+
+;--------------------------------------------------------------------------
+; Devices
+;--------------------------------------------------------------------------
+
+[Manufacturer]
+%TotalPhase%=TpdiHw,NTamd64
+
+[TpdiHw]
+%USB\VID_0403&PID_E0D0.DeviceDesc%=TpdiBus.NT,USB\VID_0403&PID_E0D0
+
+[TpdiHw.NTamd64]
+%USB\VID_0403&PID_E0D0.DeviceDesc%=TpdiBus.NTamd64,USB\VID_0403&PID_E0D0
+
+[ControlFlags]
+ExcludeFromSelect=*
+
+
+;--------------------------------------------------------------------------
+; Device driver
+;--------------------------------------------------------------------------
+
+[TpdiBus.NT]
+CopyFiles=TpdiBus.NT.Copy,TpdiBus.NT.Copy2
+AddReg=TpdiBus.NT.AddReg
+
+[TpdiBus.NTamd64]
+CopyFiles=TpdiBus.NTamd64.Copy,TpdiBus.NTamd64.Copy2,TpdiBus.NTamd64.Copy3
+AddReg=TpdiBus.NT.AddReg
+
+[TpdiBus.NT.HW]
+AddReg=TpdiBus.NT.HW.AddReg
+
+[TpdiBus.NTamd64.HW]
+AddReg=TpdiBus.NT.HW.AddReg
+
+[TpdiBus.NT.Services]
+AddService = TPDIBUS, 0x00000002, TpdiBus.NT.AddService
+
+[TpdiBus.NTamd64.Services]
+AddService = TPDIBUS, 0x00000002, TpdiBus.NT.AddService
+
+[TpdiBus.NT.AddReg]
+HKR,,DevLoader,,*ntkern
+HKR,,NTMPDriver,,tpdibus.sys
+
+[TpdiBus.NT.HW.AddReg]
+HKR,,"ConfigData",0x00010001,0
+
+
+;--------------------------------------------------------------------------
+; Services
+;--------------------------------------------------------------------------
+
+[TpdiBus.NT.AddService]
+DisplayName = %ServiceDesc%
+ServiceType = 1 ; SERVICE_KERNEL_DRIVER
+StartType = 3 ; SERVICE_DEMAND_START
+ErrorControl = 1 ; SERVICE_ERROR_NORMAL
+ServiceBinary = %10%\system32\drivers\tpdibus.sys
+LoadOrderGroup = Base
+AddReg = TpdiBus.NT.AddService.AddReg
+
+[TpdiBus.NT.AddService.AddReg]
+;HKR,Parameters,"RetryResetCount",0x10001,50
+
+
+;--------------------------------------------------------------------------
+; File Copy
+;--------------------------------------------------------------------------
+
+[TpdiBus.NT.Copy]
+tpdibus.sys
+
+[TpdiBus.NT.Copy2]
+tpd2xx.dll
+
+[TpdiBus.NTamd64.Copy]
+tpdibus.sys
+
+[TpdiBus.NTamd64.Copy2]
+tpd2xx.dll,tpd2xx64.dll
+
+[TpdiBus.NTamd64.Copy3]
+tpd2xx.dll
+
+
+;--------------------------------------------------------------------------
+; Strings
+;--------------------------------------------------------------------------
+
+[Strings]
+TotalPhase="Total Phase, Inc."
+Desc="Total Phase Aardvark I2C/SPI Host Adapter Driver Package"
+DriversDisk="Total Phase Driver Installation Disk"
+USB\VID_0403&PID_E0D0.DeviceDesc="Total Phase Aardvark I2C/SPI Host Adapter"
+ServiceDesc="TPDIBUS.SYS Total Phase Aardvark Driver"

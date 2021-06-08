@@ -1,0 +1,29 @@
+             Edgeport Driver
+              Release v5.30
+   	Windows XP, Windows Vista, Windows 7
+Windows Server 2003 & Windows Server 2008
+
+Installation package contains the following files:
+
+edgeport.inf     -- Edgeport Install script
+ionport.inf      -- Serial port Install script
+edgeser.sys    	 -- Edgeport USB driver
+edgeser64ys    	 -- Edgeport USB driver (x64)
+edgecoin.dll     -- Edgeport port Co-installer library
+edgecoin64.dll   -- Edgeport port Co-installer library (x64)
+impscoin.dll     -- Multiport serial class Co-installer library
+impscoin64.dll   -- Multiport serial class Co-installer library (x64)
+edgeport.exe   	 -- Status/Configuration utility
+edgeport64.exe   -- Status/Configuration utility (x64)
+ionflash.exe     -- Rapidport modem firmware update utility
+rp_mdm.inf       -- Rapidport modem inf file
+93009341.txt     -- This file
+
+
+Release Notes:
+==============
+
+1. Add support for Windows 7 and Server 2008 R2.
+2. Windows 7 and Server 2008 R2 driveres are available via Windows Update
+3. Drivers for all other Microsoft Operating Systems will no longer be available via Windows Update.
+4. Fix problem with performing immediate reads with a full RX buffer.

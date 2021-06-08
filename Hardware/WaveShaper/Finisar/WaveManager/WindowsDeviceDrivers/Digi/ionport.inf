@@ -1,0 +1,273 @@
+;----------------------------------------------------------------
+;
+;	FILE: IONPORT.INF for Windows XP, Vista, Server 2003 & Server 2008
+;
+;	Edgeport Installation Script
+;
+;	Copyright 1997-2010 Digi International
+;
+;----------------------------------------------------------------
+[Version]
+Signature   = $CHICAGO$
+Class       = PORTS
+ClassGuid   = {4D36E978-E325-11CE-BFC1-08002BE10318}
+Provider    = %MfgName%
+catalogfile = edgeport.cat
+DriverVer=05/05/2010, 5.30.02.0
+
+
+;----------------------------------------------------------------
+; This section lists the diskette names. Format is:
+;	diskid = %strkey% | ["]disk-description["][[,tagfile][,unused,path]]
+;----------------------------------------------------------------
+[SourceDisksNames]
+
+
+;----------------------------------------------------------------
+; This section gives location of each source file. Format is:
+;	filename = diskid[,[ subdir][, size]]
+;----------------------------------------------------------------
+[SourceDisksFiles]
+
+
+;----------------------------------------------------------------
+; This section gives location of where to put each destination file.
+; Format is:
+;	DefaultDestDir = dirid[,subdir]] 
+;	file-list-section = dirid[,subdir]]... 
+;----------------------------------------------------------------
+[DestinationDirs]
+DefaultDestDir = 11
+
+
+;----------------------------------------------------------------
+; This section gives flags for this INF file. Format is:
+;	ExcludeFromSelect[.nt[xxx]] = [*] | [hw-id[,hw-id]...]
+;	CopyFilesOnly = hw-id[,hw-id]...
+;----------------------------------------------------------------
+[ControlFlags]
+ExcludeFromSelect = *	; Hide all devices here from manual install
+
+
+;----------------------------------------------------------------
+; This section lists the manufacturer of devices installable with
+; this INF file, and gives the name of the [Models] section for each
+; manufacturer. The format is:
+;	manufacturer-name...	|
+;	%strkey% = models-section-name...
+;----------------------------------------------------------------
+[Manufacturer]
+%Digi.Mfg% = Digi, NTx86, NTAMD64
+
+
+;----------------------------------------------------------------
+; This section lists the various devices that may be installed for
+; each manufacturer. Format is:
+;
+; device-description = install-section-name,hw-id[,compatible-id...] ...
+;----------------------------------------------------------------
+[Digi.NTx86]
+%EpPortName% 		= Edgeport.Install, 	EDGEBUS\EDGEPORT_SERIAL_PORT
+%RpPortName% 		= Rapidport.Install, 	EDGEBUS\EDGEPORT_RAPID_PORT
+%GenPortName% 		= Edgeport.Install, 	EDGEBUS\GENERIC_SERIAL_PORT
+%WatchportPortName% = Edgeport.Install,		EDGEBUS\EDGEPORT_WATCHPORT_PORT
+%VirtualPortName% 	= Edgeport.Install, 	EDGEBUS\EDGEPORT_VIRTUAL_PORT
+%EpicPortName%      = Edgeport.Install,		EDGEBUS\EDGEPORT_EPIC_PORT
+%EpicPortName% 		= Edgeport.Install, 	EDGEBUS\GENERIC_EPIC_PORT
+%MotePortName% 		= Edgeport.Install, 	EDGEBUS\MOTE_SERIAL_PORT
+%MoteDiagPortName%	= Edgeport.Install, 	EDGEBUS\MOTE_DIAG_PORT
+%MoteBootPortName%	= Edgeport.Install, 	EDGEBUS\MOTE_BOOT_PORT
+
+;----------------------------------------------------------------
+[Digi.NTAMD64]
+%EpPortName% 		= Edgeport.Install, 	EDGEBUS\EDGEPORT_SERIAL_PORT
+%RpPortName% 		= Rapidport.Install, 	EDGEBUS\EDGEPORT_RAPID_PORT
+%GenPortName% 		= Edgeport.Install, 	EDGEBUS\GENERIC_SERIAL_PORT
+%WatchportPortName% = Edgeport.Install, 	EDGEBUS\EDGEPORT_WATCHPORT_PORT
+%VirtualPortName% 	= Edgeport.Install, 	EDGEBUS\EDGEPORT_VIRTUAL_PORT
+%EpicPortName%      = Edgeport.Install, 	EDGEBUS\EDGEPORT_EPIC_PORT
+%EpicPortName% 		= Edgeport.Install, 	EDGEBUS\GENERIC_EPIC_PORT
+%MotePortName% 		= Edgeport.Install, 	EDGEBUS\MOTE_SERIAL_PORT
+%MoteDiagPortName%	= Edgeport.Install, 	EDGEBUS\MOTE_DIAG_PORT
+%MoteBootPortName%	= Edgeport.Install, 	EDGEBUS\MOTE_BOOT_PORT
+
+
+;----------------------------------------------------------------
+; Edgeport ports
+;----------------------------------------------------------------
+[Edgeport.Install.NTx86]
+AddReg = Edgeport.Install.NTx86.AddReg
+
+[Edgeport.Install.NTAMD64]
+AddReg = Edgeport.Install.NTAMD64.AddReg
+
+;----------------------------------------------------------------
+[Rapidport.Install.NTx86]
+AddReg = Rapidport.Install.NTx86.AddReg
+
+[Rapidport.Install.NTAMD64]
+AddReg = Rapidport.Install.NTAMD64.AddReg
+
+;----------------------------------------------------------------
+[Edgeport.Install.NTx86.AddReg]
+HKR,,EnumPropPages32,,"MsPorts.dll,SerialPortPropPageProvider"
+
+[Edgeport.Install.NTAMD64.AddReg]
+HKR,,EnumPropPages32,,"MsPorts.dll,SerialPortPropPageProvider"
+
+;----------------------------------------------------------------
+[Rapidport.Install.NTx86.AddReg]
+HKR,,EnumPropPages32,,"MsPorts.dll,SerialPortPropPageProvider"
+
+[Rapidport.Install.NTAMD64.AddReg]
+HKR,,EnumPropPages32,,"MsPorts.dll,SerialPortPropPageProvider"
+
+;----------------------------------------------------------------
+[Edgeport.Install.NTx86.Services]
+AddService = EdgeSer, 0x00000002, Edgeser.NTx86.AddService
+AddService = Ionenum,,Ionenum.NTx86.AddService
+
+[Edgeport.Install.NTAMD64.Services]
+AddService = EdgeSer, 0x00000002, Edgeser.NTAMD64.AddService
+AddService = Ionenum,,Ionenum.NTAMD64.AddService
+
+;----------------------------------------------------------------
+[Rapidport.Install.NTx86.Services]
+AddService = EdgeSer, 0x00000002, Edgeser.NTx86.AddService
+AddService = Ionenum,,Ionenum.NTx86.AddService
+
+[Rapidport.Install.NTAMD64.Services]
+AddService = EdgeSer, 0x00000002, Edgeser.NTAMD64.AddService
+AddService = Ionenum,,Ionenum.NTAMD64.AddService
+
+;----------------------------------------------------------------
+[Edgeser.NTx86.AddService]
+DisplayName    = %EpDriverName%
+ServiceType    = 1                  ; SERVICE_KERNEL_DRIVER
+StartType      = 3                  ; SERVICE_DEMAND_START
+ErrorControl   = 1                  ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\edgeser.sys   ; 12 => nt/system32/drivers
+
+[Edgeser.NTAMD64.AddService]
+DisplayName    = %EpDriverName%
+ServiceType    = 1                  ; SERVICE_KERNEL_DRIVER
+StartType      = 3                  ; SERVICE_DEMAND_START
+ErrorControl   = 1                  ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\edgeser64.sys ; 12 => nt/system32/drivers
+
+;----------------------------------------------------------------
+[Ionenum.NTx86.AddService]
+DisplayName    = %IonenumName%
+ServiceType    = 1                  ; SERVICE_KERNEL_DRIVER
+StartType      = 3                  ; SERVICE_DEMAND_START 
+ErrorControl   = 1                  ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\ionenum.sys
+LoadOrderGroup = PNP Filter
+
+[Ionenum.NTAMD64.AddService]
+DisplayName    = %IonenumName%
+ServiceType    = 1                  ; SERVICE_KERNEL_DRIVER
+StartType      = 3                  ; SERVICE_DEMAND_START 
+ErrorControl   = 1                  ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\ionenum64.sys
+LoadOrderGroup = PNP Filter
+
+;----------------------------------------------------------------
+[Edgeport.Install.NTx86.CoInstallers]
+CopyFiles = Edgeport.Install.NTx86.Files.Sys
+AddReg = Edgeport.Install.NTx86.CoInstallers_AddReg
+
+[Edgeport.Install.NTAMD64.CoInstallers]
+CopyFiles = Edgeport.Install.NTAMD64.Files.Sys
+AddReg = Edgeport.Install.NTAMD64.CoInstallers_AddReg
+
+;----------------------------------------------------------------
+[Rapidport.Install.NTx86.CoInstallers]
+AddReg = Rapidport.Install.NTx86.CoInstallers_AddReg
+CopyFiles = Edgeport.Install.NTx86.Files.Sys
+
+[Rapidport.Install.NTAMD64.CoInstallers]
+AddReg = Rapidport.Install.NTAMD64.CoInstallers_AddReg
+CopyFiles = Edgeport.Install.NTAMD64.Files.Sys
+
+;----------------------------------------------------------------
+[Edgeport.Install.NTx86.Files.Sys]
+[Edgeport.Install.NTAMD64.Files.Sys]
+
+;----------------------------------------------------------------
+[Edgeport.Install.NTx86.CoInstallers_AddReg]
+HKR,,CoInstallers32,0x00010000,"EdgeCoIn.dll,IonPortCoInstaller"
+
+[Edgeport.Install.NTAMD64.CoInstallers_AddReg]
+HKR,,CoInstallers32,0x00010000,"EdgeCoIn64.dll,IonPortCoInstaller"
+
+;----------------------------------------------------------------
+[Rapidport.Install.NTx86.CoInstallers_AddReg]
+HKR,,CoInstallers32,0x00010000,"EdgeCoIn.dll,IonPortCoInstaller"
+
+[Rapidport.Install.NTAMD64.CoInstallers_AddReg]
+HKR,,CoInstallers32,0x00010000,"EdgeCoIn64.dll,IonPortCoInstaller"
+
+
+;----------------------------------------------------------------
+; Install IONENUM as a filter driver above each Rapidport child port
+;----------------------------------------------------------------
+[Rapidport.Install.NTx86.HW]
+AddReg = Rapidport.Install.NTx86.HW.AddReg
+
+[Rapidport.Install.NTAMD64.HW]
+AddReg = Rapidport.Install.NTAMD64.HW.AddReg
+
+;----------------------------------------------------------------
+[Rapidport.Install.NTx86.HW.AddReg]
+HKR,,"UpperFilters",0x00010000,"Ionenum"      ; 10000 => REG_MULTI_SZ value 
+
+[Rapidport.Install.NTAMD64.HW.AddReg]
+HKR,,"UpperFilters",0x00010000,"Ionenum"      ; 10000 => REG_MULTI_SZ value 
+
+
+;----------------------------------------------------------------
+; Install class "Ports" in case it wasn't previously installed.
+; Do we need MSPORTS.DLL in CopyFiles= ? msports.inf doesn't have it
+; Copied from NT5 msports.inf:
+;----------------------------------------------------------------
+[ClassInstall32.NTx86]
+AddReg = PortsClass.NTx86.AddReg
+
+[ClassInstall32.NTAMD64]
+AddReg = PortsClass.NTAMD64.AddReg
+
+;----------------------------------------------------------------
+[PortsClass.NTx86.AddReg]
+HKR,,,,%PortsClassName%
+HKR,,Icon,,"-23"
+HKR,,Installer32,,"MsPorts.Dll,PortsClassInstaller"
+
+[PortsClass.NTAMD64.AddReg]
+HKR,,,,%PortsClassName%
+HKR,,Icon,,"-23"
+HKR,,Installer32,,"MsPorts.Dll,PortsClassInstaller"
+
+
+;----------------------------------------------------------------
+; String definitions
+;----------------------------------------------------------------
+[Strings]
+MfgName           = "Digi International"
+Digi.Mfg          = "Digi International"
+EpPortName        = "Edgeport Serial Port"
+RpPortName        = "Edgeport Rapid Port"
+GenPortName       = "USB Serial Port"
+VirtualPortName   = "Edgeport Virtual Port"
+WatchportPortName = "Watchport Virtual Port"
+EpicPortName 	  = "EPIC Port"
+MotePortName 	  = "Watchport/Wireless Serial Port"
+MoteDiagPortName  = "Watchport/Wireless Diagnostic Port"
+MoteBootPortName  = "Watchport/Wireless Boot Port"
+
+EpDriverName 	  = "Edgeport Serial Port Driver for Windows 2000, XP, Vista & Server 2003"
+EpDiskName        = "Edgeport Driver Disk for Windows 2000, XP, Vista & Server 2003"
+
+; These strings come from MSPORTS.INF and should not be changed
+PortsClassName 	  = "Ports (COM & LPT)"
+IonenumName    	  = "Edgeport Filter Driver"

@@ -6,6 +6,8 @@ clc
 % datadir = "Z:\Maodong\Projects\1380 absorption\20210306-2\RUN1\sweep";
 
 datadir = "Z:\Maodong\UCSB spiral GDS\20210429\P4a\RUN3-1550\power";
+% datadir = "Z:\Maodong\Projects\1380 absorption\20210315-annealed\RUN2-1380\speed";
+
 sapoint = 1e5;
 
 % allSubfolders = dir(datadir);
