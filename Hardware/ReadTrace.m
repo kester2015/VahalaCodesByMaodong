@@ -26,12 +26,25 @@ data_length = min([numel(trans),numel(mzi),numel(time)]);
 trans = trans(1:data_length);
 mzi = mzi(1:data_length);
 time = time(1:data_length);
-% data_matrix = [time,trans,mzi]; % Boqiang Version
+            
+%             data_matrix = [time,trans,mzi]; % Boqiang Version
 
-            data_matrix = [time,trans,mzi,br]; % Added by Maodong, br: backreflection
+           data_matrix = [time,trans,mzi,br]; % Added by Maodong, br: backreflection
+           
+           
 save([filename,'.mat'],'data_matrix','-mat');
 
 waveform_figure=figure;
+
+% k = 3;
+% for j=[mzi_ch trans_ch]
+%     chanstr=['Channel ',num2str(j)];
+%     plot(data_matrix(:,1),data_matrix(:,k),'DisplayName',chanstr);
+%     k = k - 1;
+%     legend('-DynamicLegend');
+%     hold on
+% end
+
 k = 4;
 for j=[4 mzi_ch trans_ch]
     chanstr=['Channel ',num2str(j)];

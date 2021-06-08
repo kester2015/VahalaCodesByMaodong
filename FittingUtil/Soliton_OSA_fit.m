@@ -25,7 +25,7 @@ classdef Soliton_OSA_fit < handle
         pump_wavelength     % [nm]
         
         sech2_fit           % Fitting results
-        pulse_width         % taos [ps]
+        pulse_width         % taos [ps] 
         Ramanshift          % Omega/2pi [THz]
         centerpeakpower     % [dBm]
     end
@@ -111,7 +111,7 @@ classdef Soliton_OSA_fit < handle
             ylim([-80 -20]);
             grid on;
             title('Soliton Spectrum Fit','FontSize',12,'FontWeight','normal');
-            hold off;
+%             hold off;
         end
     end
 end

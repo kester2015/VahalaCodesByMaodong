@@ -3,9 +3,9 @@
 clear
 clc
 
-datadir = "Z:\Maodong\Projects\1380 absorption\20210306-2\RUN1\sweep";
+% datadir = "Z:\Maodong\Projects\1380 absorption\20210306-2\RUN1\sweep";
 
-datadir = "Z:\Maodong\Projects\1380 absorption\20210306-2\RUN3-1370\sweep";
+datadir = "Z:\Maodong\UCSB spiral GDS\20210429\P4a\RUN3-1550\power";
 sapoint = 1e5;
 
 % allSubfolders = dir(datadir);

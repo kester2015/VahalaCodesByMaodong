@@ -144,7 +144,7 @@ classdef YokogawaOSA < handle
             tt = strcat(":SENS:WAV:SPAN ",num2str(wls),"NM");
             % obj.Write(":DISP:TRAC:X:INIT");
             obj.Write(tt);
-        end
+        ende
         function wl = get.wlspan(obj)
             wl = str2double(obj.Query(":SENS:WAV:SPAN?"))/1e-9; % in unit of nm
         end

@@ -517,12 +517,12 @@ switch handles.Method.Value
         end
         for idx = 1:numel(lambda)
             filename = [filename_raw '-',num2str(lambda(idx)),'nm'];
-            if lambda(idx)>1500 %otherwise, not used for ECDL
-                if abs(Device.laser1.Wavelength - lambda(idx)) > 0.5
-                    Device.laser1.Move2Wavelength(lambda(idx));
-                    pause(1);
-                end
-            end
+%             if lambda(idx)>1500 %otherwise, not used for ECDL
+%                 if abs(Device.laser1.Wavelength - lambda(idx)) > 0.5
+%                     Device.laser1.Move2Wavelength(lambda(idx));
+%                     pause(1);
+%                 end
+%             end
             disp(['wavelength ', num2str(lambda(idx)), ' nm in progress...'])
             ReadTrace(filename,Device.osc,point,Config.trans_ch,Config.mzi_ch,0,str2double(handles.edit34.String) );
             Device.osc.Run;
@@ -558,11 +558,18 @@ switch handles.Method.Value
         Device.laser2.SetScan(scan_start,scan_end,Config.slewrate);
         disp('Returning to start wavelength...')
 %         Device.osc.Stop;
-        Device.laser2.Move2Wavelength(scan_start);
+                if isfield(Device,'fg')
+                    Device.fg.CH1(0);
+                end
+                Device.laser2.Move2Wavelength( scan_start );
+                
+        % Device.laser2.Move2Wavelength(scan_start);
         pause(5);
         % Scan
         delay = str2double(handles.Delay.String);
         B_Set_Callback([], [], handles);
+        Device.osc.HighRes;
+        pause(1);
         if (delay > 0)
             Device.osc.Single;
             pause(delay);
@@ -597,7 +604,7 @@ switch handles.Method.Value
 %         EnableDispersionProcess(handles,'on');
 
 %         Device.laser2.Move2Wavelength(Config.final);
-        Device.laser2.Move2Wavelength(1522);
+        Device.laser2.Move2Wavelength(scan_start+0.2);
     case 3
         %% Ringdown
         for ii = 1:10
@@ -626,34 +633,48 @@ switch handles.Method.Value
         end
     case 4
         %% Reading
-            lambda = str2double(handles.Wavelength.String);
+            % lambda = str2double(handles.Wavelength.String);
+        lambda_list = eval(handles.Wavelength.String);
+        for lambda = lambda_list
+%                 if isfield(Device,'fg')
+%                     Device.fg.CH1(0);
+%                 end
+%                 Device.laser1.Move2Wavelength( lambda );
+%                 if isfield(Device,'fg')
+%                     Device.fg.CH1(1);
+%                 end
+            pause(3)
+            fprintf("Reading wl = %.2f\n",lambda)
+            
             filename=[filename_raw,'-',num2str(lambda),'nm'];
             
-        NChan = 4; % Number of channel
-        Device.osc.Stop;
-        [X,Y] = Device.osc.readmultipletrace(1:NChan,[]);
-        figure;
-        for ii = 1:NChan
-            chanstr=['Channel ',num2str(ii)];
-            plot(X,Y(:,ii),'DisplayName',chanstr);
-            legend('-DynamicLegend');
-            hold on
+            NChan = 4; % Number of channel
+            Device.osc.Stop;
+            [X,Y] = Device.osc.readmultipletrace(1:NChan,[]);
+            figure;
+            for ii = 1:NChan
+                chanstr=['Channel ',num2str(ii)];
+                plot(X,Y(:,ii),'DisplayName',chanstr);
+                legend('-DynamicLegend');
+                hold on
+            end
+            if exist([filename,'.mat'],'file')
+                warning('File already exists!')
+    %             if ~overwrite
+                    movefile([filename,'.mat'],[filename,'_',char(datetime('now','Format','yyMMdd_HHmmss')),'_bak.mat']);
+                    warning('Old file was renamed!')
+    %             end
+            end
+            save([filename '.mat'],'X','Y');
+    %         filename = filename_raw;
+            Device.osc.Run;
+            Device.osc.HighRes;
         end
-        if exist([filename,'.mat'],'file')
-            warning('File already exists!')
-%             if ~overwrite
-                movefile([filename,'.mat'],[filename,'_',char(datetime('now','Format','yyMMdd_HHmmss')),'_bak.mat']);
-                warning('Old file was renamed!')
-%             end
-        end
-        save([filename '.mat'],'X','Y');
-%         filename = filename_raw;
-        Device.osc.Run;
 end
 Data.Currfilename = filename;
 fprintf('Finished\r\n');
 Device.osc.HighRes; % change back to High res mode
-Device.osc.AutoMemoryDepth; % change back to AUTO analog memory depth
+Device.osc.memoDepth = 'auto'; % change back to AUTO analog memory depth
 
 %% Dispersion Process
 function Disper = ProcessDispersion(handles,filename)
@@ -1078,8 +1099,8 @@ function wavelength_increase_button_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 global Device;
-if Device.laser1.PowerON && str2double(handles.Wavelength.String)<1569.76
-    newWavelength = str2double(handles.Wavelength.String)+0.25;
+if Device.laser1.PowerON && str2double(handles.Wavelength.String)<1569.81
+    newWavelength = str2double(handles.Wavelength.String)+0.2;
     if isfield(Device,'fg')
         Device.fg.CH1(0);
     end
@@ -1096,8 +1117,8 @@ function wavelength_decrease_button_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 global Device;
-if Device.laser1.PowerON && str2double(handles.Wavelength.String)>1520.24
-    newWavelength = str2double(handles.Wavelength.String)-0.25;
+if Device.laser1.PowerON && str2double(handles.Wavelength.String)>1520.19
+    newWavelength = str2double(handles.Wavelength.String)-0.2;
     if isfield(Device,'fg')
         Device.fg.CH1(0);
     end
