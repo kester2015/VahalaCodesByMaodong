@@ -250,12 +250,14 @@ classdef FinisarWaveshaper < handle
             % phase_array = (beta2*((freq_ws-freq_mid)*2*pi).^2/2 + beta3*((freq_ws-freq_mid)*2*pi).^3/6);
             obj.phase = @(x)rem(phase_array(x)+abs(floor(min(phase_array(x))/2/pi))*2*pi,2*pi);
             % phase_array = rem(phase_array+abs(floor(min(phase_array)/2/pi))*2*pi,2*pi);
+            
+            fprintf('%.2f meters fiber dispersion compensation Up to third order.\n', FiberL);
         end
         
         function secondDispersion(obj, disp2, center, center_units)
             % disp2 in units of ps/nm
             if nargin == 3
-                center_units = 'nm';
+                center_units = 'thz';
             end
             
             obj.phase_units = 'THz';
@@ -264,12 +266,16 @@ classdef FinisarWaveshaper < handle
                     freq_mid = center ; % transfer to THz
                 case 'NM'
                     freq_mid = obj.c_const/center * 1e-3; % frequency in Hz
+                case 'HZ'
+                    freq_mid = center / 1e12 ; % transfer to THz
                 otherwise
                     error('secondDispersion function accepts ONLY NM|THz as center unit. units %s unrecognized.',center_units)
             end
             
-            beta2 = (obj.c_const/freq_mid)^2/(2*pi*obj.c_const)*(disp2*1e-3)
+            beta2 = (obj.c_const/freq_mid)^2/(2*pi*obj.c_const)*(disp2*1e-3);
             obj.phase = @(y) ( beta2*((y-freq_mid)*2*pi).^2/2 ) ;
+            
+            fprintf('beta2 = %.4f (rad/(2pi*THz)^2). Center %.2f %s. Second order dispersion.\n', beta2, center, center_units)
         end
     end
     methods (Access = public) % attenuation related
@@ -279,6 +285,8 @@ classdef FinisarWaveshaper < handle
             end
             obj.atten_units = units;
             obj.atten = @(x) filtAtten*(x<low_band | x>high_band);
+            
+            fprintf('Low edge %.1f %s. High edge %.1f %s. Band PASS filter. Outer atten %.1f dB\n',low_band, units, high_band, units, filtAtten)
         end
         
         function bandStop(obj, low_band, high_band, filtAtten, units)
@@ -287,6 +295,8 @@ classdef FinisarWaveshaper < handle
             end
             obj.atten_units = units;
             obj.atten = @(x) filtAtten*(x>low_band & x<high_band);
+            
+            fprintf('Low edge %.1f %s. High edge %.1f %s. Band STOP filter. Inner atten %.1f dB\n',low_band, units, high_band, units, filtAtten)
         end
         
         function inverseAtten(obj,osa_wl,osa_pw)
@@ -311,6 +321,8 @@ classdef FinisarWaveshaper < handle
             obj.atten = @(x) interp1(LOCS, PKS, x);
             min_interpfun_atten = min(obj.atten_list);
             obj.atten = @(x) interp1(LOCS, PKS, x) - min_interpfun_atten;
+            
+            fprintf('Inverse attenuation to compensate apectrum dependence applied.\n');
         end
         
     end
