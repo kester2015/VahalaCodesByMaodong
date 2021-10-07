@@ -14,6 +14,7 @@ classdef FinisarWaveshaper < handle
     
     properties (Access = public)  % Should be private later
         device
+        userdata
     end
     
     properties (Dependent = true)
@@ -92,7 +93,7 @@ classdef FinisarWaveshaper < handle
             if ~obj.isconnected
                 error('write2WS: Trying to call WriteFinisar3 before device is connected.')
             end
-            status = obj.WriteFinisar3(obj.device, obj.atten_list, obj.phase_list, obj.port_list);
+            status = obj.WriteFinisar3(obj.device, max(obj.atten_list,0), mod(obj.phase_list,2*pi), obj.port_list);
             
             if status == 0 % if the write is successful
                 obj.current_atten_list = obj.atten_list;
@@ -255,6 +256,7 @@ classdef FinisarWaveshaper < handle
         end
         
         function secondDispersion(obj, disp2, center, center_units)
+            obj.userdata.disp2 = disp2;
             % disp2 in units of ps/nm
             if nargin == 3
                 center_units = 'thz';
@@ -277,10 +279,40 @@ classdef FinisarWaveshaper < handle
             
             fprintf('beta2 = %.4f (rad/(2pi*THz)^2). Center %.2f %s. Second order dispersion.\n', beta2, center, center_units)
         end
+        
+        function thirdDispersion(obj, disp2, disp3, center, center_units)
+            obj.userdata.disp2 = disp2;
+            obj.userdata.disp3 = disp3;
+            % disp2 in units of ps/nm
+            if nargin == 4
+                center_units = 'thz';
+            end
+            
+            obj.phase_units = 'THz';
+            switch upper(center_units)
+                case 'THZ' % if given center is in THz
+                    freq_mid = center ; % transfer to THz
+                case 'NM'
+                    freq_mid = obj.c_const/center * 1e-3; % frequency in Hz
+                case 'HZ'
+                    freq_mid = center / 1e12 ; % transfer to THz
+                otherwise
+                    error('secondDispersion function accepts ONLY NM|THz as center unit. units %s unrecognized.',center_units)
+            end
+            
+            beta2 = (obj.c_const/freq_mid)^2/(2*pi*obj.c_const)*(disp2*1e-3); % beta2 = lambda/omega
+            beta3 = (obj.c_const^2)/(4*pi*pi*freq_mid^4)*(disp3*1e-6); % beta3 = (beta2 = lambda/omega)^2
+            obj.phase = @(y) ( beta2*((y-freq_mid)*2*pi).^2/2 + beta3*((y-freq_mid)*2*pi).^3/6 ) ;
+            
+            fprintf('beta2 = %.4f (rad/(2pi*THz)^2). bets3 = %.4f (rad/(2pi*THz)^3). Center %.2f %s. Second order dispersion.\n', beta2, beta3,center, center_units)
+        end
     end
     methods (Access = public) % attenuation related
         function bandPass(obj, low_band, high_band, filtAtten, units)
-            if nargin == 4
+            if nargin == 3
+                filtAtten = 60;
+                units = 'THz';
+            elseif nargin == 4
                 units = 'THz';
             end
             obj.atten_units = units;
@@ -299,10 +331,16 @@ classdef FinisarWaveshaper < handle
             fprintf('Low edge %.1f %s. High edge %.1f %s. Band STOP filter. Inner atten %.1f dB\n',low_band, units, high_band, units, filtAtten)
         end
         
-        function inverseAtten(obj,osa_wl,osa_pw)
+        function inverseAtten(obj,osa_wl,osa_pw, min_atten, bandpass)
             % take OSA readings directly and conpensate any wavelength dependence
             % osa_wl: wavelength from OSA. in nm
             % osa_pw: power from OSA, in dBm
+            obj.userdata.OSA_to_inverse = {osa_wl,osa_pw};
+            obj.userdata.inverse_min_atten = min_atten;
+            if nargin == 4
+                bandpass = [];
+            end
+            
             NoiseLevel = -48;%dbm
             pump = 1550;%nm
             FSR = 18;%GHz
@@ -319,14 +357,30 @@ classdef FinisarWaveshaper < handle
 
             obj.atten_units = 'nm';
             obj.atten = @(x) interp1(LOCS, PKS, x);
-            min_interpfun_atten = min(obj.atten_list);
-            obj.atten = @(x) interp1(LOCS, PKS, x) - min_interpfun_atten;
+            min_interpfun_atten = min_atten; %min(obj.atten_list);
+            if isempty(bandpass)
+                obj.atten = @(x) interp1(LOCS, PKS, x) - min_interpfun_atten;
+            else
+                low_band = min(obj.thz2nm(bandpass));
+                high_band = max(obj.thz2nm(bandpass));
+                obj.atten = @(x) max( interp1(LOCS, PKS, x) - min_interpfun_atten,...
+                                    60*(x<low_band | x>high_band) );
+            end
             
             fprintf('Inverse attenuation to compensate apectrum dependence applied.\n');
         end
         
     end
     
+    %%
+    methods (Access = private)
+        function thz = nm2thz(obj, nm)
+            thz = obj.c_const./nm*1e-3;
+        end
+        function nm = thz2nm(obj, thz)
+            nm = obj.c_const./thz*1e-3;
+        end
+    end
     %% DONOT MODIFY! Some basic functions. Copied from previous control code. 
     % % This section should not be modified unless you really understand what you want to do.
     methods (Access = private)
