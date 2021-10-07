@@ -251,7 +251,7 @@ classdef FinisarWaveshaper < handle
             obj.phase = @(x)rem(phase_array(x)+abs(floor(min(phase_array(x))/2/pi))*2*pi,2*pi);
             % phase_array = rem(phase_array+abs(floor(min(phase_array)/2/pi))*2*pi,2*pi);
             
-            fprintf('%.2f meters fiber dispersion compensation Up to third order.\n', FiberL);
+            fprintf('%.2f meters fiber dispersion compensation Up to third order. beta2 = %.4f (rad/(2pi*THz)^2), beta3 = %.4f (rad/(2pi*THz)^3)\n', FiberL,beta2,beta3);
         end
         
         function secondDispersion(obj, disp2, center, center_units)

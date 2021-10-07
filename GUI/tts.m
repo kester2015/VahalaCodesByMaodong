@@ -30,6 +30,7 @@ function wav = tts(txt,voice,pace,fs)
 % Written by Siyi Deng; 12-21-2007;
 % See online at 
 % https://www.mathworks.com/matlabcentral/fileexchange/18091-text-to-speech
+txt = char(txt);
 if ~ispc, error('Microsoft Win32 SAPI is required.'); end
 if ~ischar(txt), error('First input must be string.'); end
 SV = actxserver('SAPI.SpVoice');

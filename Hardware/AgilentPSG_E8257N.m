@@ -59,6 +59,7 @@ classdef AgilentPSG_E8257N < handle
         function set.Freq(Obj, Freq) % Freq in unit of Hz
             Obj.Write(strcat("FREQ ",num2str(Freq)," Hz"))
             % fprintf(Obj.visaObj, strcat("FREQ ",num2str(Freq)," Hz") );
+            fprintf(strcat("PSG rep rate:",num2str(Obj.Freq/1e9,10),'GHz\n'))
         end
         
         function set.Power(Obj, Power) % Power in unit of dBm

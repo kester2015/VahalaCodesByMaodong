@@ -2,6 +2,7 @@ classdef Keysight33500 < handle
     % Keysight function generator
     properties
         visaObj
+        rampTime = 0
     end
     
     properties (Dependent = true)
@@ -14,6 +15,11 @@ classdef Keysight33500 < handle
     %% Initialization and Connect
     methods 
         function Obj = Keysight33500(strvisa)
+            if strcmpi(strvisa, '231wlower')
+                strvisa = 'USB0::0x0957::0x2C07::MY52814912::INSTR';
+            elseif strcmpi(strvisa, '231wupper')
+                strvisa = 'USB0::0x0957::0x2607::MY52202388::INSTR';
+            end
             Obj.visaObj = visa('AGILENT', strvisa);
             Obj.visaObj.Timeout = 100;
             Obj.visaObj.ByteOrder = 'littleEndian';
@@ -56,8 +62,30 @@ classdef Keysight33500 < handle
         end
         
         function set.DC2(Obj,offset)
-            fprintf(Obj.visaObj,['SOUR2:APPL:DC 10,0,' num2str(offset)]);
+            if ~ Obj.rampTime==0
+                % Ramp
+                fprintf('DC offset ramping...... (disable this by obj.rampTime = 0)\n')
+                if abs(offset)>10
+                    error("Large Offset!")
+                end
+                if Obj.DC2>offset
+                    list = Obj.DC2:-0.001:offset;
+                else
+                    list = Obj.DC2:0.001:offset;
+                end
+
+                for offset = list
+                    fprintf(Obj.visaObj,['SOUR2:APPL:DC 10,0,' num2str(offset)]);
+                    pause(Obj.rampTime/length(list))
+                end
+            else
+                fprintf(Obj.visaObj,['SOUR2:APPL:DC 10,0,' num2str(offset)]);
+            end
 %             Obj.DC2 = offset;
+        end
+        
+        function vol = get.DC2(Obj)
+            vol = str2double(Obj.Query('SOUR2:VOLT:OFFS?'));
         end
         
         function set.Freq1(Obj,coe)
@@ -123,6 +151,10 @@ classdef Keysight33500 < handle
     methods
         function Write(Obj,command)
             fprintf(Obj.visaObj,command);
+        end
+        
+        function data = Query(Obj,command)
+            data = query(Obj.visaObj,command);
         end
     end
 end

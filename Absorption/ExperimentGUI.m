@@ -667,7 +667,7 @@ switch handles.Method.Value
             end
             save([filename '.mat'],'X','Y');
     %         filename = filename_raw;
-            Device.osc.Run;
+            % Device.osc.Run;
             Device.osc.HighRes;
         end
 end

@@ -89,7 +89,13 @@ classdef YokogawaOSA < handle
         function writeTrace(obj,trace)
             if any( strcmpi(trace,["A","B","C","D","E","F","G"] ) ==1 )
                 tt = strcat("TRAC:ATTR:TR",upper(trace)," WRIT");
+                fprintf("OSA: Trace %s is being written.\n",upper(trace))
                 obj.Write(tt)
+                obj.dispTrace(trace)
+            elseif strcmpi(trace,"all")
+                for tr = ["A","B","C","D","E","F","G"]
+                    obj.writeTrace(tr);
+                end
             else
                 error("Unrecognized trace %s, should be A to G.",trace)
             end
@@ -97,7 +103,12 @@ classdef YokogawaOSA < handle
         function fixTrace(obj,trace)
             if any( strcmpi(trace,["A","B","C","D","E","F","G"] ) ==1 )
                 tt = strcat("TRAC:ATTR:TR",upper(trace)," FIX");
+                fprintf("OSA: Trace %s is being fixed.\n",upper(trace))
                 obj.Write(tt)
+            elseif strcmpi(trace,"all")
+                for tr = ["A","B","C","D","E","F","G"]
+                    obj.fixTrace(tr);
+                end
             else
                 error("Unrecognized trace %s, should be A to G.",trace)
             end
@@ -105,7 +116,12 @@ classdef YokogawaOSA < handle
         function dispTrace(obj,trace)
             if any( strcmpi(trace,["A","B","C","D","E","F","G"] ) ==1 )
                 tt = strcat(":TRAC:STAT:TR",upper(trace)," ON");
+                fprintf("OSA: Trace %s is displayed.\n",upper(trace))
                 obj.Write(tt)
+            elseif strcmpi(trace,"all")
+                for tr = ["A","B","C","D","E","F","G"]
+                    obj.dispTrace(tr);
+                end
             else
                 error("Unrecognized trace %s, should be A to G.",trace)
             end
@@ -113,7 +129,12 @@ classdef YokogawaOSA < handle
         function blankTrace(obj,trace)
             if any( strcmpi(trace,["A","B","C","D","E","F","G"] ) ==1 )
                 tt = strcat(":TRAC:STAT:TR",upper(trace)," OFF");
+                fprintf("OSA: Trace %s is blanked.\n",upper(trace))
                 obj.Write(tt)
+            elseif strcmpi(trace,"all")
+                for tr = ["A","B","C","D","E","F","G"]
+                    obj.blankTrace(tr);
+                end
             else
                 error("Unrecognized trace %s, should be A to G.",trace)
             end
@@ -123,7 +144,11 @@ classdef YokogawaOSA < handle
             obj.Write(":INIT:SMOD SING");
             obj.Write(":INIT")
         end
-        function Run(obj)
+        function Run(obj, trace2Write)
+            if nargin == 2
+                obj.fixTrace('all');
+                obj.writeTrace(trace2Write);
+            end
             obj.Write(":INIT:SMOD REP");
             obj.Write(":INIT")
         end
@@ -249,6 +274,9 @@ classdef YokogawaOSA < handle
             end
         end
         function set.refscale(obj,refsca)
+            if refsca>10
+                warning("max reflevel is 10dBm, the setting might not be valid.")
+            end
             if refsca<0
                 error("vertical scale must be positive, in unit of dbm/div")
             end
@@ -267,42 +295,42 @@ classdef YokogawaOSA < handle
             end
         end
         
-        % function set.reflevel_lin(obj,reflvl)
-        %     if strcmp(obj.vertunit, "W") || strcmp(obj.vertunit, "W/NM")
-        %         tt = strcat(":DISP:TRAC:Y1:RLEV ",num2str(reflvl),"W");
-        %         obj.Write(tt)
-        %     else
-        %         warning("You are setting reference level in Linear scale when displaying in log scale!");
-        %         obj.reflevel = 10*log10(reflvl);
-        %     end
-        % end
-        % function tt = get.reflevel_lin(obj)
-        %     if strcmp(obj.vertunit, "W") || strcmp(obj.vertunit, "W/NM")
-        %         tt = str2double(obj.Query(":DISP:TRAC:Y1:RLEV?"));
-        %         obj.Write(tt)
-        %     else
-        %         warning("You are setting reference level in Linear scale when displaying in log scale!");
-        %         tt = 10^(obj.reflevel/10);
-        %     end
-        % end
+        function set.reflevel_lin(obj,reflvl)
+            if strcmp(obj.vertunit, "W") || strcmp(obj.vertunit, "W/NM")
+                tt = strcat(":DISP:TRAC:Y1:RLEV ",num2str(reflvl),"W");
+                obj.Write(tt)
+            else
+                warning("You are setting reference level in Linear scale when displaying in log scale!");
+                obj.reflevel = 10*log10(reflvl);
+            end
+        end
+        function tt = get.reflevel_lin(obj)
+            if strcmp(obj.vertunit, "W") || strcmp(obj.vertunit, "W/NM")
+                tt = str2double(obj.Query(":DISP:TRAC:Y1:RLEV?"));
+                obj.Write(tt)
+            else
+                warning("You are setting reference level in Linear scale when displaying in log scale!");
+                tt = 10^(obj.reflevel/10);
+            end
+        end
 
         %%
         function n = GetTraceSamplingPoints(obj,strTraceName)
             n = str2double(query(obj.visaObj,[':TRACe:DATA:SNUMber? TR' strTraceName]));
         end
         
-%         function wait(obj)
-%             flag = ~ str2double( obj.Query(":STAT:OPER:EVEN?") ) ;
-%             count = 0;
-%             while flag
-%                 flag = ~str2double( obj.Query(":STAT:OPER:EVEN?") );
-%                 if count > 0
-%                     fprintf("Waiting for OSA finish sweeping. %1.f seconds waited\n",count);
-%                 end
-%                 count = count + 1;
-%                 pause(1)
-%             end
-%         end
+        function wait(obj)
+            flag = ~ str2double( obj.Query(":STAT:OPER:EVEN?") ) ;
+            count = 0;
+            while flag
+                flag = ~str2double( obj.Query(":STAT:OPER:EVEN?") );
+                if count > 0
+                    fprintf("Waiting for OSA finish sweeping. %1.f seconds waited\n",count);
+                end
+                count = count + 1;
+                pause(1)
+            end
+        end
         
         %%
         function [X,Y] = ReadTrace(obj,strTraceName,bSingle)
@@ -320,6 +348,33 @@ classdef YokogawaOSA < handle
             if obj.bPointCheck
                 PointCheck(obj,strTraceName,length(Y));
             end
+        end
+        
+        function saveTrace(obj,strTraceName,filename)
+            filename = char(filename);
+            if strcmpi(filename(end-3:end), '.mat')
+                filename = filename(1:end-4);
+            end
+            dir = fileparts(filename);
+            if ~isfolder(dir)
+                warning('Folder does not exist, new folder created.')
+                mkdir(dir)
+            end
+            
+%             obj.Stop;
+            [OSAWavelength, OSAPower] = obj.ReadTrace(strTraceName);
+            if exist([filename,'.mat'],'file')
+                warning('File already exists!')
+    %             if ~overwrite
+                    movefile([filename,'.mat'],[filename,'_',char(datetime('now','Format','yyMMdd_HHmmss')),'_bak.mat']);
+                    warning('Old file was renamed!')
+    %             end
+            end
+            save(strcat(filename, '.mat') ,'OSAPower','OSAWavelength')
+            fprintf('Spectrum Data (channel %s) file saved as %s\n', strTraceName, strcat(filename, '.mat') )
+                figure
+                plot(OSAWavelength, OSAPower)
+                ylim([-120 0])
         end
         
         function Initiate(obj,strCommand)

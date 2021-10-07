@@ -354,6 +354,11 @@ classdef Infiniium < handle
             oscTraces.Ch4 = Obj.read(4,point);
         end
         
+        function saveall(Obj, filename)
+            oscTraces = Obj.readall;
+            save(filename, oscTraces);
+        end
+        
         function [XData,YreturnData] = readmultipletrace(Obj,channel,point)
             % deprecated method. Avoid using this.
             n=length(channel);
@@ -368,6 +373,38 @@ classdef Infiniium < handle
             for i=n:-1:1
                 YreturnData(:,i)=YData{i}(1:nminlength);
             end
+        end
+        
+        function readmultipletrace_save(Obj,filename)
+            % deprecated method. Avoid using this.
+            filename = char(filename);
+            if length(filename)>4 && strcmpi(filename(end-3:end),'.mat')
+                filename = filename(1:end-4);
+            end
+            dir = fileparts(filename);
+            if ~isfolder(dir)
+                mkdir(dir)
+            end
+            
+            Obj.Stop;
+            [X,Y] = Obj.readmultipletrace(1:4,[]);
+            figure;
+            for ii = 1:4
+                chanstr=['Channel ',num2str(ii)];
+                plot(X,Y(:,ii),'DisplayName',chanstr);
+                legend('-DynamicLegend');
+                hold on
+            end
+            if exist([filename,'.mat'],'file')
+                warning('File already exists!')
+    %             if ~overwrite
+                    movefile([filename,'.mat'],[filename,'_',char(datetime('now','Format','yyMMdd_HHmmss')),'_bak.mat']);
+                    warning('Old file was renamed!')
+    %             end
+            end
+            save([filename '.mat'],'X','Y');
+            Obj.Run;
+            Obj.HighRes();
         end
         
         function write2osc(Obj,filename)
