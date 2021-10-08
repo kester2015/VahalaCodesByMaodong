@@ -98,6 +98,8 @@ classdef FinisarWaveshaper < handle
             if status == 0 % if the write is successful
                 obj.current_atten_list = obj.atten_list;
                 obj.current_phase_list = obj.phase_list;
+                
+                sound(sin(0.25*1:1500)); % beep to flag successful write
             end
         end
         

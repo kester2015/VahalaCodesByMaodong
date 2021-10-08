@@ -93,7 +93,7 @@ classdef TDS2024C < handle
             if strcmpi(filename(end-3:end), '.mat')
                 filename = filename(1:end-4);
             end
-            [dir,nn,~] = fileparts(filename);
+            [dir,~,~] = fileparts(filename);
             if ~isfolder(dir)
                 warning('Folder does not exist, new folder created.')
                 mkdir(dir)
@@ -114,7 +114,7 @@ classdef TDS2024C < handle
             fprintf('OSCilloscope Data (channel %.0f) file saved as %s\n', trace, strcat(filename, '.mat') )
                 figure
                 plot(X, Y)
-                title( sprintf('OSC Data (CH %.0f) \n saved name: %s', trace, nn ))
+                title( sprintf('OSC Data (CH %.0f) \n saved name: %s', trace, filename((length(fileparts(filename))+2):end) ),'interpreter', 'none')
         end
         
     end
