@@ -32,6 +32,9 @@ classdef Infiniium < handle
     
     methods
         function Obj = Infiniium(addr,OldVer)
+            if nargin == 0
+                addr = 'USB0::0x2A8D::0x9049::MY55510176::INSTR';
+            end
             Obj.Address = addr;
             Obj.visaObj = visa('AGILENT', Obj.Address);
             Obj.visaObj.Timeout = 100;
@@ -256,7 +259,7 @@ classdef Infiniium < handle
                 end
             elseif nargin == 2
                 point = Obj.srate * Obj.tspan * 1.05;
-                waveform = Obj.read(channel,point);
+                % waveform = Obj.read(channel,point);
             end
             
             % Specify data from Channel n
@@ -352,11 +355,56 @@ classdef Infiniium < handle
             oscTraces.Ch2 = Obj.read(2,point);
             oscTraces.Ch3 = Obj.read(3,point);
             oscTraces.Ch4 = Obj.read(4,point);
+            
+            pltLength = 5000;
+            if length(oscTraces.Ch1.RawData)>pltLength
+                samp = 1:round(length(oscTraces.Ch1.RawData)/pltLength):length(oscTraces.Ch1.RawData);
+                pltX = oscTraces.Ch1.XData(samp);
+                pltCh1 = oscTraces.Ch1.YData(samp);
+                pltCh2 = oscTraces.Ch2.YData(samp);
+                pltCh3 = oscTraces.Ch3.YData(samp);
+                pltCh4 = oscTraces.Ch4.YData(samp);
+            else
+                pltX = oscTraces.Ch1.XData;
+                pltCh1 = oscTraces.Ch1.YData;
+                pltCh2 = oscTraces.Ch2.YData;
+                pltCh3 = oscTraces.Ch3.YData;
+                pltCh4 = oscTraces.Ch4.YData;
+            end
+            figure
+            hold on
+            plot(pltX, pltCh1,'Displayname','Ch1')
+            plot(pltX, pltCh2,'Displayname','Ch2')
+            plot(pltX, pltCh3,'Displayname','Ch3')
+            plot(pltX, pltCh4,'Displayname','Ch4')
+            legend('location','best')
+            hold off
         end
         
         function saveall(Obj, filename)
             oscTraces = Obj.readall;
-            save(filename, oscTraces);
+            title( sprintf('OSC saved as: %s',filename) ,'Interpreter','none');
+            
+            filename = char(filename);
+            if strcmpi(filename(end-3:end), '.mat')
+                filename = filename(1:end-4);
+            end
+            dir = fileparts(filename);
+            if ~isfolder(dir)
+                warning('Folder does not exist, new folder created.')
+                mkdir(dir)
+            end
+            
+            if exist([filename,'.mat'],'file')
+                warning('File already exists!')
+    %             if ~overwrite
+                    movefile([filename,'.mat'],[filename,'_',char(datetime('now','Format','yyMMdd_HHmmss')),'_bak.mat']);
+                    warning('Old file was renamed!')
+    %             end
+            end
+            
+            save(strcat(filename, '.mat'), 'oscTraces');
+            fprintf('Infiniium OSC: All traces saved to file %s\n',strcat(filename, '.mat'))
         end
         
         function [XData,YreturnData] = readmultipletrace(Obj,channel,point)

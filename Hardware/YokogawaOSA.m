@@ -88,6 +88,9 @@ classdef YokogawaOSA < handle
         %% Trace operations
         function writeTrace(obj,trace)
             if any( strcmpi(trace,["A","B","C","D","E","F","G"] ) ==1 )
+                if strcmpi(trace,'A')
+                    error("OSA: DO NOT write trace A before DTRA review. Zhiquan will use that trace on 10-23-2021.")
+                end
                 tt = strcat("TRAC:ATTR:TR",upper(trace)," WRIT");
                 fprintf("OSA: Trace %s is being written.\n",upper(trace))
                 obj.Write(tt)
@@ -376,6 +379,13 @@ classdef YokogawaOSA < handle
                 plot(OSAWavelength, OSAPower)
                 ylim([-120 0])
         end
+        
+        function saveTrace2OSA(obj,strTraceName,fileName)
+            tt = strcat(":MMEMory:STORe:TRACe TR",strTraceName,',CSV,"',fileName,'",EXT');
+%             display(tt)
+            obj.Write(tt)
+        end
+        
         
         function Initiate(obj,strCommand)
             % strCommand='SINGLE' (default),"REPEAT','STOP'

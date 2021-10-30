@@ -650,12 +650,7 @@ classdef FinisarWaveshaper < handle
             catch % If the directory is not found
                  % TODO:Maodong: Add ws_api.h folder directory!
                 this_class_folder = fileparts(mfilename('fullpath'));
-                folder_to_go = strcat(this_class_folder,'\Finisar\WaveManager\waveshaper\api');
-                folder_current = cd(folder_to_go);
-                if ~(libisloaded('wslib'))
-                    loadlibrary('wsapi','include/ws_api.h','alias','wslib');
-                end
-                cd(folder_current);
+                folder_to_go = strcat()
             end
 
             %Create the WaveShaper device
