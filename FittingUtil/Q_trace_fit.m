@@ -245,7 +245,9 @@ classdef Q_trace_fit
                         g2estimate=max([(max(peakrange)-min(peakrange))^2/4-linewidth^2,0]);
                         peakdirection=sign(max(peakrange)+min(peakrange)-length(trace_Q_tofit));
                         Q_fit=fit((peakstart-peakpos:peakend-peakpos).', trace_Q_tofit, fit_Lorentz_split, ...
-                            'StartPoint', [Q_fit.A, kappa-kappa0, abs(Q_fit.LS), Q_fit.x0+peakdirection*sqrt(g2estimate), g2estimate]); % split fit, {'A','kin','LS','x0','g2'}
+                            'StartPoint', [Q_fit.A, real(kappa-kappa0), abs(Q_fit.LS), Q_fit.x0+peakdirection*sqrt(g2estimate), g2estimate]); % split fit, {'A','kin','LS','x0','g2'}
+%                         Q_fit=fit((peakstart-peakpos:peakend-peakpos).', trace_Q_tofit, fit_Lorentz_split, ...
+%                             'StartPoint', [0.013, kappa/2, kappa/2, Q_fit.x0+peakdirection*sqrt(g2estimate), g2estimate]); % split fit, {'A','kin','LS','x0','g2'}
                         kappa=2*abs(Q_fit.LS);
                         kappa0=2*abs(Q_fit.LS)-Q_fit.kin;
                     end
