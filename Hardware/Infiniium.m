@@ -252,7 +252,7 @@ classdef Infiniium < handle
             chan=['CHAN',num2str(channel)];
             if nargin == 3
                 if ~isempty(point)
-                    Obj.InputBufferSize = point*2.1*1 ;
+                    Obj.InputBufferSize = point*2.1*5 ;
                     Obj.wait;
                 else
                     Obj.InputBufferSize = 4e5*2.1*10 ; 
@@ -297,7 +297,9 @@ classdef Infiniium < handle
             if Obj.OldVer
                 fprintf('Reading Channel%d...\n',channel);
             end
+            
             waveform.RawData = binblockread(Obj.visaObj,'int16'); fread(Obj.visaObj,1);
+            
             Obj.Write(':ACQ:INT ON');
             Obj.checkerror;
             
@@ -347,6 +349,37 @@ classdef Infiniium < handle
             YData = waveform.YData;
         end
         
+        function oscTraces = readTraces(Obj,channels,point)
+            % Modified from readall method, change them into eval function
+            if nargin == 2
+                point = Obj.srate * Obj.tspan * 1.05;
+            end
+            for cc = channels
+                eval(strcat("oscTraces.Ch",num2str(cc,'%.0f')," = Obj.read(",num2str(cc,'%.0f'),",point);"));
+                data_len = length(eval(strcat("oscTraces.Ch",num2str(cc,'%.0f'),".RawData")) );
+            end
+            pltLength = 5000;
+            if data_len > pltLength
+                samp = 1:round(data_len/pltLength):data_len;
+                for cc = channels
+                    eval(strcat("pltX = oscTraces.Ch",num2str(cc,'%.0f'),".XData(samp);"))
+                    eval(strcat("pltCh",num2str(cc,'%.0f')," = oscTraces.Ch",num2str(cc,'%.0f'),".YData(samp);"))
+                end
+            else
+                for cc = channels
+                    eval(strcat("pltX = oscTraces.Ch",num2str(cc,'%.0f'),".XData;"))
+                    eval(strcat("pltCh",num2str(cc,'%.0f')," = oscTraces.Ch",num2str(cc,'%.0f'),".YData;"))
+                end
+            end
+            %figure
+            hold on
+            for cc = channels
+                eval(strcat("plot(pltX, pltCh",num2str(cc,'%.0f'),",'Displayname','Ch ",num2str(cc,'%.0f')," ')"));
+            end
+            legend('location','best')
+            hold off
+        end
+        
         function oscTraces = readall(Obj,point)
             if nargin == 1
                 point = Obj.srate * Obj.tspan * 1.05;
@@ -381,7 +414,33 @@ classdef Infiniium < handle
             hold off
         end
         
-        function saveall(Obj, filename)
+        function oscTraces = saveTraces(Obj,channels, filename)
+            oscTraces = Obj.readTraces(channels,20e6);
+            title( sprintf('OSC saved as: %s',filename) ,'Interpreter','none');
+            
+            filename = char(filename);
+            if strcmpi(filename(end-3:end), '.mat')
+                filename = filename(1:end-4);
+            end
+            dir = fileparts(filename);
+            if ~isfolder(dir)
+                warning('Folder does not exist, new folder created.')
+                mkdir(dir)
+            end
+            
+            if exist([filename,'.mat'],'file')
+                warning('File already exists!')
+    %             if ~overwrite
+                    movefile([filename,'.mat'],[filename,'_',char(datetime('now','Format','yyMMdd_HHmmss')),'_bak.mat']);
+                    warning('Old file was renamed!')
+    %             end
+            end
+            
+            save(strcat(filename, '.mat'), 'oscTraces');
+            fprintf('Infiniium OSC: All traces saved to file %s\n',strcat(filename, '.mat'))
+        end
+        
+        function oscTraces = saveall(Obj, filename)
             oscTraces = Obj.readall;
             title( sprintf('OSC saved as: %s',filename) ,'Interpreter','none');
             

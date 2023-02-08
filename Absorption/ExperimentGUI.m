@@ -524,7 +524,8 @@ switch handles.Method.Value
 %                 end
 %             end
             disp(['wavelength ', num2str(lambda(idx)), ' nm in progress...'])
-            ReadTrace(filename,Device.osc,point,Config.trans_ch,Config.mzi_ch,0,str2double(handles.edit34.String) );
+%             ReadTrace(filename,Device.osc,point,Config.trans_ch,Config.mzi_ch,0,str2double(handles.edit34.String) );
+            ReadTrace(filename,Device.osc,point,Config.trans_ch,Config.mzi_ch,0,0);
             Device.osc.Run;
             Device.osc.HighRes;
             load([filename,'.mat'],'data_matrix','-mat');

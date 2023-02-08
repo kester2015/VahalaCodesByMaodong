@@ -1,3 +1,4 @@
+
 classdef YokogawaOSA < handle
     properties
         visaResourceString;
@@ -42,7 +43,7 @@ classdef YokogawaOSA < handle
             if nargin>0
                 obj.visaResourceString = visaResourceString;
             else
-                obj.visaResourceString = "GPIB1::1::INSTR";
+                obj.visaResourceString = "GPIB0::1::INSTR";
             end
             obj.visaObj=visa('ni',obj.visaResourceString);
             obj.visaObj.Timeout=30;
@@ -88,9 +89,6 @@ classdef YokogawaOSA < handle
         %% Trace operations
         function writeTrace(obj,trace)
             if any( strcmpi(trace,["A","B","C","D","E","F","G"] ) ==1 )
-                if strcmpi(trace,'A')
-                    error("OSA: DO NOT write trace A before DTRA review. Zhiquan will use that trace on 10-23-2021.")
-                end
                 tt = strcat("TRAC:ATTR:TR",upper(trace)," WRIT");
                 fprintf("OSA: Trace %s is being written.\n",upper(trace))
                 obj.Write(tt)
@@ -353,7 +351,7 @@ classdef YokogawaOSA < handle
             end
         end
         
-        function saveTrace(obj,strTraceName,filename)
+        function [OSAWavelength, OSAPower] = saveTrace(obj,strTraceName,filename)
             filename = char(filename);
             if strcmpi(filename(end-3:end), '.mat')
                 filename = filename(1:end-4);

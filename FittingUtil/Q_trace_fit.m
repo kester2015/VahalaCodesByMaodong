@@ -1,5 +1,6 @@
 % Class Q_trace_fit, for fitting Qs from oscilloscope traces
-% 
+% 533.33us
+%
 % Usage:
 % Q_obj=Q_trace_fit(trace_Q,trace_MZI,MZI_FSR,lambda,...
 %   threshold,corr_type,cutoff_freq)
@@ -415,7 +416,7 @@ classdef Q_trace_fit
                 plot((1:Q_obj.trace_length)/Q_obj.modeFitMZI_T(1)*Q_obj.MZI_FSR,Q_obj.trace_Q);
                 text_Q=text([Q_obj.modePos/Q_obj.modeFitMZI_T(1)*Q_obj.MZI_FSR;Q_obj.modePos/Q_obj.modeFitMZI_T(1)*Q_obj.MZI_FSR],...
                     [Q_obj.modeBaseline.*(Q_obj.modeTransmission-0.02);Q_obj.modeBaseline.*(Q_obj.modeTransmission-0.07)],...
-                    num2str([Q_obj.modeQ0;Q_obj.modeQ1],'%.4g'),...
+                    num2str([Q_obj.modeQ0;Q_obj.modeQ1;Q_obj.modeQL],'%.4g'),...
                     'HorizontalAlignment','center');
                 set(text_Q(1),'Color','red');
             end

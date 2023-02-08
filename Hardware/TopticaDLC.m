@@ -3,7 +3,7 @@ classdef TopticaDLC < handle
     properties
         %visa
         SerialObj
-        USBAddress = 'COM18'
+        USBAddress = 'COM27'
     end
     
     properties (Dependent = true)

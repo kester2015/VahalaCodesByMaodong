@@ -498,9 +498,9 @@ if strcmp(handles.data_status.String,'Data loaded')
         trace_MS_baseline(index)=max([trace_MS_baseline(index) trace_MS_baseline(index+1)*(1-10/trace_length)]);
     end
     trace_MS=trace_MS_raw./trace_MS_baseline;
-    trace_MS=sgolayfilt(trace_MS,2,51);
+    trace_MS=sgolayfilt(trace_MS,2,11);
     trace_MZI=(trace_MZI_raw./sgolayfilt(trace_MZI_raw,1,1001))/2;
-    trace_MZI=sgolayfilt(trace_MZI,2,51);
+    trace_MZI=sgolayfilt(trace_MZI,2,11);
     
     % MZI processing
     threshold_MZI=0.5-(quantile(trace_MZI,0.99)-quantile(trace_MZI,0.01))/4/(10.^(sens_MZI/10));

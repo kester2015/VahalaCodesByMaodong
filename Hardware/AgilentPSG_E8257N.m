@@ -15,7 +15,7 @@ classdef AgilentPSG_E8257N < handle
     methods
         function Obj = AgilentPSG_E8257N(strvisa)
             if nargin == 0
-                strvisa = 'GPIB1::19::INSTR';
+                strvisa = 'GPIB0::19::INSTR';
             end
             Obj.visaObj = visa('AGILENT',strvisa);
             Obj.visaObj.Timeout = 100;
